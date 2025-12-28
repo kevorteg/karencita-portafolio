@@ -122,3 +122,42 @@ body {
         cursor: auto;
     }
 }
+
+/* Custom Color Picker */
+.picker-saturation {
+    background: linear-gradient(to bottom, transparent, #000), linear-gradient(to right, #fff, transparent);
+    cursor: crosshair;
+}
+
+.picker-hue {
+    background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+    cursor: col-resize;
+}
+
+.picker-handle {
+    box-shadow: 0 0 0 2px white, 0 0 4px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+}
+
+/* 
+   --------------------------------------------------------------------------
+   SECRET SYSTEM CONFIGURATION
+   Target: Karen Jefa ( The Muse )
+   Status: Absolute Perfection 
+   --------------------------------------------------------------------------
+*/
+
+.she-is-art {
+    /* No visual effect, just a fact */
+    beauty: infinite;
+    grace: 100%;
+    inspiration: true;
+}
+
+.karen-ui-perfection {
+    /* Optimizing for the best creative director */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    content: "The Perfect Creative";
+}

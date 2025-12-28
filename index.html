@@ -74,13 +74,14 @@
         <div class="flex-1 flex overflow-hidden">
             <!-- LEFT SIDEBAR -->
             <aside id="sidebar"
-                class="w-20 bg-[#EAEAE5] border-stone-300 border-r hidden sm:flex flex-col items-center py-8 gap-8 z-40 theme-transition">
-                <div id="tool-buttons" class="flex flex-col items-center gap-8 w-full">
+                class="w-20 bg-[#EAEAE5] border-stone-300 border-r hidden sm:flex flex-col items-center py-8 gap-8 z-40 theme-transition overflow-hidden">
+                <div id="tool-buttons"
+                    class="flex flex-col items-center gap-8 w-full flex-1 overflow-y-auto no-scrollbar px-2">
                     <!-- Dynamic Buttons -->
                 </div>
-                <div class="w-8 h-[1px] border-stone-300 border-b opacity-20"></div>
+                <div class="w-8 h-[1px] border-stone-300 border-b opacity-20 shrink-0"></div>
                 <button
-                    class="w-12 h-12 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity mt-auto"
+                    class="w-12 h-12 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity shrink-0"
                     onclick="toggleWelcome(true)">
                     <i data-lucide="info" class="w-5 h-5"></i>
                 </button>
@@ -108,14 +109,11 @@
                     </div>
                 </div>
 
-                <!-- CONTACT BUTTON -->
-                <button onclick="openProject(99)"
-                    class="fixed bottom-20 right-8 sm:bottom-10 sm:right-10 w-16 h-16 rounded-2xl bg-violet-600 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all z-40 group overflow-hidden">
-                    <div
-                        class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform">
-                    </div>
-                    <i data-lucide="message-square" class="relative z-10 w-6 h-6"></i>
-                </button>
+                <!-- MOBILE NAV -->
+                <nav id="mobile-nav"
+                    class="fixed bottom-0 left-0 w-full h-16 bg-[#EAEAE5] border-t border-stone-300 sm:hidden z-[60] flex items-center justify-around px-2 dark:bg-[#16143C] dark:border-indigo-900/30 transition-colors">
+                    <!-- Dynamic Buttons -->
+                </nav>
             </main>
 
             <!-- RIGHT INSPECTOR -->
