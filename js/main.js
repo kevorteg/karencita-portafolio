@@ -328,27 +328,24 @@ function renderTabs() {
 let pickerState = { h: 260, s: 100, v: 100, isDraggingSal: false, isDraggingHue: false };
 let pickerListenersAdded = false;
 
+// Flag for GLOBAL listeners only
+let pickerGlobalListenersAttached = false;
+
 function initCustomPicker() {
     const salArea = document.getElementById('picker-sl');
     const hueArea = document.getElementById('picker-hue');
 
-    // Clean up old listeners if needed (simple toggle for now)
-    if (pickerListenersAdded) return;
+    if (!salArea || !hueArea) return;
 
-    // Helper to calculate color from mouse
     const handleMove = (e, type) => {
-        let target = type === 'sl' ? salArea : hueArea;
-        if (!target) {
-            // If dragging outside, we need the reference. 
-            // In a pro implementation we'd store refs. 
-            // For now, re-query is safe enough or we rely on the fact that we passed the target or just look it up.
-            target = document.getElementById(type === 'sl' ? 'picker-sl' : 'picker-hue');
-        }
-        if (!target) return;
+        const rect = (type === 'sl' ? salArea : hueArea).getBoundingClientRect();
 
-        const rect = target.getBoundingClientRect();
-        let x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-        let y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+        // Handle both Mouse and Touch events
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        let x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        let y = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
 
         if (type === 'sl') {
             pickerState.s = x * 100;
@@ -369,71 +366,69 @@ function initCustomPicker() {
         }
 
         const hex = hsvToHex(pickerState.h, pickerState.s, pickerState.v);
-        // Optimization: Don't re-render entire app on every pixel move. 
-        // Just update visual previews and only commit on mouseup? 
-        // User asked for "Live", so let's stick to updateColor but acknowledge performance.
-        // Actually, updateColor re-renders EVERYTHING. That causes the DOM elements to be destroyed
-        // which breaks the drag because 'rect' becomes invalid or the element disappears.
-        // CRITICAL FIX: Update state ONLY here, update visuals MANUALLY here. 
+        // Live Preview only (no heavy commit)
         currentBaseColor = hex;
 
-        // Update Hex Text
+        // Update Text
         const hexDisplay = document.getElementById('picker-hex-display');
-        if (hexDisplay) {
-            hexDisplay.textContent = hex;
-            // Also update input value if exists
-        }
+        if (hexDisplay) hexDisplay.textContent = hex;
 
-        // Update Base Color Preview inside picker
-        // (If we had a dedicated preview div)
-
-        // Update Profile Preview Card (Live)
+        // Update Visuals
         document.querySelectorAll('.live-preview-bg').forEach(el => el.style.backgroundColor = hex);
         document.querySelectorAll('.live-preview-text').forEach(el => {
             el.style.color = hex;
             el.style.borderColor = hex;
         });
-
     };
 
-    const onMouseDownSl = (e) => {
+    // Events Wrappers
+    const onStartSl = (e) => {
         pickerState.isDraggingSal = true;
         handleMove(e, 'sl');
     };
 
-    const onMouseDownHue = (e) => {
+    const onStartHue = (e) => {
         pickerState.isDraggingHue = true;
         handleMove(e, 'hue');
     };
 
-    const onMouseUp = () => {
-        if (pickerState.isDraggingSal || pickerState.isDraggingHue) {
-            pickerState.isDraggingSal = false;
-            pickerState.isDraggingHue = false;
-            // Committing the change to the full app state (re-render harmonies etc)
-            // This prevents "breaking" the drag mid-way.
-            updateColor(currentBaseColor);
-        }
-    };
+    // Always re-attach LOCAL listeners (since elements are new)
+    // Mouse
+    salArea.addEventListener('mousedown', onStartSl);
+    hueArea.addEventListener('mousedown', onStartHue);
+    // Touch
+    salArea.addEventListener('touchstart', (e) => { e.preventDefault(); onStartSl(e); }, { passive: false });
+    hueArea.addEventListener('touchstart', (e) => { e.preventDefault(); onStartHue(e); }, { passive: false });
 
-    const onMouseMove = (e) => {
-        if (pickerState.isDraggingSal) {
-            e.preventDefault(); // Stop text selection
-            handleMove(e, 'sl');
-        }
-        if (pickerState.isDraggingHue) {
-            e.preventDefault();
-            handleMove(e, 'hue');
-        }
-    };
 
-    if (salArea) salArea.addEventListener('mousedown', onMouseDownSl);
-    if (hueArea) hueArea.addEventListener('mousedown', onMouseDownHue);
+    // Attach GLOBAL listeners only ONCE
+    if (!pickerGlobalListenersAttached) {
+        const onEnd = () => {
+            if (pickerState.isDraggingSal || pickerState.isDraggingHue) {
+                pickerState.isDraggingSal = false;
+                pickerState.isDraggingHue = false;
+                updateColor(currentBaseColor); // Commit change
+            }
+        };
 
-    window.addEventListener('mouseup', onMouseUp);
-    window.addEventListener('mousemove', onMouseMove);
+        const onMove = (e) => {
+            if (pickerState.isDraggingSal) {
+                e.preventDefault();
+                handleMove(e, 'sl');
+            }
+            if (pickerState.isDraggingHue) {
+                e.preventDefault();
+                handleMove(e, 'hue');
+            }
+        };
 
-    pickerListenersAdded = true;
+        window.addEventListener('mouseup', onEnd);
+        window.addEventListener('touchend', onEnd);
+        window.addEventListener('mousemove', onMove, { passive: false });
+        window.addEventListener('touchmove', onMove, { passive: false });
+
+        pickerGlobalListenersAttached = true;
+    }
 }
 
 function hsvToHex(h, s, v) {
@@ -965,7 +960,7 @@ function renderWindows() {
             <div 
                 onmousedown="focusProject(${p.id})"
                 style="z-index: ${pos.z}; top: ${pos.top}; left: ${pos.left};"
-                class="fixed w-[90%] sm:w-full sm:max-w-2xl ${themePanel} rounded-[2rem] border ${themeBorder} shadow-[0_30px_90px_rgba(0,0,0,0.25)] overflow-hidden flex flex-col pointer-events-auto theme-transition"
+                class="fixed w-[85%] sm:w-full sm:max-w-2xl ${themePanel} rounded-[2rem] border ${themeBorder} shadow-[0_30px_90px_rgba(0,0,0,0.25)] overflow-hidden flex flex-col pointer-events-auto theme-transition"
                 id="win-${p.id}"
             >
                 <div 
