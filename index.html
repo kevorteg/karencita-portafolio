@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karen: Jefa Creative Lab</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="theme-transition bg-[#F5F5F0] text-stone-800" id="body-main">
+
+    <!-- BOOTING SCREEN -->
+    <div id="booting-screen"
+        class="fixed inset-0 bg-[#F5F5F0] flex flex-col items-center justify-center text-[#16143C] font-mono z-[200]">
+        <div
+            class="w-14 h-14 rounded-xl bg-violet-600 text-white flex items-center justify-center mb-6 animate-pulse shadow-lg shadow-violet-500/20">
+            <span class="text-xl font-bold">KJ</span>
+        </div>
+        <div class="text-[10px] tracking-[0.5em] uppercase opacity-40 mb-4 font-bold text-center px-4">Iniciando Kernel
+            Jefa</div>
+        <div class="w-48 h-1 bg-violet-600/10 rounded-full overflow-hidden">
+            <div class="h-full bg-violet-600 animate-loading"></div>
+        </div>
+    </div>
+
+    <!-- MAIN APP STRUCTURE (Hidden initially) -->
+    <div id="app-container" class="fixed inset-0 flex flex-col overflow-hidden opacity-0 select-none">
+
+        <!-- TOP BAR -->
+        <header id="header"
+            class="h-12 bg-[#EAEAE5] border-stone-300 border-b flex items-center justify-between px-6 z-50 theme-transition">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-7 h-7 rounded-lg bg-violet-600 flex items-center justify-center text-white shadow-sm">
+                        <span class="text-[11px] font-bold">KJ</span>
+                    </div>
+                    <span class="text-xs font-bold uppercase tracking-widest hidden sm:inline">Portafolio Karen:
+                        Jefa</span>
+                    <span class="text-xs font-bold sm:hidden tracking-widest">K:J</span>
+                </div>
+                <nav
+                    class="hidden lg:flex items-center gap-6 text-[10px] uppercase font-bold opacity-30 tracking-widest">
+                    <span class="hover:opacity-100 cursor-pointer transition-opacity">Creative_System</span>
+                    <span class="hover:opacity-100 cursor-pointer transition-opacity"
+                        onclick="toggleWelcome(true)">Acerca de</span>
+                </nav>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-black/5 rounded-full border border-black/5"
+                    id="status-pill">
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span class="text-[9px] font-bold uppercase tracking-widest opacity-60">Jefa Online</span>
+                </div>
+                <button onclick="toggleDarkMode()"
+                    class="w-8 h-8 flex items-center justify-center hover:bg-black/10 rounded-lg transition-colors">
+                    <i data-lucide="moon" id="theme-icon" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 flex overflow-hidden">
+            <!-- LEFT SIDEBAR -->
+            <aside id="sidebar"
+                class="w-20 bg-[#EAEAE5] border-stone-300 border-r hidden sm:flex flex-col items-center py-8 gap-8 z-40 theme-transition">
+                <div id="tool-buttons" class="flex flex-col items-center gap-8 w-full">
+                    <!-- Dynamic Buttons -->
+                </div>
+                <div class="w-8 h-[1px] border-stone-300 border-b opacity-20"></div>
+                <button
+                    class="w-12 h-12 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity mt-auto"
+                    onclick="toggleWelcome(true)">
+                    <i data-lucide="info" class="w-5 h-5"></i>
+                </button>
+            </aside>
+
+            <!-- MAIN CANVAS -->
+            <main class="flex-1 relative overflow-hidden flex flex-col mb-16 sm:mb-0">
+                <!-- TABS BAR -->
+                <div id="tabs-bar"
+                    class="h-11 bg-[#EAEAE5] border-stone-300 border-b flex items-center px-4 gap-1 overflow-x-auto no-scrollbar theme-transition">
+                    <div
+                        class="flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase border-r border-stone-300 opacity-40 whitespace-nowrap tracking-tighter">
+                        <i data-lucide="monitor" class="w-3.5 h-3.5"></i> ESPACIO_DE_TRABAJO
+                    </div>
+                    <div id="active-tabs-container" class="flex h-full">
+                        <!-- Dynamic Tabs -->
+                    </div>
+                </div>
+
+                <!-- CONTENT AREA -->
+                <div id="canvas-content"
+                    class="flex-1 p-6 sm:p-14 overflow-y-auto custom-scrollbar flex flex-col bg-transparent">
+                    <div class="max-w-6xl mx-auto flex-1 w-full pb-20 sm:pb-0" id="main-content-render">
+                        <!-- Content rendered here via JS -->
+                    </div>
+                </div>
+
+                <!-- CONTACT BUTTON -->
+                <button onclick="openProject(99)"
+                    class="fixed bottom-20 right-8 sm:bottom-10 sm:right-10 w-16 h-16 rounded-2xl bg-violet-600 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all z-40 group overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform">
+                    </div>
+                    <i data-lucide="message-square" class="relative z-10 w-6 h-6"></i>
+                </button>
+            </main>
+
+            <!-- RIGHT INSPECTOR -->
+            <aside id="inspector"
+                class="w-80 bg-[#EAEAE5] border-stone-300 border-l hidden xl:flex flex-col z-40 overflow-y-auto custom-scrollbar theme-transition">
+                <div class="p-8 border-b border-stone-300">
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-8">Propiedades Perfil
+                    </h3>
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-center text-[12px] font-bold">
+                            <span class="opacity-40 uppercase text-[9px]">Liderazgo</span>
+                            <span class="tracking-tight">Jefa Creativa</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[12px] font-bold">
+                            <span class="opacity-40 uppercase text-[9px]">Modalidad</span>
+                            <span class="tracking-tight">Global / Remoto</span>
+                        </div>
+                        <div
+                            class="flex justify-between items-center p-4 rounded-2xl bg-green-500/5 border border-green-500/10">
+                            <span class="text-[9px] opacity-40 uppercase font-bold">Status</span>
+                            <span
+                                class="text-[10px] text-green-600 font-black uppercase tracking-widest flex items-center gap-2">
+                                <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div> Online
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-8 border-b border-stone-300">
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-8">Habilidades_Core</h3>
+                    <div class="space-y-6">
+                        <div class="space-y-4">
+                            <span class="text-[10px] font-bold opacity-30 uppercase">Creativas</span>
+                            <div class="skill-item" data-label="Dirección Creativa" data-level="95"></div>
+                            <div class="skill-item" data-label="Storytelling" data-level="90"></div>
+                        </div>
+                        <div class="space-y-4 pt-4">
+                            <span class="text-[10px] font-bold opacity-30 uppercase">Profesionales</span>
+                            <div class="skill-item" data-label="Gestión Proyectos" data-level="92"></div>
+                            <div class="skill-item" data-label="Trabajo Colaborativo" data-level="95"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-8">
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-8">Testimonios_Log</h3>
+                    <div class="space-y-4">
+                        <div class="testimonial-card"
+                            data-quote="Tiene una visión estratégica clara y una sensibilidad estética que aporta mucho valor.">
+                        </div>
+                        <div class="testimonial-card"
+                            data-quote="Destaca por su creatividad, compromiso y atención al detalle."></div>
+                    </div>
+                </div>
+
+                <div class="mt-auto p-8 bg-violet-600/5">
+                    <div class="flex items-center gap-3 mb-4">
+                        <i data-lucide="graduation-cap" class="text-violet-600 w-4 h-4"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Educación_Layer</span>
+                    </div>
+                    <p class="text-[11px] leading-relaxed opacity-50 font-medium italic">
+                        “Formación académica y autodidacta en diseño, publicidad y marketing.”
+                    </p>
+                </div>
+            </aside>
+        </div>
+
+        <!-- PROJECT WINDOWS CONTAINER -->
+        <div id="windows-layer" class="pointer-events-none fixed inset-0 z-[100]"></div>
+
+        <!-- WELCOME MODAL -->
+        <div id="welcome-modal"
+            class="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-black/50 backdrop-blur-sm hidden">
+            <div class="w-full max-w-2xl bg-white rounded-[2rem] border border-stone-300 shadow-2xl overflow-hidden animate-pop relative theme-transition"
+                id="modal-panel">
+                <div class="h-11 bg-[#EAEAE5] flex items-center justify-between px-6 border-b border-stone-300">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="monitor" class="w-3 h-3 opacity-30"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">Intro_Protocol</span>
+                    </div>
+                    <button onclick="toggleWelcome(false)"
+                        class="hover:text-red-500 transition-colors p-1 flex items-center justify-center">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div class="p-12 flex flex-col items-center text-center">
+                    <div
+                        class="w-18 h-18 rounded-2xl bg-violet-600 text-white flex items-center justify-center mb-10 shadow-xl shadow-violet-600/30 p-4">
+                        <i data-lucide="sparkles" class="w-10 h-10"></i>
+                    </div>
+                    <h2 class="text-4xl sm:text-5xl font-serif italic mb-8 leading-tight">Diseñar es
+                        pensar,<br />comunicar es conectar</h2>
+                    <p class="text-[15px] opacity-60 leading-relaxed mb-10 max-w-md font-medium">
+                        Soy una creativa multidisciplinar enfocada en transformar ideas en experiencias visuales y
+                        estratégicas.
+                    </p>
+                    <button onclick="toggleWelcome(false)"
+                        class="px-14 py-4 bg-violet-600 text-white rounded-full font-bold uppercase text-[11px] tracking-widest hover:bg-violet-700 hover:scale-105 active:scale-95 transition-all shadow-lg">
+                        Acceder al Sistema
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Logic -->
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>
