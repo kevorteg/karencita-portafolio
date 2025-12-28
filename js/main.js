@@ -1,10 +1,16 @@
 import { tools, projects } from './data.js';
+import { hexToHSL, hslToHex, getContrast, generateProPalettes } from './color-studio.js';
 
 // --- STATE ---
 let activeTool = 'about';
 let isDarkMode = false;
 let openProjects = [];
 let focusedProject = null;
+let currentBaseColor = '#7c3aed';
+let zIndexCounter = 200;
+let isDragging = false;
+let currentTarget = null;
+let startX, startY, initialLeft, initialTop;
 
 // --- INIT ---
 window.onload = () => {
@@ -22,37 +28,55 @@ window.onload = () => {
     }, 1200);
 };
 
+// --- CURSOR LOGIC ---
+const dot = document.getElementById('cursor-dot');
+const outline = document.getElementById('cursor-outline');
+
+window.addEventListener('mousemove', (e) => {
+    gsap.to(dot, { x: e.clientX, y: e.clientY, duration: 0.1 });
+    gsap.to(outline, { x: e.clientX - 15, y: e.clientY - 15, duration: 0.25 });
+    const isClickable = e.target.closest('button') || e.target.closest('a') || e.target.closest('.cursor-pointer') || e.target.closest('input') || e.target.closest('.window-header');
+    if (isClickable) {
+        outline.style.transform = 'scale(1.5)';
+        outline.style.borderColor = '#7c3aed';
+        dot.style.transform = 'scale(0.5)';
+    } else {
+        outline.style.transform = 'scale(1)';
+        outline.style.borderColor = 'rgba(124, 58, 237, 0.5)';
+        dot.style.transform = 'scale(1)';
+    }
+});
+
 // --- ACTIONS ---
 window.toggleDarkMode = function () {
     isDarkMode = !isDarkMode;
     const body = document.getElementById('body-main');
-    const header = document.getElementById('header');
-    const sidebar = document.getElementById('sidebar');
-    const tabsBar = document.getElementById('tabs-bar');
-    const inspector = document.getElementById('inspector');
-    const modal = document.getElementById('modal-panel');
-    const themeIcon = document.getElementById('theme-icon');
+    const elements = [
+        document.getElementById('header'),
+        document.getElementById('sidebar'),
+        document.getElementById('tabs-bar'),
+        document.getElementById('inspector'),
+        document.getElementById('modal-panel'),
+        document.getElementById('modal-header')
+    ];
 
     if (isDarkMode) {
         body.classList.replace('bg-[#F5F5F0]', 'bg-[#1A1844]');
         body.classList.replace('text-stone-800', 'text-stone-200');
-        [header, sidebar, tabsBar, inspector].forEach(el => el.classList.replace('bg-[#EAEAE5]', 'bg-[#16143C]'));
-        [header, sidebar, tabsBar, inspector].forEach(el => el.classList.replace('border-stone-300', 'border-indigo-900/30'));
-        modal.classList.replace('bg-white', 'bg-[#1D1B4B]');
-        modal.classList.replace('border-stone-300', 'border-indigo-900/30');
-        themeIcon.setAttribute('data-lucide', 'sun');
+        elements.forEach(el => el && el.classList.replace('bg-[#EAEAE5]', 'bg-[#16143C]'));
+        elements.forEach(el => el && el.classList.replace('border-stone-300', 'border-indigo-900/30'));
+        document.getElementById('theme-icon').setAttribute('data-lucide', 'sun');
     } else {
         body.classList.replace('bg-[#1A1844]', 'bg-[#F5F5F0]');
         body.classList.replace('text-stone-200', 'text-stone-800');
-        [header, sidebar, tabsBar, inspector].forEach(el => el.classList.replace('bg-[#16143C]', 'bg-[#EAEAE5]'));
-        [header, sidebar, tabsBar, inspector].forEach(el => el.classList.replace('border-indigo-900/30', 'border-stone-300'));
-        modal.classList.replace('bg-[#1D1B4B]', 'bg-white');
-        modal.classList.replace('border-indigo-900/30', 'border-stone-300');
-        themeIcon.setAttribute('data-lucide', 'moon');
+        elements.forEach(el => el && el.classList.replace('bg-[#16143C]', 'bg-[#EAEAE5]'));
+        elements.forEach(el => el && el.classList.replace('border-indigo-900/30', 'border-stone-300'));
+        document.getElementById('theme-icon').setAttribute('data-lucide', 'moon');
     }
 
     lucide.createIcons();
-    renderContent(); // Re-render content to apply theme classes
+    renderContent();
+    renderWindows();
 };
 
 window.setActiveTool = function (id) {
@@ -77,9 +101,7 @@ window.openProject = function (id) {
     if (!openProjects.find(p => p.id === id)) {
         openProjects.push(project);
     }
-    focusedProject = id;
-    renderTabs();
-    renderWindows();
+    focusProject(id);
 };
 
 window.closeProject = function (id) {
@@ -91,8 +113,55 @@ window.closeProject = function (id) {
 
 window.focusProject = function (id) {
     focusedProject = id;
+    zIndexCounter++;
+    const win = document.getElementById(`win-${id}`);
+    if (win) {
+        win.style.zIndex = zIndexCounter;
+    }
     renderTabs();
     renderWindows();
+};
+
+window.initDrag = function (e, id) {
+    // Check if the interaction is on a button (like the close button)
+    if (e.target.closest('button')) return;
+
+    isDragging = true;
+    currentTarget = document.getElementById(`win-${id}`);
+    startX = e.clientX;
+    startY = e.clientY;
+
+    // Get current calculated position
+    const rect = currentTarget.getBoundingClientRect();
+    initialLeft = rect.left;
+    initialTop = rect.top;
+
+    // Reset any percentage-based positioning to pixels for smooth dragging
+    currentTarget.style.left = `${initialLeft}px`;
+    currentTarget.style.top = `${initialTop}px`;
+    currentTarget.style.transform = 'none';
+
+    document.addEventListener('mousemove', handleDrag);
+    document.addEventListener('mouseup', stopDrag);
+};
+
+function handleDrag(e) {
+    if (!isDragging || !currentTarget) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    currentTarget.style.left = `${initialLeft + dx}px`;
+    currentTarget.style.top = `${initialTop + dy}px`;
+}
+
+function stopDrag() {
+    isDragging = false;
+    document.removeEventListener('mousemove', handleDrag);
+    document.removeEventListener('mouseup', stopDrag);
+}
+
+window.updateColor = function (hex) {
+    currentBaseColor = hex;
+    renderContent();
 };
 
 // --- RENDERING ---
@@ -119,11 +188,12 @@ function renderTabs() {
 
     container.innerHTML = openProjects.map(p => `
         <div 
-            onclick="focusProject(${p.id})"
+            onmousedown="focusProject(${p.id})"
             class="h-full flex items-center gap-3 px-5 cursor-pointer transition-colors border-r ${themeBorder} ${focusedProject === p.id ? themePanel : 'opacity-40 hover:opacity-80'} whitespace-nowrap"
         >
             <span class="text-[10px] font-bold uppercase tracking-tight">${p.title}</span>
             <button 
+                onmousedown="event.stopPropagation();"
                 onclick="event.stopPropagation(); closeProject(${p.id});"
                 class="p-1 hover:bg-red-500 hover:text-white rounded-md transition-all flex items-center justify-center"
             >
@@ -139,89 +209,169 @@ function renderContent() {
     const tool = tools.find(t => t.id === activeTool);
     const themePanel = isDarkMode ? 'bg-[#1D1B4B]' : 'bg-white';
     const themeBorder = isDarkMode ? 'border-indigo-900/30' : 'border-stone-300';
+    const themeTextSub = isDarkMode ? 'text-stone-400' : 'text-stone-500';
 
     let html = `
-        <div class="mb-14">
+        <div class="mb-14 fade-in">
             <div class="flex items-center gap-2 text-[10px] font-bold text-violet-600 mb-3 tracking-[0.4em] uppercase">
                 <i data-lucide="chevron-right" class="w-3 h-3"></i> ${tool.role}
             </div>
-            <h2 class="text-4xl sm:text-7xl font-serif italic mb-8 leading-none">${tool.label}</h2>
-            <div class="max-w-3xl border-l-4 border-violet-600 pl-8 py-2">
-                ${activeTool === 'about' ? `
-                    <p class="text-2xl italic opacity-90 leading-relaxed font-serif mb-6">${tool.title}</p>
-                    <p class="text-sm opacity-60 leading-relaxed font-medium mb-4">${tool.content}</p>
-                    <p class="text-sm opacity-60 leading-relaxed font-medium">${tool.extra}</p>
-                ` : `
-                    <p class="text-xl italic opacity-80 leading-relaxed font-serif">${tool.desc}</p>
-                    <p class="text-sm opacity-50 mt-4 leading-relaxed font-medium">${tool.manifesto}</p>
-                `}
-            </div>
-        </div>
-    `;
+            <h2 class="text-4xl sm:text-6xl font-serif italic mb-8 leading-none">${tool.label}</h2>
+            
+            ${activeTool === 'about' ? `
+                <div class="max-w-4xl border-l-4 border-violet-600 pl-8 py-2 mb-16">
+                    ${tool.intro.map(p => `<p class="text-lg sm:text-xl font-serif leading-relaxed mb-6 opacity-90">${p}</p>`).join('')}
+                </div>
 
-    if (activeTool === 'about') {
-        html += `
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24">
-                <div class="${themePanel} rounded-[2.5rem] p-10 border ${themeBorder} shadow-sm theme-transition">
-                    <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-violet-600 mb-8 border-b pb-4">Protocolos_Acción</h3>
-                    <div class="space-y-8">
-                        <div class="text-left group cursor-default">
-                            <h4 class="text-[11px] font-black uppercase tracking-wider mb-2 flex items-center gap-2 group-hover:text-violet-600 transition-colors">
-                                <i data-lucide="zap" class="w-2.5 h-2.5 fill-current"></i> Diseño Gráfico
-                            </h4>
-                            <p class="text-[13px] opacity-60 leading-relaxed">Identidades visuales y piezas que reflejan la esencia de cada marca, manteniendo coherencia estética y funcional.</p>
+                <!-- QUÉ HAGO -->
+                <div class="mb-20">
+                    <h3 class="text-xs font-black uppercase tracking-[0.3em] text-violet-600 mb-8 border-b ${themeBorder} pb-4">Qué_Hago</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        ${tool.whatIDo.map(item => `
+                            <div class="${themePanel} p-8 rounded-3xl border ${themeBorder} shadow-sm hover:shadow-md transition-all">
+                                <h4 class="font-bold text-lg mb-3 font-serif italic">${item.title}</h4>
+                                <p class="text-sm ${themeTextSub} leading-relaxed font-medium">${item.desc}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- HABILIDADES & PROCESO -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
+                    <!-- Skills -->
+                    <div class="lg:col-span-7">
+                        <h3 class="text-xs font-black uppercase tracking-[0.3em] text-violet-600 mb-8 border-b ${themeBorder} pb-4">Habilidades_Core</h3>
+                        <div class="grid grid-cols-2 gap-8">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold opacity-40 mb-4 block tracking-widest">Creativas</span>
+                                <ul class="space-y-3">
+                                    ${tool.skills.creative.map(s => `<li class="text-xs font-bold flex items-center gap-2"><div class="w-1 h-1 bg-violet-600 rounded-full"></div> ${s}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold opacity-40 mb-4 block tracking-widest">Técnicas_&_Pro</span>
+                                <ul class="space-y-3">
+                                    ${[...tool.skills.technical, ...tool.skills.professional].map(s => `<li class="text-xs font-bold flex items-center gap-2"><div class="w-1 h-1 bg-stone-400 rounded-full"></div> ${s}</li>`).join('')}
+                                </ul>
+                            </div>
                         </div>
-                        <div class="text-left group cursor-default">
-                            <h4 class="text-[11px] font-black uppercase tracking-wider mb-2 flex items-center gap-2 group-hover:text-violet-600 transition-colors">
-                                <i data-lucide="zap" class="w-2.5 h-2.5 fill-current"></i> Publicidad
-                            </h4>
-                            <p class="text-[13px] opacity-60 leading-relaxed">Conceptos claros y creativos, enfocados en comunicar mensajes relevantes y conectar de manera auténtica.</p>
-                        </div>
-                        <div class="text-left group cursor-default">
-                            <h4 class="text-[11px] font-black uppercase tracking-wider mb-2 flex items-center gap-2 group-hover:text-violet-600 transition-colors">
-                                <i data-lucide="zap" class="w-2.5 h-2.5 fill-current"></i> Marketing
-                            </h4>
-                            <p class="text-[13px] opacity-60 leading-relaxed">Estrategias basadas en análisis, objetivos y público, buscando que cada acción genere impacto real.</p>
+                    </div>
+
+                    <!-- Process -->
+                    <div class="lg:col-span-5">
+                        <h3 class="text-xs font-black uppercase tracking-[0.3em] text-violet-600 mb-8 border-b ${themeBorder} pb-4">Proceso_Creativo</h3>
+                        <div class="${themePanel} p-8 rounded-[2rem] border ${themeBorder}">
+                            <ul class="space-y-6 relative">
+                                <div class="absolute left-[7px] top-2 bottom-2 w-[1px] bg-stone-200 dark:bg-stone-800"></div>
+                                ${tool.process.map((step, i) => `
+                                    <li class="relative pl-8">
+                                        <div class="absolute left-0 top-1.5 w-3.5 h-3.5 bg-violet-600 rounded-full border-4 border-white dark:border-[#1D1B4B]"></div>
+                                        <span class="text-[10px] font-bold opacity-30 uppercase tracking-widest mb-1 block">Fase 0${i + 1}</span>
+                                        <span class="text-sm font-bold">${step}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col gap-8">
-                    <div class="${themePanel} rounded-[2.5rem] p-10 border ${themeBorder} shadow-sm flex-1 theme-transition">
-                        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-violet-600 mb-8 border-b pb-4">Proceso_Estructurado</h3>
-                        <div class="space-y-4">
-                            <div class="flex gap-4 items-start text-left">
-                                <span class="text-[10px] font-black text-violet-600 pt-1 font-mono">01</span>
-                                <p class="text-[13px] opacity-70 leading-relaxed font-medium">Investigación y análisis.</p>
+                
+                <!-- CONTACT & EDUCATION -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+                     <div class="${themePanel} p-8 rounded-[2rem] border ${themeBorder}">
+                        <h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-6">Educación</h3>
+                        <p class="text-sm leading-relaxed font-medium opacity-80">${tool.education}</p>
+                     </div>
+                     <div class="bg-violet-600 text-white p-8 rounded-[2rem] shadow-xl shadow-violet-600/20">
+                        <h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 mb-6">Status</h3>
+                        <p class="text-lg font-serif italic mb-6">${tool.contact.text}</p>
+                        <ul class="space-y-2">
+                             ${tool.contact.availability.map(item => `<li class="text-xs font-bold flex items-center gap-2 opacity-80"><i data-lucide="check" class="w-3 h-3"></i> ${item}</li>`).join('')}
+                        </ul>
+                     </div>
+                </div>
+
+            ` : `
+                <div class="max-w-3xl border-l-4 border-violet-600 pl-8 py-2">
+                    <p class="text-2xl italic opacity-90 leading-relaxed font-serif mb-6">${tool.desc}</p>
+                    <p class="text-sm opacity-50 mt-4 leading-relaxed font-medium">${tool.manifesto}</p>
+                </div>
+            `}
+            
+        </div>
+    `;
+
+    if (activeTool === 'color') {
+        const palettes = generateProPalettes(currentBaseColor);
+        const hsl = hexToHSL(currentBaseColor);
+        const contrastColor = getContrast(currentBaseColor);
+
+        html += `
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-24 items-start">
+                <!-- Technical Inspector -->
+                <div class="lg:col-span-4 flex flex-col gap-6">
+                    <div class="${themePanel} border ${themeBorder} rounded-[2.5rem] p-10 shadow-sm theme-transition">
+                        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-violet-600 mb-8 border-b pb-4">Base_Data</h3>
+                        <div class="w-full aspect-square rounded-3xl shadow-inner mb-8 flex flex-col items-center justify-center gap-2" style="background-color: ${currentBaseColor}; color: ${contrastColor}">
+                            <span class="text-xl font-mono font-bold uppercase">${currentBaseColor}</span>
+                            <span class="text-[9px] uppercase font-bold tracking-[0.2em] opacity-60">Visualización_Color</span>
+                        </div>
+                        <div class="space-y-6 font-mono">
+                            <div class="flex justify-between items-center text-[10px] border-b ${themeBorder} pb-3">
+                                <span class="opacity-40">RGB</span>
+                                <span class="font-bold uppercase tracking-widest">${parseInt(currentBaseColor.slice(1, 3), 16)}, ${parseInt(currentBaseColor.slice(3, 5), 16)}, ${parseInt(currentBaseColor.slice(5, 7), 16)}</span>
                             </div>
-                            <div class="flex gap-4 items-start text-left">
-                                <span class="text-[10px] font-black text-violet-600 pt-1 font-mono">02</span>
-                                <p class="text-[13px] opacity-70 leading-relaxed font-medium">Conceptualización creativa.</p>
+                            <div class="flex justify-between items-center text-[10px] border-b ${themeBorder} pb-3">
+                                <span class="opacity-40">HSL</span>
+                                <span class="font-bold uppercase tracking-widest">${Math.round(hsl.h)}°, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%</span>
                             </div>
-                            <div class="flex gap-4 items-start text-left">
-                                <span class="text-[10px] font-black text-violet-600 pt-1 font-mono">03</span>
-                                <p class="text-[13px] opacity-70 leading-relaxed font-medium">Desarrollo visual y estratégico.</p>
+                            <div class="flex justify-between items-center text-[10px] border-b ${themeBorder} pb-3">
+                                <span class="opacity-40">Legibilidad</span>
+                                <span class="px-3 py-1 rounded-full text-[8px] font-bold ${contrastColor === 'white' ? 'bg-white text-black' : 'bg-black text-white'}">${contrastColor.toUpperCase()} TEXT</span>
                             </div>
+                            <input type="color" value="${currentBaseColor}" oninput="updateColor(this.value)" class="w-full h-12 rounded-xl bg-transparent border-none cursor-pointer mt-4">
                         </div>
                     </div>
-                    <div class="flex gap-6 h-40">
-                        <div class="${themePanel} flex-1 rounded-3xl p-6 border ${themeBorder} flex flex-col justify-center items-center text-center theme-transition">
-                            <i data-lucide="graduation-cap" class="text-violet-600 mb-3 w-6 h-6"></i>
-                            <span class="text-[9px] font-bold uppercase tracking-widest opacity-40">Educación</span>
-                            <p class="text-[10px] font-bold mt-1">Formación Académica</p>
+                </div>
+
+                <!-- Harmonies Explorer -->
+                <div class="lg:col-span-8 flex flex-col gap-8">
+                    <!-- Harmonies -->
+                    ${Object.entries(palettes).filter(([k]) => k !== 'Shades').map(([name, colors]) => `
+                        <div class="${themePanel} border ${themeBorder} rounded-[2.5rem] p-8 shadow-sm theme-transition">
+                            <div class="flex justify-between items-center mb-6">
+                                <h4 class="text-[9px] font-black uppercase tracking-[0.3em] text-violet-600">${name}_Rule</h4>
+                                <span class="text-[8px] opacity-30 font-bold uppercase">Armonía_Generada</span>
+                            </div>
+                            <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+                                ${colors.map(c => `
+                                    <div class="flex-1 min-w-[60px] group">
+                                        <div onclick="updateColor('${c}')" class="aspect-[4/3] sm:aspect-square rounded-2xl swatch shadow-sm cursor-pointer" style="background-color: ${c}"></div>
+                                        <p class="text-[8px] font-mono mt-3 text-center opacity-40 font-bold uppercase">${c}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
                         </div>
-                        <div class="flex-1 rounded-3xl p-6 bg-violet-600 text-white flex flex-col justify-center items-center text-center">
-                            <i data-lucide="check-circle-2" class="mb-3 w-6 h-6"></i>
-                            <span class="text-[9px] font-bold uppercase tracking-widest opacity-60">Status</span>
-                            <p class="text-[10px] font-bold mt-1 uppercase">Disponible</p>
+                    `).join('')}
+
+                    <!-- Matices / Shades & Tints -->
+                    <div class="${themePanel} border ${themeBorder} rounded-[2.5rem] p-8 shadow-sm theme-transition">
+                        <h4 class="text-[9px] font-black uppercase tracking-[0.3em] text-violet-600 mb-6">Shades_&_Tints</h4>
+                        <div class="flex h-16 rounded-2xl overflow-hidden shadow-sm">
+                            ${palettes.Shades.map(c => `<div onclick="updateColor('${c}')" class="flex-1 cursor-pointer hover:scale-x-110 transition-transform" style="background-color: ${c}" title="${c}"></div>`).join('')}
+                        </div>
+                        <div class="flex justify-between mt-4 text-[8px] font-bold opacity-30 uppercase tracking-widest">
+                            <span>Darken</span>
+                            <span>Escala_Luminosidad</span>
+                            <span>Lighten</span>
                         </div>
                     </div>
                 </div>
             </div>
         `;
-    } else {
+    } else if (activeTool !== 'about' && activeTool !== 'color') {
         html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-24 items-stretch">`;
 
-        projects.filter(p => p.category === activeTool).forEach(p => {
+        projects.filter(p => p.category === activeTool || p.category === 'special').forEach(p => {
             html += `
                 <div 
                     onclick="openProject(${p.id})"
@@ -229,8 +379,7 @@ function renderContent() {
                 >
                     <div class="aspect-[4/3] rounded-[1.5rem] overflow-hidden mb-6 bg-stone-100 relative shadow-inner">
                         <img src="${p.img}" class="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700 scale-105 group-hover:scale-100" alt="${p.title}" />
-                        <div class="absolute inset-0 bg-violet-600/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <div class="absolute top-4 right-4 w-9 h-9 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                         <div class="absolute top-4 right-4 w-9 h-9 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
                             <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-white"></i>
                         </div>
                     </div>
@@ -246,52 +395,8 @@ function renderContent() {
                 </div>
             `;
         });
-
-        html += `
-            <div class="${themePanel} border border-dashed ${themeBorder} rounded-[2.5rem] p-10 flex flex-col justify-between shadow-sm group theme-transition">
-                <div class="flex flex-col gap-6">
-                    <span class="text-[10px] font-bold text-violet-600 uppercase tracking-widest border-b pb-2">Capas de Servicio</span>
-                    <ul class="space-y-4">
-                        ${tool.services ? tool.services.map(s => `
-                            <li class="text-[13px] flex items-center gap-3 font-medium">
-                                <div class="w-1.5 h-1.5 bg-violet-600 rounded-full shrink-0"></div>
-                                ${s}
-                            </li>
-                        `).join('') : ''}
-                    </ul>
-                </div>
-                <div class="mt-12 opacity-10 flex justify-center group-hover:scale-110 transition-transform">
-                    <i data-lucide="${tool.icon}" style="width: 60px; height: 60px;"></i>
-                </div>
-            </div>
-        </div>`;
+        html += `</div>`;
     }
-
-    html += `
-        <footer class="mt-auto pt-20 pb-10 border-t ${themeBorder} flex flex-col sm:flex-row justify-between items-center gap-10">
-            <div class="flex flex-col items-center sm:items-start gap-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-5 h-5 rounded-md bg-violet-600"></div>
-                    <span class="text-[11px] font-black uppercase tracking-[0.2em]">Karen: Jefa Creative Lab</span>
-                </div>
-                <p class="text-[10px] opacity-40 uppercase tracking-widest font-bold">Protocolos Creativos v.2025</p>
-            </div>
-            <div class="hidden xl:block text-[11px] font-serif italic opacity-30 text-center max-w-[200px]">
-                “Crear es unir pensamiento y emoción.”
-            </div>
-            <div class="flex items-center gap-6">
-                <div class="flex gap-4 items-center text-[10px] font-bold opacity-30 uppercase tracking-widest">
-                    <a href="#" class="hover:text-violet-600 transition-colors">LinkedIn</a>
-                    <a href="#" class="hover:text-violet-600 transition-colors">Behance</a>
-                </div>
-                <div class="flex items-center gap-3 text-[10px] font-bold opacity-30 uppercase tracking-widest border-l pl-6">
-                    <span>Hecho con</span>
-                    <i data-lucide="heart" class="w-3.5 h-3.5 text-red-500 fill-current"></i>
-                    <span>by Karen</span>
-                </div>
-            </div>
-        </footer>
-    `;
 
     container.innerHTML = html;
     lucide.createIcons();
@@ -303,32 +408,43 @@ function renderWindows() {
     const themeBorder = isDarkMode ? 'border-indigo-900/30' : 'border-stone-300';
     const themeSidebar = isDarkMode ? 'bg-[#16143C]' : 'bg-[#EAEAE5]';
 
-    container.innerHTML = openProjects.map((p, index) => `
-        <div 
-            onmousedown="focusProject(${p.id})"
-            style="z-index: ${focusedProject === p.id ? 200 : 100 + index}; top: ${12 + (index * 3)}%; left: ${18 + (index * 3)}%;"
-            class="fixed w-full max-w-2xl ${themePanel} rounded-[2rem] border ${themeBorder} shadow-[0_30px_90px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col pointer-events-auto theme-transition"
-            id="win-${p.id}"
-        >
-            <div class="h-11 ${themeSidebar} flex items-center justify-between px-6 cursor-move border-b ${themeBorder} theme-transition">
-                <div class="flex items-center gap-3">
-                    <i data-lucide="image" class="w-3.5 h-3.5 opacity-40"></i>
-                    <span class="text-[11px] font-bold uppercase tracking-widest truncate max-w-[250px]">${p.title}</span>
+    const existingPositions = {};
+    openProjects.forEach(p => {
+        const el = document.getElementById(`win-${p.id}`);
+        if (el) existingPositions[p.id] = { left: el.style.left, top: el.style.top, z: el.style.zIndex };
+    });
+
+    container.innerHTML = openProjects.map((p, index) => {
+        const pos = existingPositions[p.id] || { left: `${18 + (index * 3)}%`, top: `${12 + (index * 3)}%`, z: focusedProject === p.id ? zIndexCounter : 100 + index };
+        return `
+            <div 
+                onmousedown="focusProject(${p.id})"
+                style="z-index: ${pos.z}; top: ${pos.top}; left: ${pos.left};"
+                class="fixed w-full max-w-2xl ${themePanel} rounded-[2rem] border ${themeBorder} shadow-[0_30px_90px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col pointer-events-auto theme-transition"
+                id="win-${p.id}"
+            >
+                <div 
+                    onmousedown="initDrag(event, ${p.id})"
+                    class="h-11 ${themeSidebar} flex items-center justify-between px-6 window-header border-b ${themeBorder} theme-transition"
+                >
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="image" class="w-3.5 h-3.5 opacity-40"></i>
+                        <span class="text-[11px] font-bold uppercase tracking-widest truncate max-w-[250px]">${p.title}</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button 
+                            onmousedown="event.stopPropagation();"
+                            onclick="event.stopPropagation(); closeProject(${p.id});" 
+                            class="text-red-500 hover:bg-red-500 hover:text-white transition-all p-1.5 rounded-lg flex items-center justify-center relative z-50"
+                        >
+                            <i data-lucide="x" class="w-4.5 h-4.5"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <button 
-                        onclick="event.stopPropagation(); closeProject(${p.id});" 
-                        class="text-red-500 hover:bg-red-500 hover:text-white transition-all p-1.5 rounded-lg flex items-center justify-center"
-                    >
-                        <i data-lucide="x" class="w-4.5 h-4.5"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="flex-1 overflow-y-auto max-h-[65vh] p-10 custom-scrollbar text-left">
-                <div class="rounded-[1.5rem] overflow-hidden mb-10 shadow-md h-72">
-                    <img src="${p.img}" class="w-full h-full object-cover" alt="${p.title}" />
-                </div>
-                <div class="max-w-xl">
+                <div class="flex-1 overflow-y-auto max-h-[65vh] p-10 custom-scrollbar text-left">
+                    <div class="rounded-[1.5rem] overflow-hidden mb-10 shadow-md h-72">
+                        <img src="${p.img}" class="w-full h-full object-cover" alt="${p.title}" />
+                    </div>
                     <h3 class="text-5xl font-serif italic mb-6 leading-tight">${p.title}</h3>
                     <p class="text-[15px] leading-relaxed opacity-60 mb-10 font-medium">
                         ${p.description} <br /><br />
@@ -346,12 +462,8 @@ function renderWindows() {
                     `}
                 </div>
             </div>
-            <div class="h-8 ${themeSidebar} border-t ${themeBorder} flex items-center px-6 justify-between text-[9px] font-mono opacity-30 uppercase font-bold theme-transition">
-                <span>Batch_Karen_Jefa</span>
-                <span>Karen_Creative_Suite_v2</span>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
     lucide.createIcons();
 
@@ -369,7 +481,28 @@ function renderWindows() {
 }
 
 function renderInspector() {
-    // Skill Items
+    const aboutTool = tools.find(t => t.id === 'about');
+
+    // Skill items now come from new data or defaults?
+    // Since we moved skills to the main view, I will use this space for mini-stats or a condensed view
+    // For now, let's keep it simple or dynamic based on what we have.
+    // User didn't give numbers, so I'll generate some visual bars just for 'looks' like in the original, or 
+    // maybe just hide it if not relevant. But keeping it alive gives a techy feel.
+    // Let's populate testimonials dynamically from data.js
+
+    // Testimonials
+    const container = document.getElementById('testimonials-container');
+    if (container && aboutTool.testimonials) {
+        container.innerHTML = aboutTool.testimonials.map(quote => `
+            <div class="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 relative shadow-sm text-left italic">
+                <i data-lucide="quote" class="w-3 h-3 text-violet-600 opacity-20 absolute -top-1 -left-1"></i>
+                <p class="text-[10px] leading-relaxed opacity-60 font-medium">“${quote}”</p>
+            </div>
+        `).join('');
+    }
+
+    // Update Skills Visuals (Just for the 'vibe', even if main skills are detailed text now)
+    // We can keep the dummy stats or randomizing them slightly to feel alive
     document.querySelectorAll('.skill-item').forEach(el => {
         const label = el.dataset.label;
         const level = el.dataset.level;
@@ -386,15 +519,5 @@ function renderInspector() {
         `;
     });
 
-    // Testimonials
-    document.querySelectorAll('.testimonial-card').forEach(el => {
-        const quote = el.dataset.quote;
-        el.innerHTML = `
-            <div class="p-4 rounded-2xl bg-black/5 border border-black/5 relative shadow-sm text-left italic">
-                <i data-lucide="quote" class="w-3 h-3 text-violet-600 opacity-20 absolute -top-1 -left-1"></i>
-                <p class="text-[10px] leading-relaxed opacity-60 font-medium">“${quote}”</p>
-            </div>
-        `;
-    });
     lucide.createIcons();
 }
