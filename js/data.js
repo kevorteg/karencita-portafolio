@@ -3,48 +3,52 @@ export const tools = [
         id: 'about',
         icon: 'user-circle',
         label: 'Sobre Mí',
-        role: 'Perfil Jefe / Creativa',
-        title: 'Diseñar es pensar, comunicar es conectar',
+        role: 'Mercadóloga & Directora Creativa',
+        title: 'Estrategia que se ve, creatividad que funciona.',
         intro: [
-            "Soy una creativa multidisciplinar enfocada en transformar ideas en experiencias visuales y estratégicas. Mi trabajo se desarrolla entre el diseño, la publicidad, el marketing y la ilustración, integrando pensamiento creativo con análisis y estrategia.",
-            "Me interesa crear soluciones visuales con intención, que no solo se vean bien, sino que comuniquen con claridad y coherencia. Cada proyecto comienza entendiendo el contexto, el mensaje y las personas a las que va dirigido.",
-            "Trabajo desde una perspectiva artística y estratégica, cuidando cada etapa del proceso creativo, desde la conceptualización hasta la ejecución final."
+            "Hola, soy Karen. Mercadóloga de profesión y creativa de corazón. Me dedico a darle vida a las marcas, uniendo los puntos entre lo que una empresa necesita y lo que la gente quiere ver.",
+            "No creo en hacer cosas solo porque se ven 'bonitas'. Para mí, el diseño y la publicidad tienen que tener un propósito: comunicar, conectar y vender. Me gusta pensar antes de diseñar y analizar antes de proponer.",
+            "Mi trabajo es una mezcla de estrategia y arte. Desde crear una identidad visual desde cero hasta planear una campaña que impacte, me involucro en el proceso para asegurar que el resultado final tenga alma y sentido."
         ],
         whatIDo: [
-            { title: "Diseño gráfico", desc: "Desarrollo identidades visuales y piezas gráficas que reflejan la esencia de cada marca, manteniendo coherencia estética y funcional en todos los formatos." },
-            { title: "Publicidad", desc: "Creo conceptos publicitarios claros y creativos, enfocados en comunicar mensajes relevantes y conectar con el público de manera auténtica." },
-            { title: "Marketing y mercadotecnia", desc: "Trabajo estrategias creativas basadas en análisis, objetivos y público, buscando que cada acción tenga un propósito y genere impacto real." },
-            { title: "Ilustración y arte", desc: "Exploro la ilustración como una herramienta expresiva que complementa proyectos visuales y aporta identidad, emoción y carácter." }
+            { title: "Diseño Gráfico", desc: "Creo marcas que se sienten reales. Logos, identidades y piezas visuales que no solo decoran, sino que construyen la personalidad de tu negocio." },
+            { title: "Publicidad", desc: "Ideas que pegan. Busco el ángulo creativo perfecto para que tu mensaje llegue claro, fuerte y directo a quien le tiene que llegar." },
+            { title: "Marketing", desc: "Estrategia sin humo. Analizo el mercado y defino acciones claras para que tu marca crezca con pasos firmes y objetivos reales." },
+            { title: "Ilustración", desc: "Arte para comunicar. A veces una imagen dice más que mil palabras, y uso la ilustración para darle ese toque único y personal a los proyectos." }
         ],
         skills: {
-            creative: ["Dirección creativa", "Pensamiento conceptual", "Storytelling visual", "Composición y color"],
-            technical: ["Diseño gráfico", "Branding", "Ilustración", "Publicidad", "Marketing estratégico"],
-            professional: ["Organización creativa", "Comunicación visual", "Trabajo colaborativo", "Gestión de proyectos"]
+            creative: ["Dirección de Arte", "Conceptos Creativos", "Narrativa Visual", "Curaduría Estética"],
+            technical: ["Suite Adobe", "Branding Estratégico", "Identidad Corporativa", "Campañas 360", "Redacción Creativa"],
+            professional: ["Visión Estratégica", "Liderazgo de Equipos", "Gestión de Marcas", "Comunicación Asertiva"]
         },
         process: [
-            "Investigación y análisis.",
-            "Conceptualización creativa.",
-            "Desarrollo visual y estratégico.",
-            "Ajustes y refinamiento.",
-            "Entrega final."
+            "Platicar y entender el problema.",
+            "Investigar a fondo el contexto.",
+            "Lluvia de ideas y estrategia.",
+            "Diseño y creación (la magia).",
+            "Refinar y entregar lo mejor."
         ],
-        projectsText: "Cada proyecto representa una combinación de creatividad, estrategia y ejecución. Trabajo con marcas, emprendimientos y proyectos personales, adaptando cada solución a su contexto y necesidades.",
-        education: "Formación académica y autodidacta en diseño, publicidad y marketing, complementada con aprendizaje continuo y práctica profesional constante.",
+        projectsText: "Cada marca es un mundo y me encanta explorarlos todos. Aquí verás una selección de trabajos donde he puesto creatividad, estrategia y mucho cariño.",
+        education: "Mercadóloga graduada con formación constante en diseño y dirección de arte. Nunca dejo de aprender porque el mundo digital nunca deja de cambiar.",
         testimonials: [
-            "Destaca por su creatividad, compromiso y atención al detalle. Supo entender el proyecto y llevarlo a un nivel visual muy sólido.",
-            "Tiene una visión estratégica clara y una sensibilidad estética que aporta mucho valor al trabajo final.",
-            "Trabajar con ella fue una experiencia fluida y profesional, con resultados creativos bien pensados."
+            "Entendió perfecto lo que quería incluso mejor que yo. El resultado fue increíble y súper profesional.",
+            "Tiene una visión muy clara. No solo diseña lindo, sino que piensa en la estrategia detrás de cada elemento.",
+            "Súper recomendada. Es muy fácil trabajar con ella y siempre entrega calidad top."
         ],
         contact: {
-            text: "¿Tienes una idea, proyecto o marca que necesita dirección creativa? Estoy abierta a nuevas colaboraciones y proyectos.",
-            availability: ["Disponible para proyectos.", "Modalidad global, remoto o presencial."]
+            text: "¿Tienes un proyecto en mente? Platiquemos. Siempre estoy buscando nuevos retos y marcas interesantes para colaborar.",
+            availability: ["Freelance disponible.", "Proyectos por objetivo.", "Asesorías 1 a 1."]
         }
     },
-    { id: 'design', icon: 'palette', label: 'Diseño Gráfico', role: 'Lenguaje Visual', desc: 'El diseño es el lenguaje visual de una marca.', manifesto: 'Desarrollo identidades visuales y piezas gráficas que reflejan la esencia de cada marca.', services: ['Identidad visual', 'Branding', 'Sistemas visuales'] },
-    { id: 'illustration', icon: 'pen-tool', label: 'Ilustración', role: 'Narrativa Visual', desc: 'La ilustración es mi espacio más libre.', manifesto: 'Exploro la ilustración como una herramienta expresiva única.', services: ['Ilustración editorial', 'Concept art'] },
-    { id: 'publicity', icon: 'megaphone', label: 'Publicidad', role: 'Comunicación', desc: 'Comunicar con intención es la clave.', manifesto: 'Creo conceptos publicitarios claros y creativos.', services: ['Dirección creativa', 'Campañas'] },
-    { id: 'marketing', icon: 'bar-chart-3', label: 'Marketing', role: 'Estrategia', desc: 'La creatividad necesita análisis.', manifesto: 'Estrategias basadas en objetivos reales y métricas.', services: ['Estrategia de marca', 'Growth'] },
-    { id: 'color', icon: 'swatch-book', label: 'Color Lab', role: 'Colorimetría Pro', desc: 'Laboratorio técnico de armonías cromáticas.', manifesto: 'Herramienta avanzada para la generación de paletas profesionales y validación de accesibilidad.', services: [] }
+    { id: 'design', icon: 'palette', label: 'Diseño Gráfico', role: 'Identidad Visual', desc: 'Tu marca merece verse increíble.', manifesto: 'Diseño sistemas visuales que cuentan la historia de tu negocio.', services: ['Logotipos', 'Manual de Marca', 'Papelería'] },
+    { id: 'illustration', icon: 'pen-tool', label: 'Ilustración', role: 'Arte Digital', desc: 'Dibujando ideas.', manifesto: 'Ilustraciones personalizadas para darle carácter a tus proyectos.', services: ['Editorial', 'Redes Sociales'] },
+    { id: 'publicity', icon: 'megaphone', label: 'Publicidad', role: 'Campañas', desc: 'Hagamos ruido del bueno.', manifesto: 'Conceptos publicitarios que conectan con las emociones de la gente.', services: ['Concepto Creativo', 'Copywriting'] },
+    { id: 'marketing', icon: 'bar-chart-3', label: 'Marketing', role: 'Estrategia', desc: 'Crecer con sentido.', manifesto: 'Planeación estratégica para que cada peso invertido cuente.', services: ['Auditoría de Marca', 'Plan de Contenidos'] },
+    { id: 'color', icon: 'swatch-book', label: 'Color Lab', role: 'Estudio de Color', desc: 'El poder del color.', manifesto: 'Herramienta profesional para elegir paletas perfectas, accesibles y hermosas.', services: [] },
+    { id: 'gallery', icon: 'camera', label: 'Galería', role: 'Fotografía & Mood', desc: 'Capturando momentos.', manifesto: 'Una colección curada de vibras visuales y fotografía.', services: [] },
+    { id: 'strategy', icon: 'brain', label: 'Estrategia', role: 'Arquetipos de Marca', desc: 'Descubre el ADN de tu marca.', manifesto: 'Herramienta interactiva para definir la personalidad de tu negocio.', services: [] },
+    { id: 'contact', icon: 'send', label: 'Contacto', role: 'Inicia el Viaje', desc: 'Hagamos realidad tu proyecto.', manifesto: 'Generador de brief interactivo para entender tus necesidades.', services: [] }
+
 ];
 
 export const projects = [
