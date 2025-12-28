@@ -230,6 +230,10 @@ window.initDrag = function (e, id) {
 
     isDragging = true;
     currentTarget = document.getElementById(`win-${id}`);
+
+    // DISABLE TRANSITIONS to prevent flickering/lag during drag
+    if (currentTarget) currentTarget.style.transition = 'none';
+
     startX = e.clientX;
     startY = e.clientY;
 
@@ -257,6 +261,9 @@ function handleDrag(e) {
 
 function stopDrag() {
     isDragging = false;
+    // RESTORE TRANSITIONS
+    if (currentTarget) currentTarget.style.transition = '';
+
     document.removeEventListener('mousemove', handleDrag);
     document.removeEventListener('mouseup', stopDrag);
 }
@@ -381,14 +388,28 @@ function initCustomPicker() {
         });
     };
 
+    const disableTransitions = () => {
+        document.querySelectorAll('.live-preview-bg, .live-preview-text').forEach(el => {
+            el.style.transition = 'none';
+        });
+    };
+
+    const enableTransitions = () => {
+        document.querySelectorAll('.live-preview-bg, .live-preview-text').forEach(el => {
+            el.style.transition = '';
+        });
+    };
+
     // Events Wrappers
     const onStartSl = (e) => {
         pickerState.isDraggingSal = true;
+        disableTransitions();
         handleMove(e, 'sl');
     };
 
     const onStartHue = (e) => {
         pickerState.isDraggingHue = true;
+        disableTransitions();
         handleMove(e, 'hue');
     };
 
@@ -407,6 +428,7 @@ function initCustomPicker() {
             if (pickerState.isDraggingSal || pickerState.isDraggingHue) {
                 pickerState.isDraggingSal = false;
                 pickerState.isDraggingHue = false;
+                enableTransitions(); // Restore transitions
                 updateColor(currentBaseColor); // Commit change
             }
         };
