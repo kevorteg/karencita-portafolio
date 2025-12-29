@@ -205,3 +205,41 @@ export function getChromaticFamily(h, s, l) {
     if (h >= 300 && h < 345) return 'Rosa';
     return 'Indefinido';
 }
+
+export function getAccessibilityReport(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+
+    // Relative Luminance
+    const getLuminance = (r, g, b) => {
+        const a = [r, g, b].map(v => {
+            v /= 255;
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        });
+        return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+    };
+
+    const lum = getLuminance(r, g, b);
+
+    // Check against White (1.05 / (lum + 0.05))
+    const whiteRatio = 1.05 / (lum + 0.05);
+    // Check against Black ((lum + 0.05) / 0.05)
+    const blackRatio = (lum + 0.05) / 0.05;
+
+    return {
+        onWhite: {
+            ratio: whiteRatio.toFixed(2),
+            aa: whiteRatio >= 4.5 ? 'Pass' : 'Fail',
+            aaa: whiteRatio >= 7 ? 'Pass' : 'Fail',
+            visible: whiteRatio >= 3
+        },
+        onBlack: {
+            ratio: blackRatio.toFixed(2),
+            aa: blackRatio >= 4.5 ? 'Pass' : 'Fail',
+            aaa: blackRatio >= 7 ? 'Pass' : 'Fail',
+            visible: blackRatio >= 3
+        },
+        bestText: blackRatio > whiteRatio ? 'Negro' : 'Blanco'
+    };
+}
