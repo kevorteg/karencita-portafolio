@@ -127,3 +127,81 @@ export function getBlindnessSimulation(hex) {
         deuteranopia: toHex(deuteranopia)
     };
 }
+
+export function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return { r, g, b };
+}
+
+export function rgbToCmyk(r, g, b) {
+    let c = 1 - (r / 255);
+    let m = 1 - (g / 255);
+    let y = 1 - (b / 255);
+    let k = Math.min(c, Math.min(m, y));
+
+    c = (c - k) / (1 - k);
+    m = (m - k) / (1 - k);
+    y = (y - k) / (1 - k);
+
+    if (isNaN(c)) c = 0;
+    if (isNaN(m)) m = 0;
+    if (isNaN(y)) y = 0;
+    if (isNaN(k)) k = 1;
+
+    return {
+        c: Math.round(c * 100),
+        m: Math.round(m * 100),
+        y: Math.round(y * 100),
+        k: Math.round(k * 100)
+    };
+}
+
+export function getMatchConfidence(distance) {
+    // Distance 0 = 100% match.
+    // Distance 50 = Poor match.
+    // In RGB space (max dist approx 441), let's calibrate:
+    // < 15: High (90%+)
+    // < 40: Medium (75%+)
+    // > 40: Low (<75%)
+
+    if (distance < 15) return { label: 'Alta Similitud', score: 95, class: 'bg-green-500', text: 'text-green-600' };
+    if (distance < 35) return { label: 'Media Similitud', score: 80, class: 'bg-yellow-500', text: 'text-yellow-600' };
+    return { label: 'Baja Similitud', score: 60, class: 'bg-red-500', text: 'text-red-500' };
+}
+
+export function checkPrintSafety(r, g, b) {
+    // Estimating out-of-gamut for CMYK.
+    // Neon colors (Pure R/G/B or high saturation cyan/magenta mixes) are hard.
+    // Simple heuristic: If (R,G,B > 240) in two channels, or pure Cyan/Magenta/Yellow is too bright?
+    // Actually, print hazards are usually high saturation colors.
+
+    // A simple approximate check:
+    // If Saturation is very high (> 90%) AND Lightness is high (> 60%), tough for CMYK.
+    // Or check if pure primary RGB is dominant.
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const l = (max + min) / 2 / 255;
+    const s = (max === min) ? 0 : (max - min) / (1 - Math.abs(2 * l - 1)) / 255;
+
+    if (s > 0.9 && l > 0.4 && l < 0.8) return { safe: false, msg: 'Fuera de Gama CMYK' };
+    return { safe: true, msg: 'Seguro para Impresión' };
+}
+
+export function getChromaticFamily(h, s, l) {
+    if (s < 10 && l > 85) return 'Blanco';
+    if (s < 10 && l < 15) return 'Negro';
+    if (s < 15) return 'Gris/Neutro';
+
+    if (h >= 345 || h < 10) return 'Rojo';
+    if (h >= 10 && h < 40) return 'Naranja';
+    if (h >= 40 && h < 70) return 'Amarillo';
+    if (h >= 70 && h < 160) return 'Verde';
+    if (h >= 160 && h < 200) return 'Cian';
+    if (h >= 200 && h < 260) return 'Azul';
+    if (h >= 260 && h < 300) return 'Violeta';
+    if (h >= 300 && h < 345) return 'Rosa';
+    return 'Indefinido';
+}
