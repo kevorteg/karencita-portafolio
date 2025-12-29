@@ -177,14 +177,14 @@ window.toggleDarkMode = function () {
     }
 
     lucide.createIcons();
-    renderContent();
+    renderContent(false);
     renderWindows();
 };
 
 window.setActiveTool = function (id) {
     activeTool = id;
     renderTools();
-    renderContent();
+    renderContent(true);
 
     // Animation for new content
     gsap.fromTo("#main-content-render",
@@ -270,7 +270,7 @@ function stopDrag() {
 
 window.updateColor = function (hex) {
     currentBaseColor = hex;
-    renderContent();
+    renderContent(false);
 };
 
 // --- RENDERING ---
@@ -462,26 +462,28 @@ function hsvToHex(h, s, v) {
 }
 
 
-function renderContent() {
+function renderContent(animate = false) {
     const container = document.getElementById('main-content-render');
     const tool = tools.find(t => t.id === activeTool);
     const themePanel = isDarkMode ? 'bg-[#1D1B4B]' : 'bg-white';
     const themeBorder = isDarkMode ? 'border-indigo-900/30' : 'border-stone-300';
     const themeTextSub = isDarkMode ? 'text-stone-400' : 'text-stone-500';
 
+    const animClass = animate ? 'stagger-anim opacity-0 translate-y-4' : '';
+
     let html = `
         <div class="mb-14">
-            <div class="stagger-anim opacity-0 translate-y-4 flex items-center gap-2 text-[10px] font-bold text-violet-600 mb-3 tracking-[0.4em] uppercase">
+            <div class="${animClass} flex items-center gap-2 text-[10px] font-bold text-violet-600 mb-3 tracking-[0.4em] uppercase">
                 <i data-lucide="chevron-right" class="w-3 h-3"></i> ${tool.role}
             </div>
-            <h2 class="stagger-anim opacity-0 translate-y-4 text-3xl sm:text-6xl font-serif italic mb-6 sm:mb-8 leading-none dark:text-stone-100">${tool.label}</h2>
+            <h2 class="${animClass} text-3xl sm:text-6xl font-serif italic mb-6 sm:mb-8 leading-none dark:text-stone-100">${tool.label}</h2>
             
             ${activeTool === 'about' ? `
-                <div class="stagger-anim opacity-0 translate-y-4 max-w-4xl border-l-2 sm:border-l-4 border-violet-600 pl-4 sm:pl-8 py-2 mb-10 sm:mb-16">
+                <div class="${animClass} max-w-4xl border-l-2 sm:border-l-4 border-violet-600 pl-4 sm:pl-8 py-2 mb-10 sm:mb-16">
                     ${tool.intro.map(p => `<p class="text-[14px] sm:text-xl font-serif leading-relaxed mb-4 sm:mb-6 opacity-90 text-justify sm:text-left">${p}</p>`).join('')}
                 </div>
                  <!-- QUÉ HAGO -->
-                <div class="stagger-anim opacity-0 translate-y-4 mb-20">
+                <div class="${animClass} mb-20">
                     <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-violet-600 mb-6 sm:mb-8 border-b ${themeBorder} pb-4">Qué_Hago</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                         ${tool.whatIDo.map(item => `
@@ -493,7 +495,7 @@ function renderContent() {
                     </div>
                 </div>
                 <!-- SKILLS & PROCESS -->
-                 <div class="stagger-anim opacity-0 translate-y-4 grid grid-cols-1 lg:grid-cols-12 gap-10 sm:gap-12 mb-20">
+                 <div class="${animClass} grid grid-cols-1 lg:grid-cols-12 gap-10 sm:gap-12 mb-20">
                     <div class="lg:col-span-7">
                         <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-violet-600 mb-6 sm:mb-8 border-b ${themeBorder} pb-4">Habilidades_Core</h3>
                         <div class="grid grid-cols-2 gap-6 sm:gap-8">
@@ -527,7 +529,7 @@ function renderContent() {
                         </div>
                     </div>
                  </div>
-                 <div class="stagger-anim opacity-0 translate-y-4 grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+                 <div class="${animClass} grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
                      <div class="${themePanel} p-6 sm:p-8 rounded-[2rem] border ${themeBorder}">
                         <h3 class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-6">Educación</h3>
                         <p class="text-xs sm:text-sm leading-relaxed font-medium opacity-80">${tool.education}</p>
@@ -538,7 +540,7 @@ function renderContent() {
                      </div>
                 </div>
             ` : `
-                 <div class="stagger-anim opacity-0 translate-y-4 max-w-3xl border-l-4 border-violet-600 pl-6 sm:pl-8 py-2">
+                 <div class="${animClass} max-w-3xl border-l-4 border-violet-600 pl-6 sm:pl-8 py-2">
                     <p class="text-xl sm:text-2xl italic opacity-90 leading-relaxed font-serif mb-6">${tool.desc}</p>
                     <p class="text-xs sm:text-sm opacity-50 mt-4 leading-relaxed font-medium">${tool.manifesto}</p>
                 </div>
@@ -553,7 +555,7 @@ function renderContent() {
         const primaryMatch = pantoneMatches[0];
 
         html += `
-            <div class="stagger-anim opacity-0 translate-y-4 grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24 items-start">
+            <div class="${animClass} grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24 items-start">
                 
                 <!-- LEFT COLUMN: Color Editor -->
                 <div class="lg:col-span-4 flex flex-col gap-6">
@@ -946,10 +948,17 @@ function renderContent() {
     lucide.createIcons();
 
     // GSAP Transition
-    gsap.fromTo('.stagger-anim',
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: 'power2.out' }
-    );
+    if (animate) {
+        gsap.fromTo('.stagger-anim',
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: 'power2.out' }
+        );
+    }
+
+    // Re-initialize picker logic if we just rendered the color tool
+    if (activeTool === 'color') {
+        initCustomPicker();
+    }
 }
 
 function renderWindows() {
