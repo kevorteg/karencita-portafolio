@@ -1,5 +1,5 @@
 import { tools, projects } from './data.js';
-import { hexToHSL, hslToHex, getContrast, generateProPalettes, findClosestPantone, getBlindnessSimulation } from './color-studio.js';
+import { hexToHSL, hslToHex, getContrast, generateProPalettes, findClosestPantone, getBlindnessSimulation, hexToRgb, rgbToCmyk, getMatchConfidence, checkPrintSafety, getChromaticFamily } from './color-studio.js';
 
 // --- UTILS ---
 window.copyToClipboard = function (text) {
@@ -270,6 +270,16 @@ function stopDrag() {
 
 window.updateColor = function (hex) {
     currentBaseColor = hex;
+
+    // Manage History
+    if (!window.colorHistory) window.colorHistory = ['#6D28D9', '#000000', '#FFFFFF'];
+    // Remove if exists to bubble to top
+    window.colorHistory = window.colorHistory.filter(c => c !== hex);
+    // Add to front
+    window.colorHistory.unshift(hex);
+    // Limit to 5
+    if (window.colorHistory.length > 5) window.colorHistory.pop();
+
     renderContent(false);
 };
 
@@ -550,154 +560,285 @@ function renderContent(animate = false) {
 
     if (activeTool === 'color') {
         const palettes = generateProPalettes(currentBaseColor);
-        // pantoneMatches is an ARRAY of 3 objects now
         const pantoneMatches = findClosestPantone(currentBaseColor);
         const primaryMatch = pantoneMatches[0];
 
-        html += `
-            <div class="${animClass} grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24 items-start">
-                
-                <!-- LEFT COLUMN: Color Editor -->
-                <div class="lg:col-span-4 flex flex-col gap-6">
-                    
-                    <!-- PRO COLOR EDITOR (Fixed Dragging) -->
-                    <div class="${themePanel} border ${themeBorder} rounded-[2rem] p-5 sm:p-6 shadow-xl theme-transition relative overflow-hidden">
-                        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-violet-600 mb-6">Studio_Editor</h3>
-                        
-                        <!-- Picker Areas -->
-                        <div id="picker-sl" class="w-full aspect-[4/3] rounded-xl mb-4 relative picker-saturation shadow-inner" style="background-color: hsl(${pickerState.h}, 100%, 50%)">
-                            <div id="picker-sl-handle" class="w-4 h-4 rounded-full border-2 border-white shadow-md absolute -ml-2 -mt-2 pointer-events-none" style="background: ${currentBaseColor}; left: ${pickerState.s}%; top: ${100 - pickerState.v}%"></div>
-                        </div>
-                        <div id="picker-hue" class="w-full h-4 rounded-full mb-6 relative picker-hue shadow-inner">
-                             <div id="picker-hue-handle" class="w-4 h-4 rounded-full border-2 border-white shadow-md absolute top-0 -ml-2 bg-transparent pointer-events-none" style="left: ${pickerState.h / 3.6}%"></div>
-                        </div>
+        // Stats & Data
+        const rgb = hexToRgb(currentBaseColor);
+        const cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
+        const hsl = hexToHSL(currentBaseColor);
+        const confidence = getMatchConfidence(primaryMatch.distance);
+        const safety = checkPrintSafety(rgb.r, rgb.g, rgb.b);
 
-                        <!-- Codes -->
-                        <div class="flex items-center gap-2">
-                             <div class="flex-1 bg-black/5 dark:bg-white/5 rounded-xl px-4 py-3 flex justify-between items-center max-w-full">
-                                <span class="text-xs font-bold opacity-50">HEX</span>
-                                <span id="picker-hex-display" class="text-sm font-bold uppercase tracking-widest truncate">${currentBaseColor}</span>
-                             </div>
-                             <button onclick="window.copyToClipboard('${currentBaseColor}')" class="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center hover:bg-violet-600 hover:text-white transition-colors">
-                                <i data-lucide="copy" class="w-4 h-4"></i>
-                             </button>
-                        </div>
-                    </div>
+        // History Logic (simple global-ish access or just render last 5 if we stored them)
+        // For now, let's assume we maintain a simple history array in window or module scope.
+        if (!window.colorHistory) window.colorHistory = ['#6D28D9', '#000000', '#FFFFFF'];
 
-                    <!-- Pantone Pro Card (New Design) -->
-                    <div class="rounded-[2rem] shadow-xl overflow-hidden border ${themeBorder} theme-transition">
-                        <!-- Top Color Half -->
-                        <div class="h-24 sm:h-32 w-full relative group" style="background-color: ${primaryMatch.hex}">
-                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-sm text-white font-bold text-xs uppercase cursor-pointer" onclick="window.copyToClipboard('${primaryMatch.code}')">
-                                Copy ${primaryMatch.code}
-                            </div>
-                        </div>
-                        <!-- Bottom Info Half -->
-                        <div class="bg-white dark:bg-[#1D1B4B] p-5 sm:p-6">
-                            <h3 class="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-2">Pantone_Match</h3>
-                            <div class="flex items-end justify-between">
-                                <div>
-                                    <h2 class="text-3xl sm:text-4xl font-serif italic leading-none mb-1 text-black dark:text-white">${primaryMatch.code.replace('C', '')} <span class="text-lg opacity-50 not-italic font-sans font-bold">C</span></h2>
-                                    <p class="text-xs font-bold opacity-40 uppercase tracking-widest">${primaryMatch.name}</p>
-                                </div>
-                            </div>
-                            <!-- Suggestions -->
-                            <div class="mt-6 pt-4 border-t border-black/5 dark:border-white/5">
-                                <span class="text-[8px] font-bold uppercase opacity-30 tracking-widest block mb-3">Alternativas_Cercanas</span>
-                                <div class="flex gap-2">
-                                    ${pantoneMatches.slice(1).map(p => `
-                                        <div class="flex-1 flex gap-2 items-center bg-black/5 dark:bg-white/5 p-2 rounded-lg cursor-pointer hover:bg-black/10 transition-colors" onclick="updateColor('${p.hex}')">
-                                            <div class="w-6 h-6 rounded-md shadow-sm" style="background-color: ${p.hex}"></div>
-                                            <div class="overflow-hidden">
-                                                <div class="text-[9px] font-bold truncate">${p.code}</div>
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        const pantoneHsl = hexToHSL(primaryMatch.hex);
+        const currentFamily = getChromaticFamily(hsl.h, hsl.s, hsl.l);
+        const pantoneFamily = getChromaticFamily(pantoneHsl.h, pantoneHsl.s, pantoneHsl.l);
 
-                </div>
-
-                <!-- RIGHT COLUMN: Live & Palettes -->
-                <div class="lg:col-span-8 flex flex-col gap-6">
-                    
-                    <!-- Live Preview -->
-                    <div class="${themePanel} border ${themeBorder} rounded-[2rem] p-8 theme-transition min-h-[300px] flex items-center justify-center relative overflow-hidden">
-                         <div class="absolute top-6 left-8 text-[10px] font-black uppercase tracking-[0.3em] text-violet-600 z-10">UI_Live_Playground</div>
-                         
-                         <!-- Mock UI Component -->
-                         <div class="w-full max-w-lg bg-stone-100 dark:bg-black/20 rounded-2xl p-8 flex flex-col sm:flex-row gap-8 items-center justify-center border border-stone-200 dark:border-white/5 relative z-0">
-                            <!-- Card Mockup -->
-                            <div class="w-60 bg-white dark:bg-[#1A1844] rounded-2xl shadow-xl overflow-hidden transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
-                                <div class="h-24 w-full live-preview-bg" style="background-color: ${currentBaseColor}"></div>
-                                <div class="p-5 text-center -mt-10">
-                                    <div class="w-20 h-20 bg-white rounded-full mx-auto p-1 shadow-md mb-3">
-                                        <div class="w-full h-full rounded-full bg-stone-200 bg-cover bg-center" style="background-image: url('assets/images/profile/perfil.png');"></div>
-                                    </div>
-                                    <h4 class="font-bold text-sm mb-1 dark:text-white">Karen Jefa</h4>
-                                    <p class="text-[10px] opacity-50 mb-4 dark:text-stone-300">Creative Director</p>
-                                    <button class="w-full py-2 rounded-lg text-[10px] font-bold text-white shadow-lg  hover:opacity-90 transition-opacity live-preview-bg" style="background-color: ${currentBaseColor}">FOLLOW</button>
-                                </div>
-                            </div>
-                            
-                            <!-- UI Controls -->
-                            <div class="space-y-4 w-full sm:w-auto">
-                                <button class="px-8 py-3 rounded-xl font-bold text-xs text-white shadow-lg transition-transform hover:-translate-y-1 block w-full live-preview-bg" style="background-color: ${currentBaseColor}">Primary Action</button>
-                                <button class="px-8 py-3 rounded-xl font-bold text-xs bg-white dark:bg-white/5 border-2 transition-transform hover:-translate-y-1 block w-full dark:text-white live-preview-text" style="border-color: ${currentBaseColor}; color: ${currentBaseColor}">Secondary Action</button>
-                                <div class="flex gap-2">
-                                     <div class="h-2 flex-1 rounded-full bg-stone-200 dark:bg-white/10 overflow-hidden"><div class="h-full live-preview-bg" style="width: 70%; background-color: ${currentBaseColor}"></div></div>
-                                </div>
-                            </div>
-                         </div>
-                    </div>
-
-                    <!-- Adobe-Style Harmonies -->
-                    <div class="grid grid-cols-1 gap-4">
-                        ${Object.entries(palettes).filter(([k]) => k !== 'Shades').map(([name, colors]) => `
-                            <div class="${themePanel} border ${themeBorder} rounded-[1.5rem] p-6 shadow-sm theme-transition">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h4 class="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">${name}</h4>
-                                    <button onclick="window.copyToClipboard('${colors.join(', ')}')" class="text-[9px] font-bold text-violet-600 hover:underline">COPY PALETTE</button>
-                                </div>
-                                <div class="flex h-20 rounded-xl overflow-hidden shadow-sm relative group">
-                                    ${colors.map((c, idx) => `
-                                        <div onclick="updateColor('${c}')" class="flex-1 cursor-pointer hover:scale-105 active:scale-95 transition-transform relative border-r border-white/10 last:border-0" style="background-color: ${c}">
-                                             <div class="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/10 backdrop-blur-[1px]">
-                                                <span class="text-white text-[9px] font-mono font-bold shadow-sm">${c}</span>
-                                                <span class="text-[7px] text-white/80 uppercase font-bold tracking-widest mt-1">
-                                                    ${idx === 0 ? 'Base' : 'Accent'}
-                                                </span>
-                                             </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-
-                </div>
+        let matchLabel = "Pantone · Aproximación";
+        let subLabel = "Basado en percepción visual y rango de impresión.";
+        let recommendation = `
+            <div class="flex items-center gap-2 mt-2 text-[10px] font-bold uppercase tracking-widest opacity-60">
+                <span>🖥️ Uso: Digital</span>
+                <span class="mx-1">|</span>
+                <span>🖨️ Impresión: Variable</span>
             </div>
         `;
 
-        // Init picker listeners (only if not already added? No, we need to re-attach if DOM was replaced.
-        // Wait, updateColor replaces DOM! So initCustomPicker needs to run again.
-        // But my 'pickerListenersAdded' check prevents that.
-        // Fix: Reset that flag on render? No, the best way is to re-attach always because elements are new.
-        // But window listeners accumulate.
-        // The robust way: Remove old window listeners before adding new.
-        // Simplified approach: Inline window listeners or check if existing.
-        // Let's use a cleaner approach: Since I don't see a clear 'teardown' phase here, 
-        // I'll make sure internal event handlers are robust. 
-        // Actually, renderContent destroys the old elements, so old element listeners die. 
-        // But window listeners persist.
-        // Let's reset the global flag logic.
-        if (pickerState) { // Reset picker state if needed
-            pickerListenersAdded = false;
-            setTimeout(initCustomPicker, 50);
+        if (primaryMatch.distance > 35 || currentFamily !== pantoneFamily) {
+            matchLabel = "Pantone cercano";
+            subLabel = `Fuera de familia cromática (${currentFamily} vs ${pantoneFamily}).`;
+            recommendation = `
+                <div class="flex items-center gap-2 mt-2 text-[10px] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400">
+                    <i data-lucide="alert-triangle" class="w-3 h-3"></i>
+                    <span>Precaución en Impresión</span>
+                </div>
+             `;
         }
 
+        html += `
+            <div class="${animClass} mb-24">
+                
+                <!-- TOP BAR: History & Actions -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+                     <div class="flex items-center gap-2">
+                        <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest hidden sm:block">Recientes</span>
+                        <div class="flex gap-2">
+                            ${window.colorHistory.map(c => `
+                                <button onclick="updateColor('${c}')" class="w-6 h-6 rounded-full border border-black/10 dark:border-white/10 shadow-sm transition-transform hover:scale-110" style="background-color: ${c}"></button>
+                            `).join('')}
+                        </div>
+                     </div>
+                     <div class="flex gap-3">
+                         <button onclick="window.copyToClipboard('${currentBaseColor}')" class="px-4 py-2 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-violet-600 hover:text-white transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                            <i data-lucide="copy" class="w-3 h-3"></i> HEX
+                         </button>
+                         <button onclick="window.copyToClipboard('R:${rgb.r} G:${rgb.g} B:${rgb.b}')" class="px-4 py-2 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-violet-600 hover:text-white transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                            <i data-lucide="copy" class="w-3 h-3"></i> RGB
+                         </button>
+                     </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    
+                    <!-- LEFT COLUMN: DIGITAL INSTITUTE (Screen) -->
+                    <div class="lg:col-span-5 flex flex-col gap-6">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-2 h-2 rounded-full bg-violet-500"></div>
+                            <h3 class="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Digital_Studio (Screen)</h3>
+                        </div>
+
+                        <!-- Main Editor -->
+                        <div class="${themePanel} border ${themeBorder} rounded-[2rem] p-5 sm:p-6 shadow-xl theme-transition relative overflow-hidden">
+                            <!-- Picker Areas -->
+                            <div id="picker-sl" class="w-full aspect-[4/3] rounded-xl mb-4 relative picker-saturation shadow-inner" style="background-color: hsl(${pickerState.h}, 100%, 50%)">
+                                <div id="picker-sl-handle" class="w-4 h-4 rounded-full border-2 border-white shadow-md absolute -ml-2 -mt-2 pointer-events-none" style="background: ${currentBaseColor}; left: ${pickerState.s}%; top: ${100 - pickerState.v}%"></div>
+                            </div>
+                            <div id="picker-hue" class="w-full h-4 rounded-full mb-6 relative picker-hue shadow-inner">
+                                 <div id="picker-hue-handle" class="w-4 h-4 rounded-full border-2 border-white shadow-md absolute top-0 -ml-2 bg-transparent pointer-events-none" style="left: ${pickerState.h / 3.6}%"></div>
+                            </div>
+                            <!-- HEX Display -->
+                            <div class="flex items-center justify-between bg-black/5 dark:bg-white/5 rounded-xl px-4 py-3">
+                                <span class="text-xs font-bold opacity-50">HEX</span>
+                                <span id="picker-hex-display" class="text-xl font-serif italic text-black dark:text-white">${currentBaseColor}</span>
+                            </div>
+                        </div>
+
+                        <!-- Technical Data Accordion -->
+                        <div class="${themePanel} border ${themeBorder} rounded-[1.5rem] overflow-hidden">
+                            <details class="group">
+                                <summary class="flex items-center justify-between p-6 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                                    <span class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Datos_Técnicos</span>
+                                    <i data-lucide="chevron-down" class="w-4 h-4 opacity-40 transition-transform group-open:rotate-180"></i>
+                                </summary>
+                                <div class="px-6 pb-6 pt-2 grid grid-cols-2 gap-4">
+                                     <div>
+                                        <span class="block text-[9px] font-bold opacity-30 mb-1">RGB (Screen)</span>
+                                        <span class="font-mono text-xs font-bold">${rgb.r}, ${rgb.g}, ${rgb.b}</span>
+                                     </div>
+                                     <div>
+                                        <span class="block text-[9px] font-bold opacity-30 mb-1">HSL</span>
+                                        <span class="font-mono text-xs font-bold">${Math.round(hsl.h)}°, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%</span>
+                                     </div>
+                                     <div>
+                                        <span class="block text-[9px] font-bold opacity-30 mb-1">CMYK (Approx)</span>
+                                        <span class="font-mono text-xs font-bold">${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}</span>
+                                     </div>
+                                      <div>
+                                        <span class="block text-[9px] font-bold opacity-30 mb-1">Familia</span>
+                                        <span class="font-mono text-xs font-bold">${currentFamily}</span>
+                                     </div>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: PRINT LAB (Physical) -->
+                    <div class="lg:col-span-7 flex flex-col gap-6">
+                        <div class="flex items-center gap-2 mb-2">
+                             <div class="w-2 h-2 rounded-full bg-stone-400"></div>
+                             <h3 class="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Print_Lab (Physical)</h3>
+                        </div>
+
+                        <!-- Pantone Pro Card -->
+                        <div class="bg-white dark:bg-[#1D1B4B] rounded-[2rem] shadow-xl overflow-hidden border ${themeBorder}">
+                            <!-- Top Color Half -->
+                            <div class="h-40 w-full relative group flex items-end justify-between p-6" style="background-color: ${primaryMatch.hex}">
+                                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-sm text-white font-bold text-xs uppercase cursor-pointer" onclick="window.copyToClipboard('${primaryMatch.code}')">
+                                    Copiar ${primaryMatch.code}
+                                </div>
+                            </div>
+                            
+                            <!-- Bottom Info (Reordered Hierarchy) -->
+                            <div class="p-8 relative">
+                                <!-- Warning Ribbon for Low Match/Mismatch -->
+                                ${(primaryMatch.distance > 35 || currentFamily !== pantoneFamily) ? `
+                                    <div class="absolute top-0 left-0 right-0 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] font-bold uppercase tracking-widest py-1.5 text-center flex items-center justify-center gap-2">
+                                        <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                                        <span>Pantone sugerido fuera de familia exacta</span>
+                                    </div>
+                                ` : ''}
+
+                                <div class="mt-4 flex flex-col gap-6">
+                                    <!-- 1. Pantone & Usage Recomm -->
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <span class="text-[10px] font-bold uppercase opacity-30 tracking-[0.2em] block mb-2">${matchLabel}</span>
+                                            <h2 class="text-5xl font-serif italic text-black dark:text-white leading-none">${primaryMatch.code.replace('C', '')} <span class="text-2xl opacity-40 not-italic font-sans font-bold stroke-text">C</span></h2>
+                                            <p class="text-xs font-medium opacity-50 mt-2 max-w-xs leading-relaxed">${subLabel}</p>
+                                            
+                                            <!-- Usage Rec -->
+                                            <div class="mt-4 p-3 bg-black/5 dark:bg-white/5 rounded-lg inline-block">
+                                                ${recommendation}
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- 2. Similarity Score -->
+                                        <div class="text-right">
+                                             <div class="inline-flex flex-col items-end">
+                                                <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest block mb-1">Confianza</span>
+                                                <div class="text-3xl font-bold ${confidence.text}">${confidence.score}%</div>
+                                                <div class="text-[9px] font-bold opacity-40 uppercase tracking-widest mt-1">${confidence.label}</div>
+                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 3. Status Chips -->
+                                    <div class="flex gap-2 flex-wrap border-t border-black/5 dark:border-white/5 pt-6">
+                                         ${!safety.safe ? `
+                                            <div class="px-3 py-1.5 rounded-full bg-red-100 text-red-600 shadow-sm flex items-center gap-1.5" title="Este color puede apagarse al imprimirse">
+                                                <i data-lucide="alert-triangle" class="w-3 h-3"></i>
+                                                <span class="text-[9px] font-bold uppercase tracking-wide">Fuera de Gama CMYK</span>
+                                            </div>
+                                        ` : `
+                                             <div class="px-3 py-1.5 rounded-full bg-green-100 text-green-700 shadow-sm flex items-center gap-1.5">
+                                                <i data-lucide="printer" class="w-3 h-3"></i>
+                                                <span class="text-[9px] font-bold uppercase tracking-wide">Seguro para CMYK</span>
+                                            </div>
+                                        `}
+                                         <div class="px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/5 text-stone-500 shadow-sm flex items-center gap-1.5">
+                                            <span class="text-[9px] font-bold uppercase tracking-wide">Familia: ${currentFamily}</span>
+                                        </div>
+                                    </div>
+    
+                                    <!-- 4. Alternatives -->
+                                    <div>
+                                         <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest block mb-3">Alternativas Más Cercanas</span>
+                                         <div class="flex gap-3 overflow-x-auto custom-scrollbar pb-2">
+                                            ${pantoneMatches.slice(1).map(p => `
+                                                <div class="flex-shrink-0 flex gap-2 items-center bg-black/5 dark:bg-white/5 p-2 pr-4 rounded-xl cursor-pointer hover:bg-black/10 transition-colors opacity-60 hover:opacity-100" onclick="updateColor('${p.hex}')">
+                                                    <div class="w-8 h-8 rounded-lg shadow-sm" style="background-color: ${p.hex}"></div>
+                                                    <div>
+                                                        <div class="text-[10px] font-bold">${p.code}</div>
+                                                        <div class="text-[8px] opacity-50 uppercase">Dist: ${Math.round(p.distance)}</div>
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <!-- RESTORED: UI_Live_Playground (The Big Card) -->
+                 <div class="mt-8 ${themePanel} border ${themeBorder} rounded-[2rem] p-8 md:p-12 theme-transition relative overflow-hidden flex flex-col items-center text-center">
+                     <div class="absolute top-8 left-8 text-[10px] font-black uppercase tracking-[0.3em] text-violet-600 z-10">UI_Live_Playground</div>
+                     
+                     <!-- Interactive Playground -->
+                     <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative z-0 mt-8">
+                        
+                        <!-- 1. The Profile Card (Rotated) -->
+                        <div class="flex justify-center">
+                            <div class="w-72 bg-white dark:bg-[#1A1844] rounded-3xl shadow-2xl overflow-hidden transform rotate-[-3deg] hover:rotate-0 transition-transform duration-500 border border-black/5">
+                                <div class="h-32 w-full live-preview-bg flex items-center justify-center relative" style="background-color: ${currentBaseColor}">
+                                    <div class="absolute inset-0 bg-black/10"></div>
+                                </div>
+                                <div class="p-6 relative -mt-12 text-center">
+                                    <div class="w-24 h-24 bg-white dark:bg-[#1A1844] rounded-full mx-auto p-1.5 shadow-lg mb-4 relative z-10">
+                                        <div class="w-full h-full rounded-full bg-stone-200 bg-cover bg-center" style="background-image: url('assets/images/profile/perfil.png');"></div>
+                                    </div>
+                                    <h4 class="font-bold text-xl mb-1 dark:text-white font-serif italic">Karen Jefa</h4>
+                                    <p class="text-xs opacity-50 mb-6 uppercase tracking-widest font-bold">Creative Director</p>
+                                    
+                                    <button class="w-full py-4 rounded-xl text-xs font-black text-white shadow-xl hover:scale-105 transition-transform live-preview-bg tracking-widest uppercase" style="background-color: ${currentBaseColor}">
+                                        Follow Me
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. UI Controls & States -->
+                        <div class="flex flex-col gap-6 w-full">
+                            <!-- Button States -->
+                            <div class="bg-stone-50 dark:bg-white/5 p-6 rounded-3xl border border-black/5">
+                                <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest block mb-4">Button States</span>
+                                <div class="flex flex-col gap-4">
+                                    <button class="w-full py-4 rounded-xl font-bold text-sm text-white shadow-lg flex items-center justify-center gap-3 hover:-translate-y-1 transition-transform live-preview-bg" style="background-color: ${currentBaseColor}">
+                                        <span class="tracking-widest uppercase text-xs">Primary Interaction</span>
+                                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="w-full py-4 rounded-xl font-bold text-sm bg-white dark:bg-transparent border-2 flex items-center justify-center gap-3 hover:bg-stone-50 transition-colors live-preview-text" style="border-color: ${currentBaseColor}; color: ${currentBaseColor}">
+                                        <span class="tracking-widest uppercase text-xs">Secondary Outline</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                             <!-- Progress & Toggles -->
+                            <div class="bg-stone-50 dark:bg-white/5 p-6 rounded-3xl border border-black/5">
+                                <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest block mb-4">System Elements</span>
+                                <div class="space-y-6">
+                                     <!-- Loading -->
+                                     <div>
+                                        <div class="flex justify-between text-[10px] font-bold opacity-60 mb-2">
+                                            <span>Loading Assets...</span>
+                                            <span>65%</span>
+                                        </div>
+                                        <div class="h-2 w-full bg-stone-200 dark:bg-white/10 rounded-full overflow-hidden">
+                                            <div class="h-full live-preview-bg rounded-full" style="width: 65%; background-color: ${currentBaseColor}"></div>
+                                        </div>
+                                     </div>
+                                     <!-- Toggle -->
+                                      <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold">Enable Notifications</span>
+                                        <div class="w-12 h-6 rounded-full p-1 transition-colors live-preview-bg opacity-40 bg-stone-300" style="background-color: ${currentBaseColor}">
+                                            <div class="w-4 h-4 bg-white rounded-full shadow-sm translate-x-6"></div>
+                                        </div>
+                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                     </div>
+                </div>
+
+            </div>
+        `;
     } else if (activeTool === 'gallery') {
         // Placeholder images for masonry since we don't have real ones yet
         // Using colors/abstracts for now as "moods"
