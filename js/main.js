@@ -1,5 +1,5 @@
 import { tools, projects } from './data.js';
-import { hexToHSL, hslToHex, getContrast, generateProPalettes, findClosestPantone, getBlindnessSimulation, hexToRgb, rgbToCmyk, getMatchConfidence, checkPrintSafety, getChromaticFamily } from './color-studio.js';
+import { hexToHSL, hslToHex, getContrast, generateProPalettes, findClosestPantone, getBlindnessSimulation, hexToRgb, rgbToCmyk, getMatchConfidence, checkPrintSafety, getChromaticFamily, getAccessibilityReport } from './color-studio.js';
 
 // --- UTILS ---
 window.copyToClipboard = function (text) {
@@ -21,7 +21,7 @@ let activeTool = 'about';
 let isDarkMode = false;
 let openProjects = [];
 let focusedProject = null;
-let currentBaseColor = '#7c3aed';
+let currentBaseColor = '#5F259F'; // Nuevo morado predeterminado
 let zIndexCounter = 200;
 let isDragging = false;
 let currentTarget = null;
@@ -271,14 +271,48 @@ function stopDrag() {
 window.updateColor = function (hex) {
     currentBaseColor = hex;
 
-    // Manage History
-    if (!window.colorHistory) window.colorHistory = ['#6D28D9', '#000000', '#FFFFFF'];
-    // Remove if exists to bubble to top
-    window.colorHistory = window.colorHistory.filter(c => c !== hex);
-    // Add to front
-    window.colorHistory.unshift(hex);
-    // Limit to 5
-    if (window.colorHistory.length > 5) window.colorHistory.pop();
+    // --- GLOBAL THEME INJECTION (The "Wow" Factor) ---
+    const styleId = 'dynamic-theme-styles';
+    let styleTag = document.getElementById(styleId);
+    if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = styleId;
+        document.head.appendChild(styleTag);
+    }
+    // Override the "Brand Color" (Violet) globally, including hover states and shadows
+    styleTag.innerHTML = `
+        .text-violet-600 { color: ${hex} !important; }
+        .bg-violet-600 { background-color: ${hex} !important; }
+        .border-violet-600 { border-color: ${hex} !important; }
+        .shadow-violet-600\\/20 { box-shadow: 0 10px 15px -3px ${hex}33 !important; }
+        .shadow-violet-500\\/20 { box-shadow: 0 10px 15px -3px ${hex}33 !important; }
+        .hover\\:bg-violet-600:hover { background-color: ${hex} !important; }
+        .group:hover .group-hover\\:text-violet-600 { color: ${hex} !important; }
+        
+        /* Extra accents & Skills */
+        .text-violet-500 { color: ${hex} !important; }
+        .bg-violet-500 { background-color: ${hex} !important; }
+        .stroke-violet-600 { stroke: ${hex} !important; }
+        .stroke-violet-500 { stroke: ${hex} !important; }
+        
+        /* Creative Progress Bar Gradient */
+        .theme-progress-bar {
+            background: linear-gradient(90deg, ${hex}66 0%, ${hex} 100%) !important;
+            box-shadow: 0 0 10px ${hex}44;
+        }
+    `;
+
+    // Manage History (Smart Persistence)
+    let history = [];
+    try {
+        history = JSON.parse(localStorage.getItem('colorHistory')) || [];
+    } catch (e) { history = []; }
+
+    history = history.filter(c => c !== hex);
+    history.unshift(hex);
+    if (history.length > 5) history.pop();
+
+    localStorage.setItem('colorHistory', JSON.stringify(history));
 
     renderContent(false);
 };
@@ -569,10 +603,12 @@ function renderContent(animate = false) {
         const hsl = hexToHSL(currentBaseColor);
         const confidence = getMatchConfidence(primaryMatch.distance);
         const safety = checkPrintSafety(rgb.r, rgb.g, rgb.b);
+        const a11y = getAccessibilityReport(currentBaseColor);
 
-        // History Logic (simple global-ish access or just render last 5 if we stored them)
-        // For now, let's assume we maintain a simple history array in window or module scope.
-        if (!window.colorHistory) window.colorHistory = ['#6D28D9', '#000000', '#FFFFFF'];
+        // History Logic (Load from LocalStorage)
+        let history = [];
+        try { history = JSON.parse(localStorage.getItem('colorHistory')) || ['#5F259F', '#000000', '#ffffff']; } catch (e) { }
+        if (history.length === 0) history = ['#5F259F', '#000000', '#ffffff'];
 
         const pantoneHsl = hexToHSL(primaryMatch.hex);
         const currentFamily = getChromaticFamily(hsl.h, hsl.s, hsl.l);
@@ -607,7 +643,7 @@ function renderContent(animate = false) {
                      <div class="flex items-center gap-2">
                         <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest hidden sm:block">Recientes</span>
                         <div class="flex gap-2">
-                            ${window.colorHistory.map(c => `
+                            ${history.map(c => `
                                 <button onclick="updateColor('${c}')" class="w-6 h-6 rounded-full border border-black/10 dark:border-white/10 shadow-sm transition-transform hover:scale-110" style="background-color: ${c}"></button>
                             `).join('')}
                         </div>
@@ -622,9 +658,10 @@ function renderContent(animate = false) {
                      </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <!-- TOP GRID: STUDIO & HARMONIES/A11Y -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-20">
                     
-                    <!-- LEFT COLUMN: DIGITAL INSTITUTE (Screen) -->
+                    <!-- LEFT COLUMN: DIGITAL STUDIO (Screen) -->
                     <div class="lg:col-span-5 flex flex-col gap-6">
                         <div class="flex items-center gap-2 mb-2">
                             <div class="w-2 h-2 rounded-full bg-violet-500"></div>
@@ -641,22 +678,25 @@ function renderContent(animate = false) {
                                  <div id="picker-hue-handle" class="w-4 h-4 rounded-full border-2 border-white shadow-md absolute top-0 -ml-2 bg-transparent pointer-events-none" style="left: ${pickerState.h / 3.6}%"></div>
                             </div>
                             <!-- HEX Display -->
-                            <div class="flex items-center justify-between bg-black/5 dark:bg-white/5 rounded-xl px-4 py-3">
+                            <div class="flex items-center justify-between bg-black/5 dark:bg-white/5 rounded-xl px-4 py-3 cursor-pointer hover:bg-black/10 transition-colors" onclick="window.copyToClipboard(document.getElementById('picker-hex-display').textContent)" title="Copiar HEX">
                                 <span class="text-xs font-bold opacity-50">HEX</span>
-                                <span id="picker-hex-display" class="text-xl font-serif italic text-black dark:text-white">${currentBaseColor}</span>
+                                <div class="flex items-center gap-2">
+                                     <span id="picker-hex-display" class="text-xl font-serif italic text-black dark:text-white">${currentBaseColor}</span>
+                                     <i data-lucide="copy" class="w-4 h-4 opacity-50"></i>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Technical Data Accordion -->
                         <div class="${themePanel} border ${themeBorder} rounded-[1.5rem] overflow-hidden">
-                            <details class="group">
+                             <details class="group">
                                 <summary class="flex items-center justify-between p-6 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                                     <span class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Datos_Técnicos</span>
                                     <i data-lucide="chevron-down" class="w-4 h-4 opacity-40 transition-transform group-open:rotate-180"></i>
                                 </summary>
                                 <div class="px-6 pb-6 pt-2 grid grid-cols-2 gap-4">
                                      <div>
-                                        <span class="block text-[9px] font-bold opacity-30 mb-1">RGB (Screen)</span>
+                                        <span class="block text-[9px] font-bold opacity-30 mb-1">RGB</span>
                                         <span class="font-mono text-xs font-bold">${rgb.r}, ${rgb.g}, ${rgb.b}</span>
                                      </div>
                                      <div>
@@ -676,104 +716,67 @@ function renderContent(animate = false) {
                         </div>
                     </div>
 
-                    <!-- RIGHT COLUMN: PRINT LAB (Physical) -->
+                    <!-- RIGHT COLUMN: CREATIVE EXPANSION (Harmonies & A11y) -->
                     <div class="lg:col-span-7 flex flex-col gap-6">
                         <div class="flex items-center gap-2 mb-2">
-                             <div class="w-2 h-2 rounded-full bg-stone-400"></div>
-                             <h3 class="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Print_Lab (Physical)</h3>
+                             <div class="w-2 h-2 rounded-full bg-violet-400"></div>
+                             <h3 class="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Creative_Expansión</h3>
                         </div>
 
-                        <!-- Pantone Pro Card -->
-                        <div class="bg-white dark:bg-[#1D1B4B] rounded-[2rem] shadow-xl overflow-hidden border ${themeBorder}">
-                            <!-- Top Color Half -->
-                            <div class="h-40 w-full relative group flex items-end justify-between p-6" style="background-color: ${primaryMatch.hex}">
-                                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-sm text-white font-bold text-xs uppercase cursor-pointer" onclick="window.copyToClipboard('${primaryMatch.code}')">
-                                    Copiar ${primaryMatch.code}
-                                </div>
-                            </div>
-                            
-                            <!-- Bottom Info (Reordered Hierarchy) -->
-                            <div class="p-8 relative">
-                                <!-- Warning Ribbon for Low Match/Mismatch -->
-                                ${(primaryMatch.distance > 35 || currentFamily !== pantoneFamily) ? `
-                                    <div class="absolute top-0 left-0 right-0 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] font-bold uppercase tracking-widest py-1.5 text-center flex items-center justify-center gap-2">
-                                        <i data-lucide="alert-circle" class="w-3 h-3"></i>
-                                        <span>Pantone sugerido fuera de familia exacta</span>
-                                    </div>
-                                ` : ''}
-
-                                <div class="mt-4 flex flex-col gap-6">
-                                    <!-- 1. Pantone & Usage Recomm -->
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <span class="text-[10px] font-bold uppercase opacity-30 tracking-[0.2em] block mb-2">${matchLabel}</span>
-                                            <h2 class="text-5xl font-serif italic text-black dark:text-white leading-none">${primaryMatch.code.replace('C', '')} <span class="text-2xl opacity-40 not-italic font-sans font-bold stroke-text">C</span></h2>
-                                            <p class="text-xs font-medium opacity-50 mt-2 max-w-xs leading-relaxed">${subLabel}</p>
-                                            
-                                            <!-- Usage Rec -->
-                                            <div class="mt-4 p-3 bg-black/5 dark:bg-white/5 rounded-lg inline-block">
-                                                ${recommendation}
-                                            </div>
+                        <!-- Harmonies (Compact Grid) -->
+                        <div class="${themePanel} border ${themeBorder} rounded-[2rem] p-6 sm:p-8 shadow-sm h-full">
+                             <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest block mb-6">Armonías Cromáticas</span>
+                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                                ${Object.entries(palettes).map(([name, colors]) => `
+                                    <div class="border border-black/5 dark:border-white/5 rounded-xl p-4 hover:bg-black/5 transition-colors group">
+                                        <div class="flex justify-between mb-3">
+                                            <span class="text-[9px] font-bold uppercase tracking-wider opacity-60">${name}</span>
+                                            <i data-lucide="copy" class="w-3 h-3 opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity" onclick="window.copyToClipboard('${colors.join(', ')}')"></i>
                                         </div>
-                                        
-                                        <!-- 2. Similarity Score -->
-                                        <div class="text-right">
-                                             <div class="inline-flex flex-col items-end">
-                                                <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest block mb-1">Confianza</span>
-                                                <div class="text-3xl font-bold ${confidence.text}">${confidence.score}%</div>
-                                                <div class="text-[9px] font-bold opacity-40 uppercase tracking-widest mt-1">${confidence.label}</div>
-                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- 3. Status Chips -->
-                                    <div class="flex gap-2 flex-wrap border-t border-black/5 dark:border-white/5 pt-6">
-                                         ${!safety.safe ? `
-                                            <div class="px-3 py-1.5 rounded-full bg-red-100 text-red-600 shadow-sm flex items-center gap-1.5" title="Este color puede apagarse al imprimirse">
-                                                <i data-lucide="alert-triangle" class="w-3 h-3"></i>
-                                                <span class="text-[9px] font-bold uppercase tracking-wide">Fuera de Gama CMYK</span>
-                                            </div>
-                                        ` : `
-                                             <div class="px-3 py-1.5 rounded-full bg-green-100 text-green-700 shadow-sm flex items-center gap-1.5">
-                                                <i data-lucide="printer" class="w-3 h-3"></i>
-                                                <span class="text-[9px] font-bold uppercase tracking-wide">Seguro para CMYK</span>
-                                            </div>
-                                        `}
-                                         <div class="px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/5 text-stone-500 shadow-sm flex items-center gap-1.5">
-                                            <span class="text-[9px] font-bold uppercase tracking-wide">Familia: ${currentFamily}</span>
-                                        </div>
-                                    </div>
-    
-                                    <!-- 4. Alternatives -->
-                                    <div>
-                                         <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest block mb-3">Alternativas Más Cercanas</span>
-                                         <div class="flex gap-3 overflow-x-auto custom-scrollbar pb-2">
-                                            ${pantoneMatches.slice(1).map(p => `
-                                                <div class="flex-shrink-0 flex gap-2 items-center bg-black/5 dark:bg-white/5 p-2 pr-4 rounded-xl cursor-pointer hover:bg-black/10 transition-colors opacity-60 hover:opacity-100" onclick="updateColor('${p.hex}')">
-                                                    <div class="w-8 h-8 rounded-lg shadow-sm" style="background-color: ${p.hex}"></div>
-                                                    <div>
-                                                        <div class="text-[10px] font-bold">${p.code}</div>
-                                                        <div class="text-[8px] opacity-50 uppercase">Dist: ${Math.round(p.distance)}</div>
-                                                    </div>
-                                                </div>
+                                        <div class="flex h-10 rounded-lg overflow-hidden ring-1 ring-black/5">
+                                            ${colors.map(c => `
+                                                <div class="flex-1 h-full cursor-pointer hover:opacity-90 transition-opacity" style="background-color: ${c}" onclick="updateColor('${c}')" title="${c}"></div>
                                             `).join('')}
                                         </div>
                                     </div>
+                                `).join('')}
+                            </div>
+                            
+                            <!-- A11y Doctor (Simplified Strip) -->
+                            <div class="bg-black/5 dark:bg-white/5 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 bg-white dark:bg-black rounded-lg shadow-sm">
+                                        <i data-lucide="eye" class="w-4 h-4 opacity-50"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-xs">Visibilidad WCAG 2.1</h4>
+                                        <p class="text-[10px] opacity-50">Contraste vs Blanco/Negro</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-stone-900 rounded-lg border border-black/5">
+                                        <span class="w-2 h-2 rounded-full ${a11y.onWhite.aa === 'Pass' ? 'bg-green-500' : 'bg-red-500'}"></span>
+                                        <span class="text-[10px] font-bold">vs Blanco (${a11y.onWhite.ratio})</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-black text-white dark:bg-white dark:text-black rounded-lg border border-white/5">
+                                        <span class="w-2 h-2 rounded-full ${a11y.onBlack.aa === 'Pass' ? 'bg-green-500' : 'bg-red-500'}"></span>
+                                        <span class="text-[10px] font-bold">vs Negro (${a11y.onBlack.ratio})</span>
+                                    </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
-
                 </div>
-                
-                <!-- RESTORED: UI_Live_Playground (The Big Card) -->
-                 <div class="mt-8 ${themePanel} border ${themeBorder} rounded-[2rem] p-8 md:p-12 theme-transition relative overflow-hidden flex flex-col items-center text-center">
+
+                <!-- MIDDLE: UI_Live_Playground (The Big Card - Centerpiece) -->
+                 <div class="${themePanel} mb-20 border ${themeBorder} rounded-[2rem] p-8 md:p-12 theme-transition relative overflow-hidden flex flex-col items-center text-center">
                      <div class="absolute top-8 left-8 text-[10px] font-black uppercase tracking-[0.3em] text-violet-600 z-10">UI_Live_Playground</div>
                      
                      <!-- Interactive Playground -->
                      <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative z-0 mt-8">
                         
-                        <!-- 1. The Profile Card (Rotated) -->
+                        <!-- 1. The Profile Card -->
                         <div class="flex justify-center">
                             <div class="w-72 bg-white dark:bg-[#1A1844] rounded-3xl shadow-2xl overflow-hidden transform rotate-[-3deg] hover:rotate-0 transition-transform duration-500 border border-black/5">
                                 <div class="h-32 w-full live-preview-bg flex items-center justify-center relative" style="background-color: ${currentBaseColor}">
@@ -794,10 +797,10 @@ function renderContent(animate = false) {
                         </div>
 
                         <!-- 2. UI Controls & States -->
-                        <div class="flex flex-col gap-6 w-full">
+                        <div class="flex flex-col gap-6 w-full text-left">
                             <!-- Button States -->
                             <div class="bg-stone-50 dark:bg-white/5 p-6 rounded-3xl border border-black/5">
-                                <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest block mb-4">Button States</span>
+                                <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest block mb-4">Button Ecosystem</span>
                                 <div class="flex flex-col gap-4">
                                     <button class="w-full py-4 rounded-xl font-bold text-sm text-white shadow-lg flex items-center justify-center gap-3 hover:-translate-y-1 transition-transform live-preview-bg" style="background-color: ${currentBaseColor}">
                                         <span class="tracking-widest uppercase text-xs">Primary Interaction</span>
@@ -834,6 +837,86 @@ function renderContent(animate = false) {
                             </div>
                         </div>
 
+                     </div>
+                </div>
+
+                <!-- BOTTOM: PRINT LAB (Physical) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-20">
+                     <div class="lg:col-span-12">
+                        <div class="flex items-center gap-2 mb-2">
+                             <div class="w-2 h-2 rounded-full bg-stone-400"></div>
+                             <h3 class="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Print_Lab (Physical)</h3>
+                        </div>
+
+                        <!-- Pantone Pro Card (Full Width Version) -->
+                        <div class="bg-white dark:bg-[#1D1B4B] rounded-[2rem] shadow-xl overflow-hidden border ${themeBorder} grid grid-cols-1 md:grid-cols-2">
+                            <!-- Left: Big Color Area -->
+                            <div class="min-h-[300px] relative group flex items-end justify-between p-8" style="background-color: ${primaryMatch.hex}">
+                                 <!-- Warning Ribbon Overlay -->
+                                ${(primaryMatch.distance > 35 || currentFamily !== pantoneFamily) ? `
+                                    <div class="absolute top-6 left-6 right-6 bg-white/90 backdrop-blur-md rounded-xl p-3 flex items-center gap-3 shadow-lg">
+                                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                                            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-[10px] font-bold uppercase tracking-widest text-amber-800">Mismatch Detectado</div>
+                                            <div class="text-[10px] opacity-70 leading-tight">Pantone sugerido fuera de familia exacta (${currentFamily} vs ${pantoneFamily}).</div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-sm text-white font-bold text-xs uppercase cursor-pointer" onclick="window.copyToClipboard('${primaryMatch.code}')">
+                                    Copiar ${primaryMatch.code}
+                                </div>
+                            </div>
+                            
+                            <!-- Right: Info -->
+                            <div class="p-8 md:p-12 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex justify-between items-start mb-8">
+                                        <div>
+                                            <span class="text-[10px] font-bold uppercase opacity-30 tracking-[0.2em] block mb-2">${matchLabel}</span>
+                                            <h2 class="text-6xl font-serif italic text-black dark:text-white leading-none mb-1">${primaryMatch.code.replace('C', '')}</h2>
+                                            <span class="text-2xl opacity-40 font-bold stroke-text">C</span>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-4xl font-bold ${confidence.text}">${confidence.score}%</div>
+                                            <div class="text-[9px] font-bold opacity-30 uppercase tracking-widest mt-1">Match</div>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm font-medium opacity-60 mb-8 leading-relaxed">${subLabel}</p>
+                                    
+                                     <div class="flex gap-2 flex-wrap mb-8">
+                                         ${!safety.safe ? `
+                                            <div class="px-4 py-2 rounded-lg bg-red-100 text-red-600 shadow-sm flex items-center gap-2">
+                                                <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                                                <span class="text-[10px] font-bold uppercase tracking-wide">Fuera de Gama CMYK</span>
+                                            </div>
+                                        ` : `
+                                             <div class="px-4 py-2 rounded-lg bg-green-100 text-green-700 shadow-sm flex items-center gap-2">
+                                                <i data-lucide="printer" class="w-4 h-4"></i>
+                                                <span class="text-[10px] font-bold uppercase tracking-wide">Seguro para Impresión</span>
+                                            </div>
+                                        `}
+                                    </div>
+                                </div>
+
+                                <div>
+                                     <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest block mb-4">Alternativas Pantone</span>
+                                     <div class="flex gap-3 overflow-x-auto custom-scrollbar">
+                                        ${pantoneMatches.slice(1).map(p => `
+                                            <div class="flex-shrink-0 flex gap-3 items-center bg-black/5 dark:bg-white/5 p-2 pr-5 rounded-xl cursor-pointer hover:bg-black/10 transition-colors opacity-70 hover:opacity-100" onclick="updateColor('${p.hex}')">
+                                                <div class="w-10 h-10 rounded-lg shadow-sm" style="background-color: ${p.hex}"></div>
+                                                <div>
+                                                    <div class="text-xs font-bold">${p.code}</div>
+                                                    <div class="text-[9px] opacity-50 uppercase">Dist: ${Math.round(p.distance)}</div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                      </div>
                 </div>
 
@@ -1226,7 +1309,7 @@ function renderInspector() {
                     <span>${level}%</span>
                 </div>
                 <div class="h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
-                    <div style="width: ${level}%" class="h-full bg-violet-600/60 rounded-full"></div>
+                    <div style="width: ${level}%" class="h-full bg-violet-600/60 rounded-full theme-progress-bar transition-all duration-1000"></div>
                 </div>
             </div>
         `;
