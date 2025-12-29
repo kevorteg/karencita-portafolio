@@ -1,5 +1,9 @@
 import { tools, projects } from './data.js';
-import { hexToHSL, hslToHex, getContrast, generateProPalettes, findClosestPantone, getBlindnessSimulation, hexToRgb, rgbToCmyk, getMatchConfidence, checkPrintSafety, getChromaticFamily, getAccessibilityReport } from './color-studio.js';
+import {
+    generateProPalettes, hexToHSL, findClosestPantone, hexToRgb, rgbToCmyk,
+    getMatchConfidence, checkPrintSafety, getChromaticFamily, getAccessibilityReport,
+    fetchColorName
+} from './color-studio.js';
 
 // --- UTILS ---
 window.copyToClipboard = function (text) {
@@ -268,6 +272,65 @@ function stopDrag() {
     document.removeEventListener('mouseup', stopDrag);
 }
 
+// --- BRAND CARD EXPORT ---
+window.downloadBrandCard = function () {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const width = 1200;
+    const height = 630; // OG Image standard size
+    canvas.width = width;
+    canvas.height = height;
+
+    // Background
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, width, height);
+
+    // Accent Side
+    ctx.fillStyle = currentBaseColor;
+    ctx.fillRect(0, 0, 400, height);
+
+    // Logo / Brand
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'italic 900 80px "Playfair Display", serif'; // Fallback font
+    ctx.fillText('kj.', 100, 150);
+
+    ctx.font = 'bold 20px sans-serif';
+    ctx.globalAlpha = 0.6;
+    ctx.fillText('KAREN JEFA', 100, 200);
+    ctx.globalAlpha = 1.0;
+
+    // Content Right Side
+    ctx.fillStyle = '#000000';
+
+    // Color Name
+    const nameEl = document.getElementById('color-identity-name');
+    const colorName = nameEl ? nameEl.textContent : 'Custom Color';
+    ctx.font = 'italic 700 60px "Playfair Display", serif';
+    ctx.fillText(colorName, 460, 150);
+
+    // Codes
+    ctx.font = 'bold 30px monospace';
+    ctx.fillStyle = '#333';
+    ctx.fillText(currentBaseColor.toUpperCase(), 460, 240);
+
+    const rgb = hexToRgb(currentBaseColor);
+    ctx.font = '24px sans-serif';
+    ctx.fillStyle = '#666';
+    ctx.fillText(`RGB: ${rgb.r}, ${rgb.g}, ${rgb.b}`, 460, 290);
+
+    // Viz
+    ctx.fillStyle = currentBaseColor;
+    ctx.beginPath();
+    ctx.arc(1050, 150, 80, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Download
+    const link = document.createElement('a');
+    link.download = `KarenJefa_Brand_${currentBaseColor.replace('#', '')}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
+}
+
 window.updateColor = function (hex) {
     currentBaseColor = hex;
 
@@ -299,6 +362,14 @@ window.updateColor = function (hex) {
         .theme-progress-bar {
             background: linear-gradient(90deg, ${hex}66 0%, ${hex} 100%) !important;
             box-shadow: 0 0 10px ${hex}44;
+        }
+
+        @keyframes flash {
+            0% { background-color: ${hex}aa; }
+            100% { background-color: transparent; }
+        }
+        .animate-flash {
+            animation: flash 0.4s ease-out;
         }
     `;
 
@@ -430,6 +501,17 @@ function initCustomPicker() {
             el.style.color = hex;
             el.style.borderColor = hex;
         });
+
+        // Debounced Color Name API
+        clearTimeout(window.colorNameDebounce);
+        window.colorNameDebounce = setTimeout(async () => {
+            const nameData = await fetchColorName(hex);
+            const nameEl = document.getElementById('color-identity-name');
+            if (nameEl) {
+                nameEl.textContent = nameData.name || 'Desconocido';
+                nameEl.title = nameData.exact_match ? 'Nombre Exacto' : 'Aproximado';
+            }
+        }, 500);
     };
 
     const disableTransitions = () => {
@@ -649,6 +731,9 @@ function renderContent(animate = false) {
                         </div>
                      </div>
                      <div class="flex gap-3">
+                         <button onclick="window.downloadBrandCard()" class="px-4 py-2 rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transform">
+                            <i data-lucide="download" class="w-3 h-3"></i> Exportar
+                         </button>
                          <button onclick="window.copyToClipboard('${currentBaseColor}')" class="px-4 py-2 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-violet-600 hover:text-white transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                             <i data-lucide="copy" class="w-3 h-3"></i> HEX
                          </button>
@@ -678,11 +763,15 @@ function renderContent(animate = false) {
                                  <div id="picker-hue-handle" class="w-4 h-4 rounded-full border-2 border-white shadow-md absolute top-0 -ml-2 bg-transparent pointer-events-none" style="left: ${pickerState.h / 3.6}%"></div>
                             </div>
                             <!-- HEX Display -->
-                            <div class="flex items-center justify-between bg-black/5 dark:bg-white/5 rounded-xl px-4 py-3 cursor-pointer hover:bg-black/10 transition-colors" onclick="window.copyToClipboard(document.getElementById('picker-hex-display').textContent)" title="Copiar HEX">
-                                <span class="text-xs font-bold opacity-50">HEX</span>
+                            <div id="picker-hex-btn" class="flex items-center justify-between bg-black/5 dark:bg-white/5 rounded-xl px-4 py-3 cursor-pointer hover:bg-black/10 transition-colors relative overflow-hidden group" onclick="window.copyToClipboard(document.getElementById('picker-hex-display').textContent); this.classList.add('animate-flash'); setTimeout(() => this.classList.remove('animate-flash'), 300);" title="Copiar HEX">
+                                <div class="absolute inset-0 bg-violet-500/0 group-hover:bg-violet-500/5 transition-colors"></div>
+                                <div class="flex flex-col">
+                                    <span class="text-[9px] font-bold opacity-40 uppercase tracking-wider">HEX</span>
+                                    <span id="color-identity-name" class="text-[10px] font-bold opacity-60 truncate max-w-[100px] leading-tight min-h-[14px]">Loading...</span>
+                                </div>
                                 <div class="flex items-center gap-2">
                                      <span id="picker-hex-display" class="text-xl font-serif italic text-black dark:text-white">${currentBaseColor}</span>
-                                     <i data-lucide="copy" class="w-4 h-4 opacity-50"></i>
+                                     <i data-lucide="copy" class="w-4 h-4 opacity-30 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
                             </div>
                         </div>
@@ -915,6 +1004,68 @@ function renderContent(animate = false) {
                                         `).join('')}
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- NEW: Brand Moodboard (The 'Safe' Premium Option) -->
+                        <div class="mt-12 border-t ${themeBorder} pt-12">
+                            <div class="flex items-center justify-between mb-8">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full bg-stone-500"></div>
+                                    <h3 class="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Dirección_Creativa</h3>
+                                </div>
+                                <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest">Brand Moodboard</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 h-96 sm:h-64">
+                                
+                                <!-- 1. TYPOGRAPHY (The Voice) -->
+                                <div class="relative rounded-2xl overflow-hidden bg-stone-100 flex items-center justify-center group border border-black/5">
+                                    <span class="font-serif italic text-9xl absolute opacity-20 transform scale-150 translate-x-4 translate-y-4" style="color: ${currentBaseColor}">Aa</span>
+                                    <span class="font-serif italic text-6xl relative z-10 text-black dark:text-black">Aa</span>
+                                    <div class="absolute bottom-3 left-4 text-[8px] font-bold uppercase tracking-widest opacity-40 text-black">Tipografía</div>
+                                </div>
+
+                                <!-- 2. GRADIENT AURA (The Vibe) -->
+                                <div class="relative rounded-2xl overflow-hidden bg-white border border-black/5 flex items-center justify-center">
+                                    <div class="absolute inset-0 opacity-80" style="background: radial-gradient(circle at 70% 30%, ${currentBaseColor}, transparent 70%), radial-gradient(circle at 20% 80%, ${currentBaseColor}66, transparent 60%);"></div>
+                                    <div class="w-24 h-24 bg-white/30 backdrop-blur-xl rounded-full border border-white/20 shadow-xl z-10 flex items-center justify-center">
+                                         <div class="w-2 h-2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,1)]"></div>
+                                    </div>
+                                    <div class="absolute bottom-3 left-4 text-[8px] font-bold uppercase tracking-widest opacity-40 mix-blend-overlay text-black">Aura</div>
+                                </div>
+
+                                <!-- 3. TEXTURE (The Feel) -->
+                                <div class="relative rounded-2xl overflow-hidden bg-black flex items-center justify-center group border border-white/10">
+                                    <!-- Noise/Texture Overlay -->
+                                    <div class="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+                                    <div class="absolute inset-0 opacity-60 mix-blend-color" style="background-color: ${currentBaseColor}"></div>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+                                    
+                                    <span class="relative z-10 text-white font-mono text-xs border border-white/20 px-3 py-1 rounded-full backdrop-blur-sm">#Material</span>
+                                    <div class="absolute bottom-3 left-4 text-[8px] font-bold uppercase tracking-widest opacity-60 text-white">Textura</div>
+                                </div>
+
+                                <!-- 4. BRAND MARK (The Icon) -->
+                                <div class="relative rounded-2xl overflow-hidden flex items-center justify-center border border-black/5" style="background-color: ${currentBaseColor}">
+                                    <div class="absolute inset-0 flex items-center justify-center opacity-30">
+                                         <!-- Repeating Pattern -->
+                                         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                                            <defs>
+                                                <pattern id="dotPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                                                    <circle cx="2" cy="2" r="1" fill="white"/>
+                                                </pattern>
+                                            </defs>
+                                            <rect width="100%" height="100%" fill="url(#dotPattern)"/>
+                                        </svg>
+                                    </div>
+                                    
+                                    <div class="w-16 h-16 bg-white text-black rounded-lg shadow-2xl flex items-center justify-center font-black text-xl italic relative z-10 transform transition-transform group-hover:rotate-12 duration-500">
+                                        kj.
+                                    </div>
+                                    <div class="absolute bottom-3 left-4 text-[8px] font-bold uppercase tracking-widest opacity-40 text-white">Sello</div>
+                                </div>
+
                             </div>
                         </div>
                      </div>
