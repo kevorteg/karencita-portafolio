@@ -1,4 +1,4 @@
-import { tools, projects } from './data.js';
+import { tools, projects, sidebarData } from './data.js';
 import {
     generateProPalettes, hexToHSL, findClosestPantone, hexToRgb, rgbToCmyk,
     getMatchConfidence, checkPrintSafety, getChromaticFamily, getAccessibilityReport,
@@ -1618,43 +1618,105 @@ function renderWindows() {
 }
 
 function renderInspector() {
-    const aboutTool = tools.find(t => t.id === 'about');
+    const inspector = document.getElementById('inspector');
+    if (!inspector) return;
 
-    // Skill items now come from new data or defaults?
-    // Since we moved skills to the main view, I will use this space for mini-stats or a condensed view
-    // For now, let's keep it simple or dynamic based on what we have.
-    // User didn't give numbers, so I'll generate some visual bars just for 'looks' like in the original, or 
-    // maybe just hide it if not relevant. But keeping it alive gives a techy feel.
-    // Let's populate testimonials dynamically from data.js
-
-    // Testimonials
-    const container = document.getElementById('testimonials-container');
-    if (container && aboutTool.testimonials) {
-        container.innerHTML = aboutTool.testimonials.map(quote => `
-            <div class="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 relative shadow-sm text-left italic">
-                <i data-lucide="quote" class="w-3 h-3 text-violet-600 opacity-20 absolute -top-1 -left-1"></i>
-                <p class="text-[10px] leading-relaxed opacity-60 font-medium">“${quote}”</p>
-            </div>
-        `).join('');
+    if (!sidebarData) {
+        console.warn("Sidebar Data not found");
+        return;
     }
 
-    // Update Skills Visuals (Just for the 'vibe', even if main skills are detailed text now)
-    // We can keep the dummy stats or randomizing them slightly to feel alive
-    document.querySelectorAll('.skill-item').forEach(el => {
-        const label = el.dataset.label;
-        const level = el.dataset.level;
-        el.innerHTML = `
-            <div class="space-y-2">
-                <div class="flex justify-between text-[10px] font-bold uppercase opacity-50 tracking-tighter">
-                    <span>${label}</span>
-                    <span>${level}%</span>
+    const { profile, skills, education } = sidebarData;
+
+    inspector.innerHTML = `
+        <div class="p-8 border-b border-stone-300">
+            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-8">${profile.label}</h3>
+            <div class="space-y-6">
+                ${profile.items.map(item => `
+                    ${item.isStatus ? `
+                        <div class="flex justify-between items-center p-4 rounded-2xl bg-green-500/5 border border-green-500/10">
+                            <span class="text-[9px] opacity-40 uppercase font-bold">${item.label}</span>
+                            <span class="text-[10px] text-green-600 font-black uppercase tracking-widest flex items-center gap-2">
+                                <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div> ${item.value}
+                            </span>
+                        </div>
+                    ` : `
+                        <div class="flex justify-between items-center text-[12px] font-bold">
+                            <span class="opacity-40 uppercase text-[9px]">${item.label}</span>
+                            <span class="tracking-tight">${item.value}</span>
+                        </div>
+                    `}
+                `).join('')}
+            </div>
+        </div>
+
+        <div class="p-8 border-b border-stone-300">
+            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-8">Habilidades_Core</h3>
+            <div class="space-y-6">
+                <div class="space-y-4">
+                    <span class="text-[10px] font-bold opacity-30 uppercase">${skills.creativeTitle}</span>
+                    ${skills.creative.map(s => `
+                        <div class="skill-item" data-label="${s.name}" data-level="${s.level}"></div>
+                    `).join('')}
                 </div>
-                <div class="h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
-                    <div style="width: ${level}%" class="h-full bg-violet-600/60 rounded-full theme-progress-bar transition-all duration-1000"></div>
+                <div class="space-y-4 pt-4">
+                    <span class="text-[10px] font-bold opacity-30 uppercase">${skills.professionalTitle}</span>
+                    ${skills.professional.map(s => `
+                        <div class="skill-item" data-label="${s.name}" data-level="${s.level}"></div>
+                    `).join('')}
                 </div>
             </div>
-        `;
-    });
+        </div>
 
-    lucide.createIcons();
+        <div class="p-8">
+            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-8">Testimonios_Log</h3>
+            <div class="space-y-4" id="testimonials-container">
+            </div>
+        </div>
+
+        <div class="mt-auto p-8 bg-violet-600/5">
+            <div class="flex items-center gap-3 mb-4">
+                <i data-lucide="graduation-cap" class="text-violet-600 w-4 h-4"></i>
+                <span class="text-[10px] font-bold uppercase tracking-widest">${education.title}</span>
+            </div>
+            <p class="text-[11px] leading-relaxed opacity-50 font-medium italic">
+                “${education.text}”
+            </p>
+        </div>
+    `;
+
+    // Render Skill Bars
+    setTimeout(() => {
+        document.querySelectorAll('.skill-item').forEach(el => {
+            const label = el.dataset.label;
+            const level = el.dataset.level;
+
+            el.innerHTML = `
+                <div class="space-y-2">
+                    <div class="flex justify-between text-[10px] font-bold uppercase opacity-50 tracking-tighter">
+                        <span>${label}</span>
+                        <span>${level}%</span>
+                    </div>
+                    <div class="h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
+                        <div style="width: ${level}%" class="h-full bg-violet-600/60 rounded-full theme-progress-bar transition-all duration-1000"></div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Render Testimonials
+        const aboutTool = tools.find(t => t.id === 'about');
+        if (aboutTool && aboutTool.testimonials) {
+            const container = document.getElementById('testimonials-container');
+            if (container) {
+                container.innerHTML = aboutTool.testimonials.map(quote => `
+                    <div class="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 relative shadow-sm text-left italic">
+                        <i data-lucide="quote" class="w-3 h-3 text-violet-600 opacity-20 absolute -top-1 -left-1"></i>
+                        <p class="text-[10px] leading-relaxed opacity-60 font-medium">“${quote}”</p>
+                    </div>
+                 `).join('');
+            }
+        }
+        lucide.createIcons();
+    }, 50);
 }
