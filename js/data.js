@@ -48,8 +48,34 @@ export const tools = [
     { id: 'gallery', icon: 'camera', label: 'Galería', role: 'Fotografía & Mood', desc: 'Capturando momentos.', manifesto: 'Una colección curada de vibras visuales y fotografía.', services: [] },
     { id: 'strategy', icon: 'brain', label: 'Estrategia', role: 'Arquetipos de Marca', desc: 'Descubre el ADN de tu marca.', manifesto: 'Herramienta interactiva para definir la personalidad de tu negocio.', services: [] },
     { id: 'contact', icon: 'send', label: 'Contacto', role: 'Inicia el Viaje', desc: 'Hagamos realidad tu proyecto.', manifesto: 'Generador de brief interactivo para entender tus necesidades.', services: [] }
-
 ];
+
+export const sidebarData = {
+    profile: {
+        label: "Propiedades Perfil",
+        items: [
+            { label: "Liderazgo", value: "Creativa" },
+            { label: "Modalidad", value: "Global / Remoto" },
+            { label: "Status", value: "Online", isStatus: true }
+        ]
+    },
+    skills: {
+        creativeTitle: "Creativas",
+        creative: [
+            { name: "Dirección Creativa", level: 95 },
+            { name: "Storytelling", level: 90 }
+        ],
+        professionalTitle: "Profesionales",
+        professional: [
+            { name: "Gestión Proyectos", level: 92 },
+            { name: "Trabajo Colaborativo", level: 95 }
+        ]
+    },
+    education: {
+        title: "Educación_Layer",
+        text: "Formación académica y autodidacta en diseño, publicidad y marketing."
+    }
+};
 
 export const projects = [
     { id: 1, title: 'Aura Branding', category: 'design', img: 'assets/images/projects/aura.jpg', description: 'Sistema visual para marca de lujo.' },

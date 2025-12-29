@@ -1,70 +1,73 @@
-# 📖 Guía de Edición (Modo No-Código)
+# ✨ ¡Hola Karencita! (Guía de Supervivencia) 💖
 
-¡Hola! Esta guía es para que puedas cambiar los textos, fotos y proyectos de tu portafolio sin necesidad de saber programar. Todo el contenido importante vive en un solo archivo llamado `data.js`.
+Si estás leyendo esto es porque quieres **cambiar algo de tu portafolio** (o pusiste a un amigo a hacerlo). ¡Relax! No necesitas ser hacker para actualizar tus textos o subir fotos nuevas.
 
----
+Solo hay **UNA** regla sagrada:
 
-## 📂 ¿Dónde edito?
-
-1.  Ve a la carpeta de tu proyecto.
-2.  Entra en la carpeta `js`.
-3.  Abre el archivo **`data.js`** (puedes usar el Bloc de Notas, VS Code o cualquier editor de texto).
+> 🚨 **¡NO TOQUES EL CÓDIGO!** 🚨
+> (Aléjate de archivos como `main.js` o `index.html` si no quieres que la magia se rompa).
 
 ---
 
-## 📝 Reglas de Oro (¡Lee esto primero!)
+## 📂 Tu Zona Segura: `js/data.js`
 
-Para que la página no se rompa, sigue estas 3 reglas simples:
+Todo el contenido de tu página vive en un archivito llamado **`data.js`** (dentro de la carpeta `js`). 
+Ese es tu **centro de control**. Ahí puedes cambiar todo sin miedo a dañar el sistema.
 
-1.  **Respeta las comillas**: Los textos siempre van entre comillas simples `'texto'` o dobles `"texto"`. Si borras una, ¡el código falla!
-    *   ✅ BIEN: `'Hola mundo'`
-    *   ❌ MAL: `'Hola mundo`
-2.  **Cuidado con las comas**: Si ves una lista de cosas, cada línea suele terminar con una coma `,`. No las borres.
-3.  **No toques lo que está en azul/código**: Solo cambia el texto que está en blanco/naranja (lo que está dentro de las comillas). No cambies palabras como `id:`, `icon:`, `const`, `export`.
+### ¿Cómo edito sin romper nada? 🛠️
+
+Abre `js/data.js` y sigue estos tips de oro:
+
+1.  **Solo cambia lo naranja/blanco**: Lo que está entre comillas (`'texto'` o `"texto"`).
+    *   ✅ BIEN: `'Hola Karen'`
+    *   ❌ MAL: `'Hola Karen` (¡Te comiste una comilla! 😱)
+2.  **Respeta las comitas**: Al final de cada línea suele haber una coma `,`. ¡No la borres!
 
 ---
 
-## 🛠️ ¿Qué puedo cambiar?
+## ✏️ ¿Qué quieres cambiar hoy?
 
-### 1. Tu Perfil ("Sobre Mí")
-Busca la sección que dice `id: 'about'`.
-*   **`role`**: Tu título profesional (ej. "Directora Creativa").
-*   **`title`**: La frase principal de tu bio.
-*   **`intro`**: Tu historia. Cada párrafo es un texto separado por comas.
-*   **`skills`**: Tus habilidades. Están agrupadas en `creative`, `technical`, y `professional`. ¡Agrega o quita las que quieras!
+### 1. ¿Nuevo puesto o Bio? 👩‍💻
+Busca la parte que dice **`about`**.
+Ahí puedes cambiar tu título en `role` (ej. "Jefa Suprema") o tu historia en `intro`.
 
-### 2. Tus Servicios
-Busca las líneas que empiezan con `{ id: 'design'...`, `{ id: 'illustration'...`, etc.
-*   **`label`**: El nombre del botón en el menú.
-*   **`desc`**: La frase corta que aparece abajo.
-*   **`manifesto`**: La descripción larga del servicio.
-*   **`services`**: Una lista de lo que incluye (ej. `['Logotipos', 'Branding']`).
+### 1.5 Estadísticas y Barras de Porcentaje 📊
+¡Sí, lo de la derecha también se cambia!
+Baja al final del archivo donde dice **`sidebarData`**.
+*   **Perfil**: Cambia "Liderazgo" o "Status".
+*   **Habilidades (Skills)**: Verás números como `level: 95`. ¡Ese es el porcentaje de la barra!
+    *   Ejemplo: Cambia `95` por `100` para subirle el nivel.
 
-### 3. Testimonios
-Busca la parte que dice `testimonials: [`
-*   Ahí verás frases entre comillas. Simplemente borra las de ejemplo y escribe lo que dicen tus clientes reales.
+### 2. ¿Tus Servicios? 🎨
+Baja hasta donde dicen `design`, `illustration`, `marketing`...
+Cambia lo que dice en `desc` (la frase corta) o `services` (la lista de cosas que haces).
 
-### 4. Proyectos (Galería)
-Al final del archivo verás `export const projects = [`.
-Cada proyecto es un bloque así:
+### 3. ¿Testimonios de Clientes? ⭐
+Busca **`testimonials`**.
+Simplemente borra mis ejemplos y pega las flores que te echen tus clientes reales.
+
+### 4. ¿Subir Proyecto Nuevo? 📸
+Al final del archivo está la lista **`projects`**. Para agregar uno nuevo, copia y pega esto antes del cierre `];`:
+
 ```javascript
 { 
-    id: 1, 
+    id: 99, 
     title: 'Nombre del Proyecto', 
-    category: 'design', 
-    img: 'assets/images/foto.jpg', 
-    description: 'Descripción corta.' 
+    category: 'design',   // O 'illustration', 'marketing'
+    img: 'assets/images/projects/tu-foto.jpg', 
+    description: 'Chisme corto del proyecto.' 
 },
 ```
-*   **Para agregar una foto nueva**:
-    1.  Guarda tu imagen en la carpeta `assets/images/projects/`.
-    2.  En `data.js`, cambia la parte de `img:` por el nombre de tu archivo (ej. `'assets/images/projects/mi-logo-nuevo.jpg'`).
+*(Ojo: Asegúrate que la foto `tu-foto.jpg` esté guardada en la carpeta `assets/images/projects/`)*.
 
 ---
 
-## 🆘 ¿Algo salió mal?
-Si guardas y la página se pone en blanco o no carga:
-1.  Probablemente borraste una comilla `'` o una coma `,` por accidente.
-2.  Presiona `Ctrl + Z` (Deshacer) hasta que vuelva a funcionar e inténtalo de nuevo con calma.
+## 🆘 ¡Ayuda, rompí algo!
 
-¡Disfruta actualizando tu portafolio! 🚀
+Si guardas y la página se pone blanca o no carga:
+1.  ¡Respira! 🧘‍♀️
+2.  Seguro borraste una comilla `'` o una coma `,` sin querer.
+3.  Dale **Ctrl + Z** (Deshacer) hasta que reviva y vuelve a intentarlo con más calmita.
+4.  Si no te funciona, escríbeme para corregir los errores.
+
+¡Tú puedes! Haz que ese portafolio brille. ✨🚀
