@@ -240,6 +240,23 @@ export function getAccessibilityReport(hex) {
             aaa: blackRatio >= 7 ? 'Pass' : 'Fail',
             visible: blackRatio >= 3
         },
-        bestText: blackRatio > whiteRatio ? 'Negro' : 'Blanco'
     };
+}
+
+// --- API & UTILS ---
+export async function fetchColorName(hex) {
+    // Remove # if present
+    const cleanHex = hex.replace('#', '');
+    try {
+        const response = await fetch(`https://www.thecolorapi.com/id?hex=${cleanHex}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        return {
+            name: data.name.value, // e.g., "Lavender"
+            exact_match: data.name.exact_match_name
+        };
+    } catch (error) {
+        console.warn('Color API failed:', error);
+        return { name: 'Unknown', exact_match: false };
+    }
 }
