@@ -66,6 +66,16 @@ window.onload = () => {
             sessionStorage.setItem('welcomeShown', 'true');
         }
     }, 1200);
+
+    // Safety Fallback: Force open if something gets stuck
+    setTimeout(() => {
+        const boot = document.getElementById('booting-screen');
+        if (boot && boot.style.display !== 'none') {
+            console.warn('Boot sequence timeout - Forcing entry.');
+            boot.style.display = 'none';
+            document.getElementById('app-container').style.opacity = '1';
+        }
+    }, 5000);
 };
 
 window.sendWhatsApp = function () {
@@ -156,6 +166,7 @@ window.addEventListener('mousemove', (e) => {
 // --- ACTIONS ---
 window.toggleDarkMode = function () {
     isDarkMode = !isDarkMode;
+    document.documentElement.classList.toggle('dark'); // Enable Tailwind & CSS dark mode
     const body = document.getElementById('body-main');
     const elements = [
         document.getElementById('header'),
@@ -460,7 +471,12 @@ function initCustomPicker() {
     if (!salArea || !hueArea) return;
 
     const handleMove = (e, type) => {
-        const rect = (type === 'sl' ? salArea : hueArea).getBoundingClientRect();
+        // Always fetch fresh elements to avoid stale closure references after re-renders
+        const currentSal = document.getElementById('picker-sl');
+        const currentHue = document.getElementById('picker-hue');
+        if (!currentSal || !currentHue) return;
+
+        const rect = (type === 'sl' ? currentSal : currentHue).getBoundingClientRect();
 
         // Handle both Mouse and Touch events
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -605,8 +621,26 @@ function renderContent(animate = false) {
             <h2 class="${animClass} text-3xl sm:text-6xl font-serif italic mb-6 sm:mb-8 leading-none dark:text-stone-100">${tool.label}</h2>
             
             ${activeTool === 'about' ? `
-                <div class="${animClass} max-w-4xl border-l-2 sm:border-l-4 border-violet-600 pl-4 sm:pl-8 py-2 mb-10 sm:mb-16">
-                    ${tool.intro.map(p => `<p class="text-[14px] sm:text-xl font-serif leading-relaxed mb-4 sm:mb-6 opacity-90 text-justify sm:text-left">${p}</p>`).join('')}
+                <div class="${animClass} grid grid-cols-1 lg:grid-cols-12 gap-10 sm:gap-16 mb-16 items-start">
+                    <!-- Intro Text -->
+                    <div class="lg:col-span-7 order-2 lg:order-1 border-l-2 sm:border-l-4 border-violet-600 pl-4 sm:pl-8 py-2">
+                         ${tool.intro.map(p => `<p class="text-[14px] sm:text-l font-serif leading-relaxed mb-4 sm:mb-6 opacity-90 text-justify sm:text-left">${p}</p>`).join('')}
+                    </div>
+
+                    <!-- Profile Picture (Hierarchical Placement) -->
+                    <div class="lg:col-span-5 order-1 lg:order-2">
+                        <div class="relative rounded-[2rem] overflow-hidden aspect-[4/5] shadow-2xl group border ${themeBorder} transform rotate-3 hover:rotate-0 transition-all duration-700">
+                             <div class="absolute inset-0 bg-violet-600/10 mix-blend-multiply pointer-events-none z-10 opacity-100 group-hover:opacity-0 transition-opacity duration-700"></div>
+                             <img src="assets/images/profile/perfil.png" 
+                                  alt="Karen Jefa" 
+                                  class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-110 group-hover:scale-100" />
+                             
+                             <!-- Floating Badge -->
+                             <div class="absolute bottom-4 left-4 bg-white/90 dark:bg-black/80 backdrop-blur-md px-4 py-2 rounded-full border border-black/5 z-20">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-violet-600">The_Creator</span>
+                             </div>
+                        </div>
+                    </div>
                 </div>
                  <!-- QUÉ HAGO -->
                 <div class="${animClass} mb-20">
@@ -763,17 +797,28 @@ function renderContent(animate = false) {
                                  <div id="picker-hue-handle" class="w-4 h-4 rounded-full border-2 border-white shadow-md absolute top-0 -ml-2 bg-transparent pointer-events-none" style="left: ${pickerState.h / 3.6}%"></div>
                             </div>
                             <!-- HEX Display -->
-                            <div id="picker-hex-btn" class="flex items-center justify-between bg-black/5 dark:bg-white/5 rounded-xl px-4 py-3 cursor-pointer hover:bg-black/10 transition-colors relative overflow-hidden group" onclick="window.copyToClipboard(document.getElementById('picker-hex-display').textContent); this.classList.add('animate-flash'); setTimeout(() => this.classList.remove('animate-flash'), 300);" title="Copiar HEX">
+                            <div id="picker-hex-btn" class="flex items-center justify-between bg-black/5 dark:bg-white/5 rounded-xl px-4 py-3 cursor-pointer hover:bg-black/10 transition-colors relative overflow-hidden group" onclick="window.copyToClipboard(document.getElementById('picker-hex-display').textContent); const iconP = document.getElementById('picker-copy-icon'); if(iconP) { iconP.setAttribute('data-lucide', 'check'); iconP.classList.add('text-green-500'); lucide.createIcons(); setTimeout(() => { iconP.setAttribute('data-lucide', 'copy'); iconP.classList.remove('text-green-500'); lucide.createIcons(); }, 1500); }" title="Copiar HEX">
                                 <div class="absolute inset-0 bg-violet-500/0 group-hover:bg-violet-500/5 transition-colors"></div>
                                 <div class="flex flex-col">
-                                    <span class="text-[9px] font-bold opacity-40 uppercase tracking-wider">HEX</span>
-                                    <span id="color-identity-name" class="text-[10px] font-bold opacity-60 truncate max-w-[100px] leading-tight min-h-[14px]">Loading...</span>
+                                    <span class="text-[9px] font-bold opacity-40 uppercase tracking-wider">Nombre</span>
+                                    <span id="color-identity-name" class="text-xs sm:text-sm font-black opacity-100 truncate max-w-[150px] leading-tight min-h-[18px] text-violet-600 dark:text-violet-400">Loading...</span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                     <span id="picker-hex-display" class="text-xl font-serif italic text-black dark:text-white">${currentBaseColor}</span>
-                                     <i data-lucide="copy" class="w-4 h-4 opacity-30 group-hover:opacity-100 transition-opacity"></i>
+                                     <span id="picker-hex-display" class="text-xl font-serif italic ${isDarkMode ? 'text-white' : 'text-black'}">${currentBaseColor}</span>
+                                     <i data-lucide="copy" id="picker-copy-icon" class="w-4 h-4 opacity-30 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
                             </div>
+                            <script>
+                                // Auto-load color name on render
+                                setTimeout(async () => {
+                                    const nameData = await import('./color-studio.js').then(m => m.fetchColorName('${currentBaseColor}'));
+                                    const el = document.getElementById('color-identity-name');
+                                    if(el) {
+                                        el.textContent = nameData.name;
+                                        el.title = nameData.exact_match ? 'Nombre Exacto' : 'Aproximado';
+                                    }
+                                }, 100);
+                            </script>
                         </div>
 
                         <!-- Technical Data Accordion -->
@@ -867,12 +912,12 @@ function renderContent(animate = false) {
                         
                         <!-- 1. The Profile Card -->
                         <div class="flex justify-center">
-                            <div class="w-72 bg-white dark:bg-[#1A1844] rounded-3xl shadow-2xl overflow-hidden transform rotate-[-3deg] hover:rotate-0 transition-transform duration-500 border border-black/5">
+                            <div class="w-72 ${isDarkMode ? 'bg-[#1A1844]' : 'bg-white'} rounded-3xl shadow-2xl overflow-hidden transform rotate-[-3deg] hover:rotate-0 transition-transform duration-500 border border-black/5">
                                 <div class="h-32 w-full live-preview-bg flex items-center justify-center relative" style="background-color: ${currentBaseColor}">
                                     <div class="absolute inset-0 bg-black/10"></div>
                                 </div>
                                 <div class="p-6 relative -mt-12 text-center">
-                                    <div class="w-24 h-24 bg-white dark:bg-[#1A1844] rounded-full mx-auto p-1.5 shadow-lg mb-4 relative z-10">
+                                    <div class="w-24 h-24 ${isDarkMode ? 'bg-[#1A1844]' : 'bg-white'} rounded-full mx-auto p-1.5 shadow-lg mb-4 relative z-10">
                                         <div class="w-full h-full rounded-full bg-stone-200 bg-cover bg-center" style="background-image: url('assets/images/profile/perfil.png');"></div>
                                     </div>
                                     <h4 class="font-bold text-xl mb-1 dark:text-white font-serif italic">Karen Jefa</h4>
@@ -888,7 +933,8 @@ function renderContent(animate = false) {
                         <!-- 2. UI Controls & States -->
                         <div class="flex flex-col gap-6 w-full text-left">
                             <!-- Button States -->
-                            <div class="bg-stone-50 dark:bg-white/5 p-6 rounded-3xl border border-black/5">
+                            <!-- Button States -->
+                            <div class="${isDarkMode ? 'bg-white/5' : 'bg-stone-50'} p-6 rounded-3xl border border-black/5">
                                 <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest block mb-4">Button Ecosystem</span>
                                 <div class="flex flex-col gap-4">
                                     <button class="w-full py-4 rounded-xl font-bold text-sm text-white shadow-lg flex items-center justify-center gap-3 hover:-translate-y-1 transition-transform live-preview-bg" style="background-color: ${currentBaseColor}">
@@ -902,7 +948,8 @@ function renderContent(animate = false) {
                             </div>
 
                              <!-- Progress & Toggles -->
-                            <div class="bg-stone-50 dark:bg-white/5 p-6 rounded-3xl border border-black/5">
+                             <!-- Progress & Toggles -->
+                            <div class="${isDarkMode ? 'bg-white/5' : 'bg-stone-50'} p-6 rounded-3xl border border-black/5">
                                 <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest block mb-4">System Elements</span>
                                 <div class="space-y-6">
                                      <!-- Loading -->
@@ -938,7 +985,8 @@ function renderContent(animate = false) {
                         </div>
 
                         <!-- Pantone Pro Card (Full Width Version) -->
-                        <div class="bg-white dark:bg-[#1D1B4B] rounded-[2rem] shadow-xl overflow-hidden border ${themeBorder} grid grid-cols-1 md:grid-cols-2">
+                        <!-- Pantone Pro Card (Full Width Version) -->
+                        <div class="${isDarkMode ? 'bg-[#1D1B4B]' : 'bg-white'} rounded-[2rem] shadow-xl overflow-hidden border ${themeBorder} grid grid-cols-1 md:grid-cols-2">
                             <!-- Left: Big Color Area -->
                             <div class="min-h-[300px] relative group flex items-end justify-between p-8" style="background-color: ${primaryMatch.hex}">
                                  <!-- Warning Ribbon Overlay -->
@@ -965,7 +1013,7 @@ function renderContent(animate = false) {
                                     <div class="flex justify-between items-start mb-8">
                                         <div>
                                             <span class="text-[10px] font-bold uppercase opacity-30 tracking-[0.2em] block mb-2">${matchLabel}</span>
-                                            <h2 class="text-6xl font-serif italic text-black dark:text-white leading-none mb-1">${primaryMatch.code.replace('C', '')}</h2>
+                                            <h2 class="text-6xl font-serif italic ${isDarkMode ? 'text-white' : 'text-black'} leading-none mb-1">${primaryMatch.code.replace('C', '')}</h2>
                                             <span class="text-2xl opacity-40 font-bold stroke-text">C</span>
                                         </div>
                                         <div class="text-right">
