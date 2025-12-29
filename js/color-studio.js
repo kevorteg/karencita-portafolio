@@ -260,3 +260,101 @@ export async function fetchColorName(hex) {
         return { name: 'Unknown', exact_match: false };
     }
 }
+// --- NEW CREATIVE FEATURES ---
+
+export function generateAura(hex) {
+    const { h, s, l } = hexToHSL(hex);
+    let aura = { title: "Energía Latente", desc: "Equilibrio neutral.", vibe: "✨" };
+
+    // 1. By Lightness/Saturation (Mood)
+    if (l < 15) aura = { title: "Sombra Profunda", desc: "Misterio, elegancia y autoridad absoluta.", vibe: "🌑" };
+    else if (l > 90) aura = { title: "Luz Pura", desc: "Claridad, limpieza y nuevos comienzos.", vibe: "☁️" };
+    else if (s < 10) aura = { title: "Neutralidad Zen", desc: "Calma, estabilidad y minimalismo.", vibe: "🧘" };
+    else {
+        // 2. By Hue (Personality)
+        if (h >= 345 || h < 10) aura = { title: "Fuego Interior", desc: "Pasión, urgencia y alta energía vital.", vibe: "🔥" };
+        else if (h >= 10 && h < 40) aura = { title: "Entusiasmo Solar", desc: "Creatividad, amistad y confianza.", vibe: "🍊" };
+        else if (h >= 40 && h < 70) aura = { title: "Optimismo Radiante", desc: "Felicidad, intelecto y precaución.", vibe: "☀️" };
+        else if (h >= 70 && h < 160) aura = { title: "Crecimiento Vital", desc: "Naturaleza, frescura y prosperidad.", vibe: "🌿" };
+        else if (h >= 160 && h < 200) aura = { title: "Mente Clara", desc: "Innovación, fluidez y tecnología.", vibe: "💧" };
+        else if (h >= 200 && h < 260) aura = { title: "Profundidad Cósmica", desc: "Confianza, lógica y paz interior.", vibe: "🌌" };
+        else if (h >= 260 && h < 300) aura = { title: "Visión Mística", desc: "Lujo, espiritualidad y creatividad.", vibe: "🔮" };
+        else if (h >= 300 && h < 345) aura = { title: "Encanto Magnético", desc: "Romance, dulzura y diversión.", vibe: "🌸" };
+    }
+    return aura;
+}
+
+export function generateGradients(hex, harmonies) {
+    // Generate simple but pro gradients
+    const colors = harmonies.Analogous || [hex, '#ffffff'];
+    const c1 = hex;
+    const c2 = colors[0];
+    const c3 = colors[2] || colors[1] || '#000000';
+
+    return [
+        { name: "Cosmic Mesh", css: `radial-gradient(at 0% 0%, ${c1} 0px, transparent 50%), radial-gradient(at 100% 0%, ${c2} 0px, transparent 50%), radial-gradient(at 100% 100%, ${c3} 0px, transparent 50%), radial-gradient(at 0% 100%, ${c1} 0px, transparent 50%), #000000` },
+        { name: "Deep Linear", css: `linear-gradient(135deg, ${c1} 0%, ${c2} 50%, ${c3} 100%)` },
+        { name: "Glass Aura", css: `radial-gradient(circle, ${c1} 0%, ${c1}00 70%)` }
+    ];
+}
+
+export async function extractColorsFromImage(imageSrc) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        // Removed crossOrigin to avoid Tainted Canvas issues with local/data URLs
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Resize for efficient processing
+            const targetWidth = 150;
+            const scale = targetWidth / img.width;
+            canvas.width = targetWidth;
+            canvas.height = img.height * scale;
+
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            try {
+                const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                const colorCounts = {};
+
+                // Scan pixels (Step 10 for speed)
+                const step = 4 * 10;
+                for (let i = 0; i < data.length; i += step) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    const alpha = data[i + 3];
+
+                    if (alpha < 128) continue;
+
+                    // 2. Safe Quantization (Clamp to 255)
+                    const rQ = Math.min(255, Math.round(r / 10) * 10);
+                    const gQ = Math.min(255, Math.round(g / 10) * 10);
+                    const bQ = Math.min(255, Math.round(b / 10) * 10);
+
+                    // 3. Safe Hex Conversion
+                    const toHex = (c) => c.toString(16).padStart(2, '0');
+                    const hex = `#${toHex(rQ)}${toHex(gQ)}${toHex(bQ)}`;
+
+                    colorCounts[hex] = (colorCounts[hex] || 0) + 1;
+                }
+
+                const sorted = Object.entries(colorCounts).sort((a, b) => b[1] - a[1]);
+                const result = sorted.slice(0, 5).map(x => x[0]);
+
+                if (result.length === 0) resolve(['#888888']);
+                else resolve(result);
+
+            } catch (e) {
+                console.warn("Canvas Read Error", e);
+                resolve(['#888888']);
+            }
+        };
+        img.onerror = (e) => {
+            console.error("Image Load Failed", e);
+            resolve(['#888888']);
+        };
+        img.src = imageSrc;
+    });
+}

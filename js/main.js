@@ -2,7 +2,7 @@ import { tools, projects } from './data.js';
 import {
     generateProPalettes, hexToHSL, findClosestPantone, hexToRgb, rgbToCmyk,
     getMatchConfidence, checkPrintSafety, getChromaticFamily, getAccessibilityReport,
-    fetchColorName
+    fetchColorName, generateAura, generateGradients, extractColorsFromImage
 } from './color-studio.js';
 
 // --- UTILS ---
@@ -89,6 +89,76 @@ window.sendWhatsApp = function () {
 
     const url = `https://wa.me/573164321424?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
+};
+
+window.handleImageUpload = async function (input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const url = URL.createObjectURL(file);
+
+        // Update State
+        window.currentImageURL = url;
+        renderContent(false);
+
+        // Auto-Extract on Load
+        setTimeout(async () => {
+            const { extractColorsFromImage } = await import('./color-studio.js');
+            try {
+                const colors = await extractColorsFromImage(url);
+                if (colors && colors.length > 0) {
+                    updateColor(colors[0]);
+                }
+            } catch (err) {
+                console.error("Extraction failed", err);
+            }
+        }, 50);
+    }
+};
+
+window.handleImageClick = function (e) {
+    const img = e.target;
+    // Calculate coordinates relative to the natural image size
+    const rect = img.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Scale ratio
+    const limitX = img.naturalWidth || img.width;
+    const limitY = img.naturalHeight || img.height;
+
+    // Safety check just in case
+    if (limitX === 0 || limitY === 0) return;
+
+    const scaleX = limitX / img.clientWidth;
+    const scaleY = limitY / img.clientHeight;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = limitX;
+    canvas.height = limitY;
+
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+
+    try {
+        const pixel = ctx.getImageData(x * scaleX, y * scaleY, 1, 1).data;
+        // pixel is [r, g, b, a]
+        const r = pixel[0];
+        const g = pixel[1];
+        const b = pixel[2];
+        const a = pixel[3];
+
+        if (a < 128) {
+            // Handle transparency? Maybe ignore or assume white background?
+            return;
+        }
+
+        const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        updateColor(hex);
+
+        // Optional: Simple visual feedback (ripple?)
+    } catch (err) {
+        console.error("Eyedropper Error", err);
+    }
 };
 
 // --- QUIZ LOGIC (Global Helpers) ---
@@ -397,7 +467,26 @@ window.updateColor = function (hex) {
     localStorage.setItem('colorHistory', JSON.stringify(history));
 
     renderContent(false);
+
+    // --- ASYNC UPDATE: Name & Aura ---
+    (async () => {
+        try {
+            const { fetchColorName, generateAura } = await import('./color-studio.js');
+
+            // 1. Name
+            const nameEl = document.getElementById('color-identity-name');
+            if (nameEl) {
+                const data = await fetchColorName(hex);
+                // Ensure we are still on the same color (race condition)
+                if (currentBaseColor === hex) {
+                    nameEl.textContent = data.name;
+                    nameEl.title = data.exact_match ? 'Nombre Exacto' : 'Aproximado';
+                }
+            }
+        } catch (e) { console.error("Async Update Failed", e); }
+    })();
 };
+
 
 // --- RENDERING ---
 function renderTools() {
@@ -709,6 +798,9 @@ function renderContent(animate = false) {
     `;
 
     if (activeTool === 'color') {
+        // State Initialization
+        window.pickerMode = window.pickerMode || 'manual';
+
         const palettes = generateProPalettes(currentBaseColor);
         const pantoneMatches = findClosestPantone(currentBaseColor);
         const primaryMatch = pantoneMatches[0];
@@ -720,6 +812,8 @@ function renderContent(animate = false) {
         const confidence = getMatchConfidence(primaryMatch.distance);
         const safety = checkPrintSafety(rgb.r, rgb.g, rgb.b);
         const a11y = getAccessibilityReport(currentBaseColor);
+        const aura = generateAura(currentBaseColor);
+        const cosmicGradients = generateGradients(currentBaseColor, palettes);
 
         // History Logic (Load from LocalStorage)
         let history = [];
@@ -740,6 +834,7 @@ function renderContent(animate = false) {
             </div>
         `;
 
+        // Warning Logic
         if (primaryMatch.distance > 35 || currentFamily !== pantoneFamily) {
             matchLabel = "Pantone cercano";
             subLabel = `Fuera de familia cromática (${currentFamily} vs ${pantoneFamily}).`;
@@ -782,20 +877,53 @@ function renderContent(animate = false) {
                     
                     <!-- LEFT COLUMN: DIGITAL STUDIO (Screen) -->
                     <div class="lg:col-span-5 flex flex-col gap-6">
-                        <div class="flex items-center gap-2 mb-2">
-                            <div class="w-2 h-2 rounded-full bg-violet-500"></div>
-                            <h3 class="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Digital_Studio (Screen)</h3>
+                        <div class="flex items-center justify-between mb-2">
+                             <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-violet-500"></div>
+                                <h3 class="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Digital_Studio</h3>
+                             </div>
+                             <!-- MODE SWITCHER -->
+                             <div class="flex bg-black/5 dark:bg-white/5 rounded-lg p-1 gap-1">
+                                <button onclick="window.pickerMode='manual'; renderContent(false);" class="px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${window.pickerMode === 'manual' ? 'bg-white dark:bg-stone-800 shadow-sm opacity-100' : 'opacity-40 hover:opacity-100'}">Manual</button>
+                                <button onclick="window.pickerMode='image'; renderContent(false);" class="px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${window.pickerMode === 'image' ? 'bg-white dark:bg-stone-800 shadow-sm opacity-100' : 'opacity-40 hover:opacity-100'}">Imagen</button>
+                             </div>
                         </div>
 
                         <!-- Main Editor -->
                         <div class="${themePanel} border ${themeBorder} rounded-[2rem] p-5 sm:p-6 shadow-xl theme-transition relative overflow-hidden">
-                            <!-- Picker Areas -->
-                            <div id="picker-sl" class="w-full aspect-[4/3] rounded-xl mb-4 relative picker-saturation shadow-inner" style="background-color: hsl(${pickerState.h}, 100%, 50%)">
-                                <div id="picker-sl-handle" class="w-4 h-4 rounded-full border-2 border-white shadow-md absolute -ml-2 -mt-2 pointer-events-none" style="background: ${currentBaseColor}; left: ${pickerState.s}%; top: ${100 - pickerState.v}%"></div>
-                            </div>
-                            <div id="picker-hue" class="w-full h-4 rounded-full mb-6 relative picker-hue shadow-inner">
-                                 <div id="picker-hue-handle" class="w-4 h-4 rounded-full border-2 border-white shadow-md absolute top-0 -ml-2 bg-transparent pointer-events-none" style="left: ${pickerState.h / 3.6}%"></div>
-                            </div>
+                            
+                            ${window.pickerMode === 'manual' ? `
+                                <!-- Picker Areas -->
+                                <div id="picker-sl" class="w-full aspect-[4/3] rounded-xl mb-4 relative picker-saturation shadow-inner" style="background-color: hsl(${pickerState.h}, 100%, 50%)">
+                                    <div id="picker-sl-handle" class="w-4 h-4 rounded-full border-2 border-white shadow-md absolute -ml-2 -mt-2 pointer-events-none" style="background: ${currentBaseColor}; left: ${pickerState.s}%; top: ${100 - pickerState.v}%"></div>
+                                </div>
+                                <div id="picker-hue" class="w-full h-4 rounded-full mb-6 relative picker-hue shadow-inner">
+                                     <div id="picker-hue-handle" class="w-4 h-4 rounded-full border-2 border-white shadow-md absolute top-0 -ml-2 bg-transparent pointer-events-none" style="left: ${pickerState.h / 3.6}%"></div>
+                                </div>
+                            ` : `
+                                <!-- Image Drop Zone or Interactive Image -->
+                                ${window.currentImageURL ? `
+                                    <div class="w-full aspect-[4/3] rounded-xl mb-4 relative overflow-hidden shadow-inner group">
+                                        <img src="${window.currentImageURL}" onclick="handleImageClick(event)" class="w-full h-full object-contain bg-pattern cursor-crosshair" id="interactive-img" />
+                                        <button onclick="window.currentImageURL = null; renderContent(false);" class="absolute top-2 right-2 p-2 bg-black/50 text-white rounded-full hover:bg-red-500 transition-colors backdrop-blur-md shadow-lg z-50" title="Cambiar Imagen">
+                                            <i data-lucide="x" class="w-4 h-4"></i>
+                                        </button>
+                                        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/50 backdrop-blur-md text-white/90 text-[9px] font-bold uppercase tracking-widest pointer-events-none">
+                                            Click para seleccionar
+                                        </div>
+                                    </div>
+                                ` : `
+                                    <div id="drop-zone" class="w-full aspect-[4/3] rounded-xl mb-4 relative border-2 border-dashed border-stone-300 dark:border-indigo-900/50 flex flex-col items-center justify-center gap-4 transition-colors hover:bg-black/5 dark:hover:bg-white/5 group cursor-pointer overflow-hidden">
+                                        <input type="file" id="img-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-50" onchange="handleImageUpload(this)">
+                                        <div class="w-12 h-12 rounded-full bg-violet-600/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <i data-lucide="image-plus" class="w-6 h-6 text-violet-600"></i>
+                                        </div>
+                                        <span class="text-[10px] font-bold uppercase tracking-widest opacity-40">Arrastra o Click</span>
+                                        <img id="preview-img" class="absolute inset-0 w-full h-full object-cover opacity-0 pointer-events-none transition-opacity" />
+                                    </div>
+                                `}
+                            `}
+
                             <!-- HEX Display -->
                             <div id="picker-hex-btn" class="flex items-center justify-between bg-black/5 dark:bg-white/5 rounded-xl px-4 py-3 cursor-pointer hover:bg-black/10 transition-colors relative overflow-hidden group" onclick="window.copyToClipboard(document.getElementById('picker-hex-display').textContent); const iconP = document.getElementById('picker-copy-icon'); if(iconP) { iconP.setAttribute('data-lucide', 'check'); iconP.classList.add('text-green-500'); lucide.createIcons(); setTimeout(() => { iconP.setAttribute('data-lucide', 'copy'); iconP.classList.remove('text-green-500'); lucide.createIcons(); }, 1500); }" title="Copiar HEX">
                                 <div class="absolute inset-0 bg-violet-500/0 group-hover:bg-violet-500/5 transition-colors"></div>
@@ -808,6 +936,16 @@ function renderContent(animate = false) {
                                      <i data-lucide="copy" id="picker-copy-icon" class="w-4 h-4 opacity-30 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
                             </div>
+
+                            <!-- AURA READING -->
+                            <div class="mt-4 px-2">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-lg animate-float inline-block">${aura.vibe}</span>
+                                    <span class="text-xs font-bold uppercase tracking-widest opacity-80">${aura.title}</span>
+                                </div>
+                                <p class="text-[10px] opacity-50 leading-relaxed font-medium">${aura.desc}</p>
+                            </div>
+
                             <script>
                                 // Auto-load color name on render
                                 setTimeout(async () => {
@@ -850,7 +988,7 @@ function renderContent(animate = false) {
                         </div>
                     </div>
 
-                    <!-- RIGHT COLUMN: CREATIVE EXPANSION (Harmonies & A11y) -->
+                    <!-- RIGHT COLUMN: CREATIVE EXPANSION (Harmonies & A11y & Gradients) -->
                     <div class="lg:col-span-7 flex flex-col gap-6">
                         <div class="flex items-center gap-2 mb-2">
                              <div class="w-2 h-2 rounded-full bg-violet-400"></div>
@@ -858,7 +996,7 @@ function renderContent(animate = false) {
                         </div>
 
                         <!-- Harmonies (Compact Grid) -->
-                        <div class="${themePanel} border ${themeBorder} rounded-[2rem] p-6 sm:p-8 shadow-sm h-full">
+                        <div class="${themePanel} border ${themeBorder} rounded-[2rem] p-6 sm:p-8 shadow-sm">
                              <span class="text-[9px] font-bold uppercase opacity-30 tracking-widest block mb-6">Armonías Cromáticas</span>
                              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                                 ${Object.entries(palettes).map(([name, colors]) => `
@@ -875,6 +1013,8 @@ function renderContent(animate = false) {
                                     </div>
                                 `).join('')}
                             </div>
+                            
+
                             
                             <!-- A11y Doctor (Simplified Strip) -->
                             <div class="bg-black/5 dark:bg-white/5 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -900,6 +1040,8 @@ function renderContent(animate = false) {
                             </div>
 
                         </div>
+                    </div>
+                </div>
                     </div>
                 </div>
 
