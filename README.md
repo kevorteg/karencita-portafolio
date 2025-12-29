@@ -5,7 +5,9 @@ Si estás leyendo esto es porque quieres **cambiar algo de tu portafolio** (o pu
 Solo hay **UNA** regla sagrada:
 
 > 🚨 **¡NO TOQUES EL CÓDIGO!** 🚨
-> (Aléjate de archivos como `main.js` o `index.html` si no quieres que la magia se rompa).
+> Aléjate de archivos como `main.js` o `index.html`.
+>
+> 💀 **Y SOBRE TODO:** Jamás de los jamases toques **`js/color-studio.js`**. Esa es nuestra obra maestra matemática. Si le mueves una coma, el universo explota (y el selector de color deja de funcionar). 🤯
 
 ---
 
