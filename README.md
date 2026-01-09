@@ -51,6 +51,7 @@ Simplemente borra mis ejemplos y pega las flores que te echen tus clientes reale
 ### 4. ¿Subir Proyecto Nuevo? 📸
 Al final del archivo está la lista **`projects`**. Para agregar uno nuevo, copia y pega esto antes del cierre `];`:
 
+
 ```javascript
 { 
     id: 99, 

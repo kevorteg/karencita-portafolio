@@ -14,7 +14,7 @@ export const tools = [
             { title: "Diseño Gráfico", desc: "Creo marcas que se sienten reales. Logos, identidades y piezas visuales que no solo decoran, sino que construyen la personalidad de tu negocio." },
             { title: "Publicidad", desc: "Ideas que pegan. Busco el ángulo creativo perfecto para que tu mensaje llegue claro, fuerte y directo a quien le tiene que llegar." },
             { title: "Marketing", desc: "Estrategia sin humo. Analizo el mercado y defino acciones claras para que tu marca crezca con pasos firmes y objetivos reales." },
-            { title: "Ilustración", desc: "Arte para comunicar. A veces una imagen dice más que mil palabras, y uso la ilustración para darle ese toque único y personal a los proyectos." }
+            { title: "Branding", desc: "Arte para comunicar. A veces una imagen dice más que mil palabras, y uso la ilustración para darle ese toque único y personal a los proyectos." }
         ],
         skills: {
             creative: ["Dirección de Arte", "Conceptos Creativos", "Narrativa Visual", "Curaduría Estética"],
@@ -41,7 +41,7 @@ export const tools = [
         }
     },
     { id: 'design', icon: 'palette', label: 'Diseño Gráfico', role: 'Identidad Visual', desc: 'Tu marca merece verse increíble.', manifesto: 'Diseño sistemas visuales que cuentan la historia de tu negocio.', services: ['Logotipos', 'Manual de Marca', 'Papelería'] },
-    { id: 'illustration', icon: 'pen-tool', label: 'Ilustración', role: 'Arte Digital', desc: 'Dibujando ideas.', manifesto: 'Ilustraciones personalizadas para darle carácter a tus proyectos.', services: ['Editorial', 'Redes Sociales'] },
+    { id: 'branding', icon: 'pen-tool', label: 'Branding', role: 'Arte Digital', desc: 'Dibujando ideas.', manifesto: 'Ilustraciones personalizadas para darle carácter a tus proyectos.', services: ['Editorial', 'Redes Sociales'] },
     { id: 'publicity', icon: 'megaphone', label: 'Publicidad', role: 'Campañas', desc: 'Hagamos ruido del bueno.', manifesto: 'Conceptos publicitarios que conectan con las emociones de la gente.', services: ['Concepto Creativo', 'Copywriting'] },
     { id: 'marketing', icon: 'bar-chart-3', label: 'Marketing', role: 'Estrategia', desc: 'Crecer con sentido.', manifesto: 'Planeación estratégica para que cada peso invertido cuente.', services: ['Auditoría de Marca', 'Plan de Contenidos'] },
     { id: 'color', icon: 'swatch-book', label: 'Color Lab', role: 'Estudio de Color', desc: 'El poder del color.', manifesto: 'Herramienta profesional para elegir paletas perfectas, accesibles y hermosas.', services: [] },
@@ -79,6 +79,6 @@ export const sidebarData = {
 
 export const projects = [
     { id: 1, title: 'Aura Branding', category: 'design', img: 'assets/images/projects/aura.jpg', description: 'Sistema visual para marca de lujo.' },
-    { id: 2, title: 'Noches de Neón', category: 'illustration', img: 'assets/images/projects/neon.jpg', description: 'Serie de ilustraciones digitales.' },
+    { id: 2, title: 'Noches de Neón', category: 'branding', img: 'assets/images/projects/neon.jpg', description: 'Serie de ilustraciones digitales.' },
     { id: 99, title: 'Protocolo Contacto', category: 'special', img: 'assets/images/projects/contact.jpg', description: 'Estoy abierta a nuevas colaboraciones creativas.' }
 ];
