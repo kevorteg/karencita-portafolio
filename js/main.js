@@ -222,6 +222,20 @@ window.addEventListener('mousemove', (e) => {
     gsap.to(dot, { x: e.clientX, y: e.clientY, duration: 0.1 });
     gsap.to(outline, { x: e.clientX - 15, y: e.clientY - 15, duration: 0.25 });
     const isClickable = e.target.closest('button') || e.target.closest('a') || e.target.closest('.cursor-pointer') || e.target.closest('input') || e.target.closest('.window-header');
+
+    // --- HOVER TEXT LOGIC ---
+    const cursorText = document.getElementById('cursor-text');
+    const hoverLabel = e.target.closest('[data-hover-title]');
+
+    if (hoverLabel && cursorText) {
+        cursorText.textContent = hoverLabel.getAttribute('data-hover-title');
+        cursorText.style.opacity = '1';
+        // Position next to cursor
+        gsap.to(cursorText, { x: e.clientX + 20, y: e.clientY + 20, duration: 0.1 });
+    } else if (cursorText) {
+        cursorText.style.opacity = '0';
+    }
+
     if (isClickable) {
         outline.style.transform = 'scale(1.5)';
         outline.style.borderColor = '#7c3aed';
@@ -496,6 +510,7 @@ function renderTools() {
     const html = tools.map(tool => `
         <button
             onclick="setActiveTool('${tool.id}')"
+            data-hover-title="${tool.label}"
             class="w-12 h-12 flex items-center justify-center rounded-xl transition-all relative group ${activeTool === tool.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20' : 'hover:bg-black/5 opacity-40 hover:opacity-100'}"
         >
             <i data-lucide="${tool.icon}" class="w-5 h-5"></i>
