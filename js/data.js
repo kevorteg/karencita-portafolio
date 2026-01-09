@@ -82,3 +82,41 @@ export const projects = [
     { id: 2, title: 'Noches de Neón', category: 'branding', img: 'assets/images/projects/neon.jpg', description: 'Serie de ilustraciones digitales.' },
     { id: 99, title: 'Protocolo Contacto', category: 'special', img: 'assets/images/projects/contact.jpg', description: 'Estoy abierta a nuevas colaboraciones creativas.' }
 ];
+
+export const tutorialSteps = [
+    {
+        target: 'header',
+        title: 'Centro de Comando',
+        text: 'Aquí controlas el sistema global. Puedes cambiar entre modo Día/Noche para descansar la vista y verificar tu estado de conexión.'
+    },
+    {
+        target: 'sidebar',
+        title: 'Barra de Herramientas',
+        text: 'Este es tu menú principal. Navega entre mis diferentes facetas profesionales. Cada icono desbloquea una nueva interfaz.'
+    },
+    {
+        target: 'tool-btn-color',
+        title: 'Color Lab 🧪',
+        text: '¡La joya de la corona! Una herramienta técnica avanzada para diseñadores. Genera paletas, extrae colores de imágenes y verifica accesibilidad.'
+    },
+    {
+        target: 'tool-btn-branding',
+        title: 'Branding & Diseño',
+        text: 'Explora mis servicios visuales. Aquí es donde la magia ocurre y las marcas cobran identidad propia.'
+    },
+    {
+        target: 'tool-btn-strategy',
+        title: 'Estrategia de Marca',
+        text: 'No solo es diseño bonitos. Aquí definimos el ADN, los arquetipos y la ruta de crecimiento de tu negocio.'
+    },
+    {
+        target: 'tabs-bar',
+        title: 'Multitarea',
+        text: 'Gestiona tus "ventanas" abiertas. Puedes tener varios proyectos o herramientas activas al mismo tiempo, como en un sistema operativo.'
+    },
+    {
+        target: 'inspector',
+        title: 'Inspector de Propiedades',
+        text: 'El panel de detalles. Aquí verás información contextual, mis niveles de habilidad (Skills) y testimonios reales de clientes.'
+    }
+];

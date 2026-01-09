@@ -199,3 +199,21 @@ body {
 .animate-float {
     animation: float 3s ease-in-out infinite;
 }
+
+/* Tutorial Spotlight Effect */
+#tutorial-overlay {
+    z-index: 99999;
+    /* Ensure it's above everything including tooltips */
+}
+
+#tutorial-backdrop {
+    /* Large shadow to create the "dimmed" effect around the hole */
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
+    border-radius: 12px;
+    pointer-events: none;
+    z-index: 99998;
+}
+
+#tutorial-card {
+    z-index: 99999;
+}

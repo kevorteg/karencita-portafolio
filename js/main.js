@@ -1,4 +1,4 @@
-import { tools, projects, sidebarData } from './data.js';
+import { tools, projects, sidebarData, tutorialSteps } from './data.js';
 import {
     generateProPalettes, hexToHSL, findClosestPantone, hexToRgb, rgbToCmyk,
     getMatchConfidence, checkPrintSafety, getChromaticFamily, getAccessibilityReport,
@@ -60,8 +60,14 @@ window.onload = () => {
         // Important: Re-run Lucide to render the new icon
         lucide.createIcons();
 
-        // Welcome Modal Logic: Show only once per session
-        if (!sessionStorage.getItem('welcomeShown')) {
+        // Welcome & Tutorial Logic
+        if (!localStorage.getItem('tutorialShown')) {
+            setTimeout(() => {
+                startTutorial();
+                localStorage.setItem('tutorialShown', 'true');
+            }, 1000);
+        } else if (!sessionStorage.getItem('welcomeShown')) {
+            // New session but not new user: Show Welcome Modal
             setTimeout(() => toggleWelcome(true), 500);
             sessionStorage.setItem('welcomeShown', 'true');
         }
@@ -509,6 +515,7 @@ function renderTools() {
 
     const html = tools.map(tool => `
         <button
+            id="tool-btn-${tool.id}"
             onclick="setActiveTool('${tool.id}')"
             data-hover-title="${tool.label}"
             class="w-12 h-12 flex items-center justify-center rounded-xl transition-all relative group ${activeTool === tool.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20' : 'hover:bg-black/5 opacity-40 hover:opacity-100'}"
@@ -698,6 +705,110 @@ function initCustomPicker() {
         pickerGlobalListenersAttached = true;
     }
 }
+
+
+
+// --- TUTORIAL LOGIC ---
+let currentStepIndex = 0;
+
+window.startTutorial = function () {
+    currentStepIndex = 0;
+    const overlay = document.getElementById('tutorial-overlay');
+    overlay.classList.remove('hidden');
+    // Allow small delay for rendering visibility before positioning
+    setTimeout(() => updateTutorialStep(), 100);
+};
+
+window.endTutorial = function () {
+    const overlay = document.getElementById('tutorial-overlay');
+    const backdrop = document.getElementById('tutorial-backdrop');
+
+    // Reset visual state
+    backdrop.style.width = '0px';
+    backdrop.style.height = '0px';
+    backdrop.style.top = '50%';
+    backdrop.style.left = '50%';
+
+    overlay.classList.add('hidden');
+    currentStepIndex = 0;
+};
+
+window.nextStep = function () {
+    currentStepIndex++;
+    if (currentStepIndex >= tutorialSteps.length) {
+        endTutorial();
+    } else {
+        updateTutorialStep();
+    }
+};
+
+function updateTutorialStep() {
+    const step = tutorialSteps[currentStepIndex];
+    const targetEl = document.getElementById(step.target);
+    const backdrop = document.getElementById('tutorial-backdrop');
+    const card = document.getElementById('tutorial-card');
+
+    if (!targetEl) {
+        // Skip if target not found (e.g. mobile hidden elements)
+        nextStep();
+        return;
+    }
+
+    // Get Coordinates
+    const rect = targetEl.getBoundingClientRect();
+    const padding = 10;
+
+    // Move Backdrop (Creating the "Hole")
+    backdrop.style.width = `${rect.width + padding * 2}px`;
+    backdrop.style.height = `${rect.height + padding * 2}px`;
+    backdrop.style.top = `${rect.top - padding}px`;
+    backdrop.style.left = `${rect.left - padding}px`;
+    backdrop.style.position = 'absolute';
+
+    // Update Content
+    document.getElementById('tut-title').innerText = step.title;
+    document.getElementById('tut-text').innerText = step.text;
+    document.getElementById('tut-step-count').innerText = `PASO ${currentStepIndex + 1}/${tutorialSteps.length}`;
+
+    // Rerender icons because we changed content dynamically
+    if (window.lucide) window.lucide.createIcons();
+
+    // Position Card (Smart Positioning)
+    const cardRect = card.getBoundingClientRect();
+    let top = rect.bottom + 20;
+    let left = rect.left;
+
+    // Check if correct goes off scren
+    // Check if correction goes off screen
+    if (top + cardRect.height > window.innerHeight) {
+        top = rect.top - cardRect.height - 20; // Flip to top
+    }
+
+    // Safety check for top edge - ensure it doesn't go negative or too high up
+    if (top < 20) {
+        // If flipping to top makes it go off-screen, try below again or center it
+        top = 20;
+    }
+
+    if (left + cardRect.width > window.innerWidth) {
+        left = window.innerWidth - cardRect.width - 20; // Flip to left
+    }
+
+    // Safety check for left edge
+    if (left < 20) left = 20;
+
+    card.style.top = `${top}px`;
+    card.style.left = `${left}px`;
+
+    // Animate In
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(10px)';
+    setTimeout(() => {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 200);
+}
+
 
 function hsvToHex(h, s, v) {
     s /= 100;
