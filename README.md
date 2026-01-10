@@ -1,4 +1,4 @@
-# ✨ ¡Hola Karencita! (Guía de Supervivencia) 💖
+¡Hola Karencita! (Guía de Supervivencia)
 
 Si estás leyendo esto es porque quieres **cambiar algo de tu portafolio** (o pusiste a un amigo a hacerlo). ¡Relax! No necesitas ser hacker para actualizar tus textos o subir fotos nuevas.
 
