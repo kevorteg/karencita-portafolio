@@ -34,7 +34,7 @@ let startX, startY, initialLeft, initialTop;
 
 // --- INIT ---
 window.onload = () => {
-    // Secret System Message 🤫
+    // Secret System Message 
     console.log(
         "%c Karen Jefa System Loaded: Creative Perfection Detected. \n %c The muse of this code is online.",
         "color: #7c3aed; font-weight: 900; font-size: 16px; font-family: 'Playfair Display', serif; padding: 10px 0;",
