@@ -1,9 +1,26 @@
 import { pantoneColors } from './pantone_data.js'; // Color Studio Core
 
+// --- CORE UTILS ---
+
+// Centralized Hex Parser (DRY Principle)
+function _parseHex(hex) {
+    // Remove # if present
+    hex = hex.replace('#', '');
+
+    // Parse to integer
+    const bigint = parseInt(hex, 16);
+
+    // Extract channels
+    return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255
+    };
+}
+
 export function hexToHSL(hex) {
-    let r = parseInt(hex.slice(1, 3), 16) / 255;
-    let g = parseInt(hex.slice(3, 5), 16) / 255;
-    let b = parseInt(hex.slice(5, 7), 16) / 255;
+    let { r, g, b } = _parseHex(hex);
+    r /= 255; g /= 255; b /= 255;
     let max = Math.max(r, g, b), min = Math.min(r, g, b);
     let h, s, l = (max + min) / 2;
     if (max == min) h = s = 0;
@@ -30,9 +47,7 @@ export function hslToHex(h, s, l) {
 }
 
 export function getContrast(hex) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
+    const { r, g, b } = _parseHex(hex);
     const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
     return yiq >= 128 ? 'black' : 'white';
 }
@@ -73,6 +88,11 @@ export function generateProPalettes(currentBaseColor) {
 
 // Helper: RGB to LAB (CIE L*a*b*)
 export function rgbToLab(r, g, b) {
+    // SECURITY PATCH: Clamp values to valid 0-255 range
+    r = Math.min(255, Math.max(0, r));
+    g = Math.min(255, Math.max(0, g));
+    b = Math.min(255, Math.max(0, b));
+
     let r_ = r / 255, g_ = g / 255, b_ = b / 255;
 
     // 1. RGB to XYZ
@@ -101,16 +121,12 @@ export function rgbToLab(r, g, b) {
 }
 
 export function findClosestPantone(hex) {
-    const r1 = parseInt(hex.slice(1, 3), 16);
-    const g1 = parseInt(hex.slice(3, 5), 16);
-    const b1 = parseInt(hex.slice(5, 7), 16);
+    const { r: r1, g: g1, b: b1 } = _parseHex(hex);
     const lab1 = rgbToLab(r1, g1, b1);
 
     // Calculate distance for ALL colors
     const matches = pantoneColors.map(p => {
-        const r2 = parseInt(p.hex.slice(1, 3), 16);
-        const g2 = parseInt(p.hex.slice(3, 5), 16);
-        const b2 = parseInt(p.hex.slice(5, 7), 16);
+        const { r: r2, g: g2, b: b2 } = _parseHex(p.hex);
 
         // UPGRADE 1: Use LAB Space Distance (CIE76)
         // Ideally we'd use CIEDE2000, but CIE76 is a massive leap over RGB Euclidean
@@ -130,12 +146,8 @@ export function findClosestPantone(hex) {
 }
 
 export function getBlindnessSimulation(hex) {
-    // RGB to Linear RGB
-    const hexToRgb = (hex) => {
-        const bigint = parseInt(hex.slice(1), 16);
-        return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
-    };
-    const rgb = hexToRgb(hex);
+    const { r, g, b } = _parseHex(hex);
+    const rgb = [r, g, b];
 
     // Simple matrix approximation for color blindness types
     // Using widely accepted conversion matrices
@@ -169,10 +181,7 @@ export function getBlindnessSimulation(hex) {
 }
 
 export function hexToRgb(hex) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return { r, g, b };
+    return _parseHex(hex);
 }
 
 export function rgbToCmyk(r, g, b) {
@@ -247,9 +256,7 @@ export function getChromaticFamily(h, s, l) {
 }
 
 export function getAccessibilityReport(hex) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
+    const { r, g, b } = _parseHex(hex);
 
     // Relative Luminance
     const getLuminance = (r, g, b) => {
