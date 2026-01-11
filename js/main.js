@@ -24,6 +24,7 @@ window.copyToClipboard = function (text) {
 let activeTool = 'about';
 let isDarkMode = false;
 let openProjects = [];
+let minimizedProjects = []; // Store IDs of minimized projects
 let focusedProject = null;
 let currentBaseColor = '#5F259F'; // Nuevo morado predeterminado
 let zIndexCounter = 200;
@@ -269,13 +270,13 @@ window.toggleDarkMode = function () {
 
     if (isDarkMode) {
         body.classList.replace('bg-[#F5F5F0]', 'bg-[#1A1844]');
-        body.classList.replace('text-stone-800', 'text-stone-200');
+        body.classList.replace('text-stone-800', 'text-white');
         elements.forEach(el => el && el.classList.replace('bg-[#EAEAE5]', 'bg-[#16143C]'));
         elements.forEach(el => el && el.classList.replace('border-stone-300', 'border-indigo-900/30'));
         document.getElementById('theme-icon').setAttribute('data-lucide', 'sun');
     } else {
         body.classList.replace('bg-[#1A1844]', 'bg-[#F5F5F0]');
-        body.classList.replace('text-stone-200', 'text-stone-800');
+        body.classList.replace('text-white', 'text-stone-800');
         elements.forEach(el => el && el.classList.replace('bg-[#16143C]', 'bg-[#EAEAE5]'));
         elements.forEach(el => el && el.classList.replace('border-indigo-900/30', 'border-stone-300'));
         document.getElementById('theme-icon').setAttribute('data-lucide', 'moon');
@@ -313,17 +314,40 @@ window.openProject = function (id) {
 
 window.closeProject = function (id) {
     openProjects = openProjects.filter(p => p.id !== id);
+    minimizedProjects = minimizedProjects.filter(pid => pid !== id);
     if (focusedProject === id) focusedProject = openProjects.length > 0 ? openProjects[openProjects.length - 1].id : null;
     renderTabs();
     renderWindows();
 };
 
+window.minimizeProject = function (id) {
+    if (!minimizedProjects.includes(id)) {
+        minimizedProjects.push(id);
+    }
+    // Remove focus if minimized
+    if (focusedProject === id) {
+        focusedProject = null;
+    }
+    renderWindows();
+    renderTabs(); // Update tabs to show minimized state
+};
+
 window.focusProject = function (id) {
+    // Un-minimize if it was minimized
+    if (minimizedProjects.includes(id)) {
+        minimizedProjects = minimizedProjects.filter(pid => pid !== id);
+    }
+
     focusedProject = id;
     zIndexCounter++;
     const win = document.getElementById(`win-${id}`);
     if (win) {
         win.style.zIndex = zIndexCounter;
+
+        // Ensure it's visible if we just restored it (though renderWindows handles this usually)
+        if (win.style.display === 'none') {
+            win.style.display = 'flex';
+        }
     }
     renderTabs();
     renderWindows();
@@ -537,7 +561,7 @@ function renderTools() {
                 class="group relative flex items-center justify-center w-12 h-12 rounded-full transition-all"
             >
                 <div class="absolute inset-0 bg-violet-600 rounded-full opacity-0 scale-50 transition-all duration-300 ${activeTool === tool.id ? 'opacity-100 scale-100' : ''}"></div>
-                <i data-lucide="${tool.icon}" class="relative z-10 w-5 h-5 transition-colors ${activeTool === tool.id ? 'text-white' : 'text-stone-400 dark:text-stone-500'}"></i>
+                <i data-lucide="${tool.icon}" class="relative z-10 w-5 h-5 transition-colors ${activeTool === tool.id ? 'text-white' : 'text-stone-400 dark:text-white'}"></i>
             </button>
         `).join('');
     }
@@ -550,21 +574,31 @@ function renderTabs() {
     const themeBorder = isDarkMode ? 'border-indigo-900/30' : 'border-stone-300';
     const themePanel = isDarkMode ? 'bg-[#1D1B4B]' : 'bg-white';
 
-    container.innerHTML = openProjects.map(p => `
+    container.innerHTML = openProjects.map(p => {
+        const isMinimized = minimizedProjects.includes(p.id);
+        const isActive = focusedProject === p.id;
+
+        // Style logic: Active gets themePanel, Minimized gets opacity, Inactive gets hover effect
+        let tabStyle = 'opacity-40 hover:opacity-80';
+        if (isActive) tabStyle = themePanel + ' opacity-100 shadow-sm';
+        if (isMinimized) tabStyle = 'opacity-50 grayscale border-b-2 border-transparent';
+
+        return `
         <div 
             onmousedown="focusProject(${p.id})"
-            class="h-full flex items-center gap-3 px-5 cursor-pointer transition-colors border-r ${themeBorder} ${focusedProject === p.id ? themePanel : 'opacity-40 hover:opacity-80'} whitespace-nowrap"
+            class="h-full flex items-center gap-3 px-5 cursor-pointer transition-all border-r ${themeBorder} ${tabStyle} whitespace-nowrap relative group"
         >
+            ${isMinimized ? `<div class="w-1.5 h-1.5 rounded-full bg-stone-400"></div>` : ''}
             <span class="text-[10px] font-bold uppercase tracking-tight">${p.title}</span>
             <button 
                 onmousedown="event.stopPropagation();"
                 onclick="event.stopPropagation(); closeProject(${p.id});"
-                class="p-1 hover:bg-red-500 hover:text-white rounded-md transition-all flex items-center justify-center"
+                class="p-1 hover:bg-red-500 hover:text-white rounded-md transition-all flex items-center justify-center ml-1 opacity-0 group-hover:opacity-100 focus:opacity-100"
             >
                 <i data-lucide="x" class="w-3 h-3"></i>
             </button>
         </div>
-    `).join('');
+    `}).join('');
     lucide.createIcons();
 }
 
@@ -1668,6 +1702,9 @@ function renderWindows() {
     });
 
     container.innerHTML = openProjects.map((p, index) => {
+        // If minimized, do not render the window (effectively hiding it)
+        if (minimizedProjects.includes(p.id)) return '';
+
         // Smart Positioning
         let defaultLeft = isMobile ? '5%' : `${18 + (index * 3)}%`;
         let defaultTop = isMobile ? '15%' : `${12 + (index * 3)}%`;
@@ -1693,14 +1730,26 @@ function renderWindows() {
                         <i data-lucide="image" class="w-3.5 h-3.5 opacity-40 shrink-0"></i>
                         <span class="text-[11px] font-bold uppercase tracking-widest truncate">${p.title}</span>
                     </div>
-                    <div class="flex items-center gap-4 shrink-0 pl-4">
+                    <div class="flex items-center gap-2 shrink-0 pl-4">
+                        <!-- Minimize Button -->
+                        <button 
+                            onmousedown="event.stopPropagation();"
+                            onclick="event.stopPropagation(); minimizeProject(${p.id});" 
+                            class="text-stone-400 hover:bg-black/5 dark:hover:bg-white/10 hover:text-stone-600 dark:hover:text-white transition-all p-1.5 rounded-lg flex items-center justify-center relative z-50"
+                            title="Minimizar"
+                        >
+                            <span class="sr-only">Minimizar</span>
+                            <i data-lucide="minus" class="w-4 h-4"></i>
+                        </button>
+
                         <button 
                             onmousedown="event.stopPropagation();"
                             onclick="event.stopPropagation(); closeProject(${p.id});" 
-                            class="text-red-500 hover:bg-red-500 hover:text-white transition-all p-2 rounded-lg flex items-center justify-center relative z-50"
+                            class="text-red-500 hover:bg-red-500 hover:text-white transition-all p-1.5 rounded-lg flex items-center justify-center relative z-50"
+                            title="Cerrar"
                         >
                             <span class="sr-only">Cerrar</span>
-                            <i data-lucide="x" class="w-5 h-5"></i>
+                            <i data-lucide="x" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
