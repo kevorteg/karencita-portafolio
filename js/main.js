@@ -8,15 +8,22 @@ import {
 // --- UTILS ---
 window.copyToClipboard = function (text) {
     navigator.clipboard.writeText(text).then(() => {
-        // Simple visual feedback
-        const el = document.activeElement;
-        const original = el.innerHTML;
-        el.innerHTML = '<i data-lucide="check" class="w-3 h-3"></i>';
+        // Create a temporary toast notification instead of modifying the DOM element
+        // This prevents layout shifts and "flickering"
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-6 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest z-[99999] shadow-xl animate-pop flex items-center gap-2';
+        toast.innerHTML = `<i data-lucide="check" class="w-3 h-3 text-green-400"></i> Copiado: ${text}`;
+
+        document.body.appendChild(toast);
         lucide.createIcons();
+
+        // Remove after 2 seconds
         setTimeout(() => {
-            el.innerHTML = original;
-            lucide.createIcons();
-        }, 1000);
+            toast.style.opacity = '0';
+            toast.style.transform = 'translate(-50%, -20px)';
+            toast.style.transition = 'all 0.3s';
+            setTimeout(() => toast.remove(), 300);
+        }, 2000);
     });
 };
 
