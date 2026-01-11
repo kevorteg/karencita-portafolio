@@ -1,4 +1,4 @@
-import { pantoneColors } from './pantone_data.js';
+import { pantoneColors } from './pantone_data.js'; // Color Studio Core
 
 export function hexToHSL(hex) {
     let r = parseInt(hex.slice(1, 3), 16) / 255;
