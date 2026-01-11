@@ -43,9 +43,10 @@ let startX, startY, initialLeft, initialTop;
 window.onload = () => {
     // Secret System Message 
     console.log(
-        "%c Karen Jefa System Loaded: Creative Perfection Detected. \n %c The muse of this code is online.",
+        "%c Karen Jefa System Loaded: Creative Perfection Detected. \n %c Developed by Kevin Ortega [github.com/kevorteg] \n %c The muse of this code is online.",
         "color: #7c3aed; font-weight: 900; font-size: 16px; font-family: 'Playfair Display', serif; padding: 10px 0;",
-        "color: #a8a29e; font-size: 12px; font-style: italic;"
+        "color: #stone-500; font-size: 11px; font-weight: bold; letter-spacing: 1px;",
+        "color: #999; font-size: 11px; font-style: italic;"
     );
 
     setTimeout(() => {
