@@ -71,17 +71,56 @@ export function generateProPalettes(currentBaseColor) {
 
 // ---------------- NEW METHODS ----------------
 
+// Helper: RGB to LAB (CIE L*a*b*)
+export function rgbToLab(r, g, b) {
+    let r_ = r / 255, g_ = g / 255, b_ = b / 255;
+
+    // 1. RGB to XYZ
+    r_ = r_ > 0.04045 ? Math.pow((r_ + 0.055) / 1.055, 2.4) : r_ / 12.92;
+    g_ = g_ > 0.04045 ? Math.pow((g_ + 0.055) / 1.055, 2.4) : g_ / 12.92;
+    b_ = b_ > 0.04045 ? Math.pow((b_ + 0.055) / 1.055, 2.4) : b_ / 12.92;
+
+    r_ *= 100; g_ *= 100; b_ *= 100;
+
+    const x = r_ * 0.4124 + g_ * 0.3576 + b_ * 0.1805;
+    const y = r_ * 0.2126 + g_ * 0.7152 + b_ * 0.0722;
+    const z = r_ * 0.0193 + g_ * 0.1192 + b_ * 0.9505;
+
+    // 2. XYZ to LAB
+    let x_ = x / 95.047, y_ = y / 100.000, z_ = z / 108.883;
+
+    x_ = x_ > 0.008856 ? Math.pow(x_, 1 / 3) : (7.787 * x_) + (16 / 116);
+    y_ = y_ > 0.008856 ? Math.pow(y_, 1 / 3) : (7.787 * y_) + (16 / 116);
+    z_ = z_ > 0.008856 ? Math.pow(z_, 1 / 3) : (7.787 * z_) + (16 / 116);
+
+    const L = (116 * y_) - 16;
+    const A = 500 * (x_ - y_);
+    const B = 200 * (y_ - z_);
+
+    return { l: L, a: A, b: B };
+}
+
 export function findClosestPantone(hex) {
     const r1 = parseInt(hex.slice(1, 3), 16);
     const g1 = parseInt(hex.slice(3, 5), 16);
     const b1 = parseInt(hex.slice(5, 7), 16);
+    const lab1 = rgbToLab(r1, g1, b1);
 
     // Calculate distance for ALL colors
     const matches = pantoneColors.map(p => {
         const r2 = parseInt(p.hex.slice(1, 3), 16);
         const g2 = parseInt(p.hex.slice(3, 5), 16);
         const b2 = parseInt(p.hex.slice(5, 7), 16);
-        const distance = Math.sqrt(Math.pow(r2 - r1, 2) + Math.pow(g2 - g1, 2) + Math.pow(b2 - b1, 2));
+
+        // UPGRADE 1: Use LAB Space Distance (CIE76)
+        // Ideally we'd use CIEDE2000, but CIE76 is a massive leap over RGB Euclidean
+        const lab2 = rgbToLab(r2, g2, b2);
+
+        const deltaL = lab1.l - lab2.l;
+        const deltaA = lab1.a - lab2.a;
+        const deltaB = lab1.b - lab2.b;
+
+        const distance = Math.sqrt(deltaL * deltaL + deltaA * deltaA + deltaB * deltaB);
         return { ...p, distance };
     });
 
@@ -117,6 +156,7 @@ export function getBlindnessSimulation(hex) {
 
     const toHex = (arr) => {
         return "#" + arr.map(c => {
+            // CRITICAL FIX: Strict clamping to 0-255 range
             const v = Math.min(255, Math.max(0, Math.round(c)));
             return v.toString(16).padStart(2, '0');
         }).join('');
