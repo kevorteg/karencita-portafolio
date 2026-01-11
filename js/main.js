@@ -557,6 +557,7 @@ function renderTools() {
     if (mobileContainer) {
         mobileContainer.innerHTML = tools.map(tool => `
             <button
+                id="mobile-tool-btn-${tool.id}"
                 onclick="setActiveTool('${tool.id}')"
                 class="group relative flex items-center justify-center w-12 h-12 rounded-full transition-all"
             >
@@ -778,7 +779,22 @@ window.nextStep = function () {
 
 function updateTutorialStep() {
     const step = tutorialSteps[currentStepIndex];
-    const targetEl = document.getElementById(step.target);
+    let targetId = step.target;
+
+    // SMART MOBILE REDIRECT
+    // If we are on mobile (and target is a generic tool button), try to find the mobile equivalent
+    const isMobile = window.innerWidth < 640;
+    if (isMobile) {
+        if (targetId === 'sidebar') targetId = 'mobile-nav';
+        if (targetId.startsWith('tool-btn-')) {
+            targetId = targetId.replace('tool-btn-', 'mobile-tool-btn-');
+        }
+    }
+
+    let targetEl = document.getElementById(targetId);
+
+    // Fallback: If mobile target not found, try original (or vice versa logic if needed)
+    if (!targetEl) targetEl = document.getElementById(step.target);
     const backdrop = document.getElementById('tutorial-backdrop');
     const card = document.getElementById('tutorial-card');
 
