@@ -14,6 +14,9 @@ let startX, startY, initialLeft, initialTop;
 
 // --- WINDOW MANAGMENT API ---
 
+// Identify Mobile
+const isMobileDevice = () => window.innerWidth < 640;
+
 export function toggleMaximize(id) {
     if (maximizedProjects.includes(id)) {
         // Restore
@@ -39,10 +42,12 @@ export function openProject(id) {
     if (!openProjects.find(p => p.id === id)) {
         openProjects.push(project);
     }
+    // Auto-focus the new project
     focusProject(id);
 }
 
 export function closeProject(id) {
+    console.log("Closing Project ID:", id);
     openProjects = openProjects.filter(p => p.id !== id);
     minimizedProjects = minimizedProjects.filter(pid => pid !== id);
     maximizedProjects = maximizedProjects.filter(pid => pid !== id);
@@ -54,6 +59,7 @@ export function closeProject(id) {
 }
 
 export function minimizeProject(id) {
+    console.log("Minimizing Project ID:", id);
     if (!minimizedProjects.includes(id)) {
         minimizedProjects.push(id);
     }
@@ -98,7 +104,7 @@ export function renderWindows() {
     const themeSidebar = isDarkMode ? 'bg-[#16143C]' : 'bg-[#EAEAE5]';
 
     // Mobile Detection
-    const isMobile = window.innerWidth < 640;
+    const isMobile = isMobileDevice();
 
     const existingPositions = {};
     // Capture current positions to prevent jumping on re-render
@@ -117,8 +123,9 @@ export function renderWindows() {
         const isMaximized = maximizedProjects.includes(p.id);
 
         // Starting Position Stagger (Cascade effect) if not already set
-        const defaultLeft = isMobile ? '0px' : `${50 + (index * 30)}px`;
-        const defaultTop = isMobile ? '0px' : `${50 + (index * 30)}px`;
+        // Updated Default Position: Center-ish
+        const defaultLeft = isMobile ? '4%' : `${5 + (index * 2)}%`; // Mobile: Centered-ish (4% margin for 92vw width)
+        const defaultTop = isMobile ? '10%' : `5%`; // Mobile: Lower down
 
         // Position Logic: 1. Existing DOM (if not max) 2. Pre-max (if restore) 3. Default
         let targetPos = existingPositions[p.id] || { left: defaultLeft, top: defaultTop };
@@ -145,9 +152,17 @@ export function renderWindows() {
             windowClasses += " inset-0 w-full h-full rounded-none z-[500]";
             windowStyles += " left: 0 !important; top: 0 !important; width: 100% !important; height: 100% !important; transform: none !important; border-radius: 0 !important;";
         } else {
-            windowClasses += " w-full sm:w-[800px] h-[calc(100%-80px)] sm:h-[600px] rounded-t-[2rem] sm:rounded-[2rem]";
+            // NEW SIZE: Bigger by default (90vw width on desktop, 85vh height)
+            // Mobile: 92vw width, 70vh height, Fully rounded corners
+            windowClasses += " w-[92vw] sm:w-[90vw] md:w-[85vw] lg:w-[1000px] h-[70vh] sm:h-[85vh] rounded-[1.5rem] sm:rounded-[2rem]";
             windowStyles += ` left: ${targetPos.left}; top: ${targetPos.top};`;
         }
+
+        // Button sizing logic - INCREASED FOR MOBILE
+        // Using a larger touch target wrapper instead of just larger icons
+        const btnSize = isMobile ? "w-6 h-6" : "w-3 h-3";
+        const btnContainerGap = isMobile ? "gap-6" : "gap-2";
+        const btnIconSize = isMobile ? "w-3 h-3" : "w-2 h-2";
 
         return `
         <div 
@@ -158,54 +173,68 @@ export function renderWindows() {
         >
             <!-- Window Header -->
             <div 
-                class="window-header h-12 flex items-center justify-between px-6 border-b ${themeBorder} ${themeSidebar} cursor-grab active:cursor-grabbing select-none"
+                class="window-header h-16 sm:h-12 flex items-center justify-between px-6 border-b ${themeBorder} ${themeSidebar} cursor-grab active:cursor-grabbing select-none relative"
                 onmousedown="initDrag(event, ${p.id})"
                 ontouchstart="initDrag(event, ${p.id})"
             >
-                <div class="flex items-center gap-3">
-                    <div class="flex gap-2 group">
+                <div class="flex items-center gap-3 w-full">
+                    <!-- BUTTONS CONTAINER -->
+                     <div class="flex ${btnContainerGap} group relative z-[500] pointer-events-auto items-center">
+                         <!-- STOP PROPAGATION WRAPPER -->
                         <button 
                             onmousedown="event.stopPropagation()" 
                             ontouchstart="event.stopPropagation()" 
-                            onclick="console.log('Close clicked'); event.stopPropagation(); closeProject(${p.id})" 
-                            class="w-3 h-3 rounded-full bg-red-400 hover:bg-red-600 transition-colors z-[100] cursor-pointer relative"
-                        ></button>
+                            onclick="closeProject(${p.id}); event.stopPropagation();" 
+                            class="${btnSize} rounded-full bg-red-400 hover:bg-red-600 transition-colors cursor-pointer flex items-center justify-center group/btn shadow-sm"
+                            title="Cerrar"
+                        >
+                            <i data-lucide="x" class="${btnIconSize} text-red-900 opacity-0 group-hover/btn:opacity-100 transition-opacity"></i>
+                        </button>
                         <button 
                             onmousedown="event.stopPropagation()" 
                             ontouchstart="event.stopPropagation()" 
-                            onclick="console.log('Minimize clicked'); event.stopPropagation(); minimizeProject(${p.id})" 
-                            class="w-3 h-3 rounded-full bg-yellow-400 hover:bg-yellow-600 transition-colors z-[100] cursor-pointer relative"
-                        ></button>
+                            onclick="minimizeProject(${p.id}); event.stopPropagation();" 
+                            class="${btnSize} rounded-full bg-yellow-400 hover:bg-yellow-600 transition-colors cursor-pointer flex items-center justify-center group/btn shadow-sm"
+                            title="Minimizar"
+                        >
+                             <i data-lucide="minus" class="${btnIconSize} text-yellow-900 opacity-0 group-hover/btn:opacity-100 transition-opacity"></i>
+                        </button>
                         <button 
                             onmousedown="event.stopPropagation()" 
                             ontouchstart="event.stopPropagation()" 
-                            onclick="console.log('Maximize clicked'); event.stopPropagation(); toggleMaximize(${p.id})" 
-                            class="w-3 h-3 rounded-full bg-green-400 hover:bg-green-600 transition-colors z-[100] cursor-pointer relative"
-                        ></button>
+                            onclick="toggleMaximize(${p.id}); event.stopPropagation();" 
+                            class="${btnSize} rounded-full bg-green-400 hover:bg-green-600 transition-colors cursor-pointer flex items-center justify-center group/btn shadow-sm"
+                            title="Maximizar"
+                        >
+                            <i data-lucide="${isMaximized ? 'minimize-2' : 'maximize-2'}" class="${btnIconSize} text-green-900 opacity-0 group-hover/btn:opacity-100 transition-opacity"></i>
+                        </button>
                     </div>
-                    <span class="text-[10px] font-black uppercase tracking-widest opacity-50 ml-2">${p.title}</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest opacity-50 ml-2 truncate flex-1 ${isMobile ? 'text-right pr-2' : ''}">${p.title}</span>
                 </div>
-                <div class="opacity-30">
+                
+                <!-- Desktop Only Icon (Decoration) -->
+                ${!isMobile ? `
+                <div class="opacity-30 flex-shrink-0">
                     <i data-lucide="${isMaximized ? 'minimize-2' : 'maximize-2'}" class="w-4 h-4"></i>
-                </div>
+                </div>` : ''}
             </div>
 
             <!-- Window Content -->
-            <div class="flex-1 overflow-y-auto p-0 scrollbar-hide relative bg-white dark:bg-[#0F0E24]">
+            <div class="flex-1 overflow-y-auto p-0 scrollbar-hide relative bg-white dark:bg-[#0F0E24] overscroll-contain">
                  <!-- Hero Image -->
-                 <div class="h-64 w-full relative">
+                 <div class="h-64 sm:h-80 w-full relative shrink-0">
                     <img src="${p.img}" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-8">
                          <div class="text-white">
                             <span class="px-3 py-1 bg-violet-600 text-[10px] font-bold uppercase tracking-widest rounded-full mb-4 inline-block shadow-lg shadow-violet-600/50">Case Study 0${p.id}</span>
-                            <h1 class="text-4xl font-serif italic">${p.title}</h1>
+                            <h1 class="text-3xl sm:text-5xl font-serif italic leading-tight">${p.title}</h1>
                          </div>
                     </div>
                  </div>
 
                  <!-- Content Body -->
-                 <div class="p-8 sm:p-12 max-w-3xl mx-auto dark:text-gray-300">
-                    <p class="text-xl leading-relaxed font-serif italic opacity-80 mb-12 border-l-4 border-violet-600 pl-6">
+                 <div class="p-8 sm:p-12 max-w-4xl mx-auto dark:text-gray-300 pb-24">
+                    <p class="text-lg sm:text-xl leading-relaxed font-serif italic opacity-80 mb-12 border-l-4 border-violet-600 pl-6">
                         "${p.description}"
                     </p>
 
@@ -225,7 +254,7 @@ export function renderWindows() {
                     </div>
 
                     <div class="rounded-2xl overflow-hidden mb-12 shadow-xl">
-                        <img src="assets/images/projects/neon.jpg" class="w-full h-auto">
+                        <img src="assets/images/projects/neon.jpg" class="w-full h-auto" onerror="this.src='https://images.unsplash.com/photo-1600607686527-6fb886090705?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'">
                     </div>
 
                     <div class="flex flex-wrap gap-3 mb-12">
@@ -246,11 +275,7 @@ export function renderWindows() {
     }).join('');
 
     container.innerHTML = html;
-    lucide.createIcons();
-
-    // Restore handlers for drag if needed, usually onmousedown attributes handle it
-    // But we need global listeners for drag movement
-    // The initDrag function is attached to window, so it works.
+    if (window.lucide) window.lucide.createIcons();
 }
 
 export function renderTabs() {
@@ -284,13 +309,14 @@ export function renderTabs() {
             </button>
         </div>
     `}).join('');
-    lucide.createIcons();
+    if (window.lucide) window.lucide.createIcons();
 }
 
 // --- DRAG LOGIC ---
 
 export function initDrag(e, id) {
     // Check if the interaction is on a button (like the close button)
+    // Using closest to check if the target is inside a button or is a button
     if (e.target.closest('button')) return;
 
     isDragging = true;
@@ -352,13 +378,14 @@ function stopDrag() {
 }
 
 // Attach to window for HTML accessibility
-window.openProject = openProject;
-window.closeProject = closeProject;
-window.maximizeProject = toggleMaximize; // Alias for consistency
-window.toggleMaximize = toggleMaximize;
-window.minimizeProject = minimizeProject;
-window.focusProject = focusProject;
-window.initDrag = initDrag;
-window.renderWindows = renderWindows; // Make sure it's available globally as main.js might call it? 
-// Actually openProject calls renderWindows internaly so it might be fine,
-// BUT main.js calls renderWindows on toggleDarkMode. So yes, export to window.
+// Use a safe check for SSR (though this is client side)
+if (typeof window !== 'undefined') {
+    window.openProject = openProject;
+    window.closeProject = closeProject;
+    window.maximizeProject = toggleMaximize; // Alias for consistency
+    window.toggleMaximize = toggleMaximize;
+    window.minimizeProject = minimizeProject;
+    window.focusProject = focusProject;
+    window.initDrag = initDrag;
+    window.renderWindows = renderWindows;
+}
