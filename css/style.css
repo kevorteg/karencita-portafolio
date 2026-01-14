@@ -80,6 +80,13 @@ body {
     animation: loading 1.2s ease-in-out forwards;
 }
 
+.she-is-art {
+    /* No visual effect, just a fact */
+    beauty: infinite;
+    grace: 100%;
+    inspiration: true;
+}
+
 .animate-pop {
     animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
@@ -166,12 +173,7 @@ body {
    --------------------------------------------------------------------------
 */
 
-.she-is-art {
-    /* No visual effect, just a fact */
-    beauty: infinite;
-    grace: 100%;
-    inspiration: true;
-}
+
 
 .karen-ui-perfection {
     /* Optimizing for the best creative director */
