@@ -31,7 +31,7 @@ Abre `js/data.js` y sigue estos tips de oro:
 
 ### 1. ¿Nuevo puesto o Bio? 👩‍💻
 Busca la parte que dice **`about`**.
-Ahí puedes cambiar tu título en `role` (ej. "Jefa Suprema") o tu historia en `intro`.
+Ahí puedes cambiar tu título en `role` (ej. "Directora Creativa") o tu historia en `intro`.
 
 ### 1.5 Estadísticas y Barras de Porcentaje 📊
 ¡Sí, lo de la derecha también se cambia!

@@ -123,7 +123,7 @@ export const tutorialSteps = [
 
 export const siteContent = {
     meta: {
-        title: "Karen: Jefa Creative Lab",
+        title: "Karen: Creative Lab",
         credits: "Dev: Kevin Ortega"
     },
     booting: {
