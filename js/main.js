@@ -87,7 +87,7 @@ function renderSiteContent() {
 window.onload = () => {
     // Secret System Message 
     console.log(
-        "%c Karen Jefa System Loaded: Creative Perfection Detected. \n %c Developed by Kevin Ortega [github.com/kevorteg] \n %c The muse of this code is online.",
+        "%c Karen System Loaded: Creative Perfection Detected. \n %c Developed by Kevin Ortega [github.com/kevorteg] \n %c The muse of this code is online.",
         "color: #7c3aed; font-weight: 900; font-size: 16px; font-family: 'Playfair Display', serif; padding: 10px 0;",
         "color: #stone-500; font-size: 11px; font-weight: bold; letter-spacing: 1px;",
         "color: #999; font-size: 11px; font-style: italic;"
@@ -424,7 +424,7 @@ window.downloadBrandCard = function () {
 
     ctx.font = 'bold 20px sans-serif';
     ctx.globalAlpha = 0.6;
-    ctx.fillText('KAREN JEFA', 100, 200);
+    ctx.fillText('KAREN', 100, 200);
     ctx.globalAlpha = 1.0;
 
     // Content Right Side
@@ -454,7 +454,7 @@ window.downloadBrandCard = function () {
 
     // Download
     const link = document.createElement('a');
-    link.download = `KarenJefa_Brand_${currentBaseColor.replace('#', '')}.png`;
+    link.download = `Karen_Brand_${currentBaseColor.replace('#', '')}.png`;
     link.href = canvas.toDataURL();
     link.click();
 }
