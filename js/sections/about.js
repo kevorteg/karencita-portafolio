@@ -70,7 +70,7 @@ export function renderAboutSection(container, themePanel, themeBorder) {
 
                     <div class="w-full flex justify-between items-center text-xs font-bold opacity-60">
                         <span>EXP</span>
-                        <span>7+ Años</span>
+                        <span>3+ Años</span>
                     </div>
                 </div>
 
