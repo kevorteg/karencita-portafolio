@@ -420,7 +420,7 @@ window.downloadBrandCard = function () {
     // Logo / Brand
     ctx.fillStyle = '#FFFFFF';
     ctx.font = 'italic 900 80px "Playfair Display", serif'; // Fallback font
-    ctx.fillText('kj.', 100, 150);
+    ctx.fillText('kc.', 100, 150);
 
     ctx.font = 'bold 20px sans-serif';
     ctx.globalAlpha = 0.6;

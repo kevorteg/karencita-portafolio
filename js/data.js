@@ -131,7 +131,7 @@ export const siteContent = {
     },
     header: {
         logoText: "Portafolio Karen:",
-        mobileLogo: "K:J",
+        mobileLogo: "K:C",
         navBrand: "Creative_System",
         navAbout: "Acerca de",
         status: "Karen Online"
