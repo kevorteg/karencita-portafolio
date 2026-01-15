@@ -45,7 +45,7 @@ export function renderStrategyTool(container, themePanel, themeBorder) {
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             ${q.options.map(opt => `
-                                <button onclick="window.nextQuiz('${q.id}', '${opt.value}', ${index === data.questions.length - 1})" class="text-left group relative p-8 rounded-[2rem] border ${themeBorder} hover:border-violet-600 hover:shadow-xl hover:shadow-violet-600/5 transition-all bg-stone-50/50 dark:bg-white/5">
+                                <button onclick="window.nextQuiz('${q.id}', '${opt.value}', ${index === data.questions.length - 1})" class="text-left group relative p-8 rounded-[2rem] border ${themeBorder} hover:border-violet-600 hover:shadow-xl hover:shadow-violet-600/5 transition-all bg-stone-50/50 dark:bg-white/5 hover:text-stone-900 dark:hover:text-white">
                                     <div class="w-12 h-12 bg-white dark:bg-white/10 rounded-xl flex items-center justify-center mb-6 shadow-sm border ${themeBorder} group-hover:scale-110 transition-transform">
                                         <i data-lucide="${opt.icon}" class="w-6 h-6 text-violet-600"></i>
                                     </div>
@@ -75,7 +75,7 @@ export function renderStrategyTool(container, themePanel, themeBorder) {
                      </div>
 
                      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                         <button onclick="window.setActiveTool('contact')" class="w-full sm:w-auto px-10 py-5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-bold uppercase text-xs tracking-widest hover:scale-105 active:scale-95 transition-transform shadow-xl">
+                         <button onclick="window.setActiveTool('contact')" class="w-full sm:w-auto px-10 py-5 bg-black dark:bg-violet-600 text-white rounded-xl font-bold uppercase text-xs tracking-widest hover:scale-105 active:scale-95 transition-transform shadow-xl">
                             Agendar Asesoría
                          </button>
                          <button onclick="window.startQuiz()" class="w-full sm:w-auto px-10 py-5 border border-stone-300 dark:border-white/10 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
