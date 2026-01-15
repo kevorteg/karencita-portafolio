@@ -34,7 +34,7 @@ window.copyToClipboard = function (text) {
 
 // --- STATE ---
 let activeTool = 'about';
-let isDarkMode = false;
+let isDarkMode = true; // Default to Dark Mode
 let currentBaseColor = '#5F259F'; // Nuevo morado predeterminado
 
 // --- RENDER SITE CONTENT ---
@@ -100,6 +100,9 @@ window.onload = () => {
 
         renderSiteContent();
         renderTools();
+
+        applyTheme(); // Apply default theme logic immediately
+
         renderContent();
         renderInspector();
         lucide.createIcons();
@@ -126,17 +129,20 @@ window.onload = () => {
             sessionStorage.setItem('welcomeShown', 'true');
         }
     }, 1200);
-
-    // Safety Fallback: Force open if something gets stuck
-    setTimeout(() => {
-        const boot = document.getElementById('booting-screen');
-        if (boot && boot.style.display !== 'none') {
-            console.warn('Boot sequence timeout - Forcing entry.');
-            boot.style.display = 'none';
-            document.getElementById('app-container').style.opacity = '1';
-        }
-    }, 5000);
 };
+
+// Safety Fallback: Force open if something gets stuck (MOVED OUTSIDE ONLOAD for reliability)
+setTimeout(() => {
+    const boot = document.getElementById('booting-screen');
+    if (boot && getComputedStyle(boot).display !== 'none') {
+        console.warn('Boot sequence timeout - Forcing entry.');
+        boot.style.display = 'none';
+        document.getElementById('app-container').style.opacity = '1';
+
+        // Ensure theme is correct on forced entry
+        applyTheme();
+    }
+}, 3000); // Reduced to 3s for snapper feel
 
 window.sendWhatsApp = function () {
     const name = document.getElementById('contact-name').value;
@@ -308,37 +314,72 @@ window.addEventListener('mousemove', (e) => {
 });
 
 // --- ACTIONS ---
+// --- ACTIONS ---
 window.toggleDarkMode = function () {
     isDarkMode = !isDarkMode;
-    document.documentElement.classList.toggle('dark'); // Enable Tailwind & CSS dark mode
+    applyTheme();
+};
+
+function applyTheme() {
+    // 1. Toggle Tailwind 'dark' class on HTML
+    if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+
+    // 2. Manual DOM updates for elements that don't fully rely on Tailwind 'dark:' prefix yet
     const body = document.getElementById('body-main');
     const elements = [
         document.getElementById('header'),
         document.getElementById('sidebar'),
         document.getElementById('tabs-bar'),
         document.getElementById('inspector'),
-        document.getElementById('modal-panel'),
         document.getElementById('modal-header')
     ];
+    // Modal Panel has a different base color (white), so we handle it separately or add specific logic
+    const modalPanel = document.getElementById('modal-panel');
 
     if (isDarkMode) {
-        body.classList.replace('bg-[#F5F5F0]', 'bg-[#1A1844]');
-        body.classList.replace('text-stone-800', 'text-white');
-        elements.forEach(el => el && el.classList.replace('bg-[#EAEAE5]', 'bg-[#16143C]'));
-        elements.forEach(el => el && el.classList.replace('border-stone-300', 'border-indigo-900/30'));
-        document.getElementById('theme-icon').setAttribute('data-lucide', 'sun');
+        if (body) {
+            body.classList.replace('bg-[#F5F5F0]', 'bg-[#1A1844]');
+            body.classList.replace('text-stone-800', 'text-white');
+        }
+        elements.forEach(el => {
+            if (el) {
+                el.classList.replace('bg-[#EAEAE5]', 'bg-[#16143C]');
+                el.classList.replace('border-stone-300', 'border-indigo-900/30');
+            }
+        });
+        if (modalPanel) {
+            modalPanel.classList.replace('bg-white', 'bg-[#1E1B4B]');
+            modalPanel.classList.replace('border-stone-300', 'border-indigo-900/30');
+        }
+        const icon = document.getElementById('theme-icon');
+        if (icon) icon.setAttribute('data-lucide', 'sun');
     } else {
-        body.classList.replace('bg-[#1A1844]', 'bg-[#F5F5F0]');
-        body.classList.replace('text-white', 'text-stone-800');
-        elements.forEach(el => el && el.classList.replace('bg-[#16143C]', 'bg-[#EAEAE5]'));
-        elements.forEach(el => el && el.classList.replace('border-indigo-900/30', 'border-stone-300'));
-        document.getElementById('theme-icon').setAttribute('data-lucide', 'moon');
+        if (body) {
+            body.classList.replace('bg-[#1A1844]', 'bg-[#F5F5F0]');
+            body.classList.replace('text-white', 'text-stone-800');
+        }
+        elements.forEach(el => {
+            if (el) {
+                el.classList.replace('bg-[#16143C]', 'bg-[#EAEAE5]');
+                el.classList.replace('border-indigo-900/30', 'border-stone-300');
+            }
+        });
+        if (modalPanel) {
+            modalPanel.classList.replace('bg-[#1E1B4B]', 'bg-white');
+            modalPanel.classList.replace('border-indigo-900/30', 'border-stone-300');
+        }
+        const icon = document.getElementById('theme-icon');
+        if (icon) icon.setAttribute('data-lucide', 'moon');
     }
 
     lucide.createIcons();
     renderContent(false);
     renderWindows();
-};
+}
 
 window.setActiveTool = function (id) {
     activeTool = id;
