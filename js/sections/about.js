@@ -15,7 +15,7 @@ export function renderAboutSection(container, themePanel, themeBorder) {
             <div class="lg:col-span-8 flex flex-col gap-8">
                 <!-- BIO CARD -->
                 <div class="${themePanel} border ${themeBorder} rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden group">
-                     <div class="absolute top-0 right-0 w-64 h-64 bg-stone-100 dark:bg-white/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+                     <div class="absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
                      
                      <div class="relative z-10">
                         <div class="flex items-start justify-between mb-8">
@@ -37,7 +37,7 @@ export function renderAboutSection(container, themePanel, themeBorder) {
                 <!-- SERVICES GRID -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     ${aboutTool.whatIDo.map((item, i) => `
-                        <div class="${themePanel} border ${themeBorder} rounded-[2rem] p-8 hover:bg-stone-50 dark:hover:bg-white/5 transition-all group hover:-translate-y-1">
+                        <div class="${themePanel} border ${themeBorder} rounded-[2rem] p-8 hover:bg-stone-50 hover:text-stone-900 dark:hover:bg-white/5 dark:hover:text-white transition-all group hover:-translate-y-1">
                             <div class="w-10 h-10 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-600 mb-6 group-hover:scale-110 transition-transform">
                                 <span class="font-serif italic font-bold">0${i + 1}</span>
                             </div>
@@ -79,7 +79,7 @@ export function renderAboutSection(container, themePanel, themeBorder) {
                     <h3 class="text-xs font-black uppercase tracking-widest opacity-40 mb-6">${data.skillsCore}</h3>
                     <div class="flex flex-wrap gap-2">
                         ${[...aboutTool.skills.creative, ...aboutTool.skills.technical].slice(0, 8).map(s => `
-                            <span class="px-3 py-1.5 border border-stone-200 dark:border-white/10 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-violet-50 dark:hover:bg-white/10 transition-colors cursor-default">
+                            <span class="px-3 py-1.5 border border-stone-200 dark:border-white/10 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-zinc-800 dark:hover:text-white transition-colors cursor-default">
                                 ${s}
                             </span>
                         `).join('')}
