@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Karen: Jefa Creative Lab</title>
     <!-- Tailwind CSS -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- GSAP for animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -15,7 +20,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body class="theme-transition bg-[#F5F5F0] text-stone-800" id="body-main">
+<body class="theme-transition bg-[#1A1844] text-white" id="body-main">
 
     <!-- CUSTOM CURSOR -->
     <div id="cursor-dot"></div>
@@ -26,7 +31,7 @@
 
     <!-- BOOTING SCREEN -->
     <div id="booting-screen"
-        class="fixed inset-0 bg-[#F5F5F0] flex flex-col items-center justify-center text-[#16143C] font-mono z-[200]">
+        class="fixed inset-0 bg-[#16143C] flex flex-col items-center justify-center text-white font-mono z-[200]">
         <div
             class="w-14 h-14 rounded-xl bg-violet-600 text-white flex items-center justify-center mb-6 animate-pulse shadow-lg shadow-violet-500/20">
             <span class="text-xl font-bold">KJ</span>
@@ -43,7 +48,7 @@
 
         <!-- TOP BAR -->
         <header id="header"
-            class="h-12 bg-[#EAEAE5] border-stone-300 border-b flex items-center justify-between px-6 z-50 theme-transition">
+            class="h-12 bg-[#16143C] border-indigo-900/30 border-b flex items-center justify-between px-6 z-50 theme-transition">
             <div class="flex items-center gap-6">
                 <div class="flex items-center gap-3">
                     <div class="w-7 h-7 rounded-lg bg-violet-600 flex items-center justify-center text-white shadow-sm">
@@ -70,7 +75,7 @@
                 </div>
                 <button onclick="toggleDarkMode()"
                     class="w-8 h-8 flex items-center justify-center hover:bg-black/10 rounded-lg transition-colors">
-                    <i data-lucide="moon" id="theme-icon" class="w-4 h-4"></i>
+                    <i data-lucide="sun" id="theme-icon" class="w-4 h-4"></i>
                 </button>
                 <button onclick="startTutorial()"
                     class="w-8 h-8 flex items-center justify-center hover:bg-violet-600 hover:text-white rounded-lg transition-colors text-violet-600 bg-violet-100"
@@ -83,7 +88,7 @@
         <div class="flex-1 flex overflow-hidden">
             <!-- LEFT SIDEBAR -->
             <aside id="sidebar"
-                class="w-20 bg-[#EAEAE5] border-stone-300 border-r hidden sm:flex flex-col items-center py-8 gap-8 z-40 theme-transition overflow-hidden">
+                class="w-20 bg-[#16143C] border-indigo-900/30 border-r hidden sm:flex flex-col items-center py-8 gap-8 z-40 theme-transition overflow-hidden">
                 <div id="tool-buttons"
                     class="flex flex-col items-center gap-8 w-full flex-1 overflow-y-auto no-scrollbar px-2">
                     <!-- Dynamic Buttons -->
@@ -100,7 +105,7 @@
             <main class="flex-1 relative overflow-hidden flex flex-col mb-16 sm:mb-0">
                 <!-- TABS BAR -->
                 <div id="tabs-bar"
-                    class="h-11 bg-[#EAEAE5] border-stone-300 border-b flex items-center px-4 gap-1 overflow-x-auto no-scrollbar theme-transition">
+                    class="h-11 bg-[#16143C] border-indigo-900/30 border-b flex items-center px-4 gap-1 overflow-x-auto no-scrollbar theme-transition">
                     <div
                         class="flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase border-r border-stone-300 opacity-40 whitespace-nowrap tracking-tighter">
                         <i data-lucide="monitor" class="w-3.5 h-3.5"></i> <span id="workspace-dtext"></span>
@@ -120,14 +125,14 @@
 
                 <!-- MOBILE NAV -->
                 <nav id="mobile-nav"
-                    class="fixed bottom-0 left-0 w-full h-16 bg-[#EAEAE5] border-t border-stone-300 sm:hidden z-[60] flex items-center justify-around px-2 dark:bg-[#16143C] dark:border-indigo-900/30 transition-colors">
+                    class="fixed bottom-0 left-0 w-full h-16 bg-[#16143C] border-t border-indigo-900/30 sm:hidden z-[60] flex items-center justify-around px-2 dark:bg-[#16143C] dark:border-indigo-900/30 transition-colors">
                     <!-- Dynamic Buttons -->
                 </nav>
             </main>
 
             <!-- RIGHT INSPECTOR -->
             <aside id="inspector"
-                class="w-80 bg-[#EAEAE5] border-stone-300 border-l hidden xl:flex flex-col z-40 overflow-y-auto custom-scrollbar theme-transition">
+                class="w-80 bg-[#16143C] border-indigo-900/30 border-l hidden xl:flex flex-col z-40 overflow-y-auto custom-scrollbar theme-transition">
                 <!-- Dynamic Content Loading... -->
             </aside>
         </div>
@@ -138,9 +143,9 @@
         <!-- WELCOME MODAL -->
         <div id="welcome-modal"
             class="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-black/50 backdrop-blur-sm hidden">
-            <div class="w-full max-w-2xl bg-white rounded-[2rem] border border-stone-300 shadow-2xl overflow-hidden animate-pop relative theme-transition"
+            <div class="w-full max-w-2xl bg-white dark:bg-[#1E1B4B] rounded-[2rem] border border-stone-300 dark:border-indigo-900/30 shadow-2xl overflow-hidden animate-pop relative theme-transition"
                 id="modal-panel">
-                <div class="h-11 bg-[#EAEAE5] flex items-center justify-between px-6 border-b border-stone-300"
+                <div class="h-11 bg-[#EAEAE5] dark:bg-[#16143C] flex items-center justify-between px-6 border-b border-stone-300 dark:border-indigo-900/30"
                     id="modal-header">
                     <div class="flex items-center gap-2">
                         <i data-lucide="monitor" class="w-3 h-3 opacity-30"></i>
