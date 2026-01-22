@@ -3,13 +3,29 @@ export const tools = [
         id: 'about',
         icon: 'user-circle',
         label: 'Sobre Mí',
-        role: 'Mercadóloga & Directora Creativa',
+        role: 'Mercadóloga & Social Media',
         title: 'Estrategia que se ve, creatividad que funciona.',
-        intro: [
-            "Hola, soy Karen. Mercadóloga de profesión y creativa de corazón. Me dedico a darle vida a las marcas, uniendo los puntos entre lo que una empresa necesita y lo que la gente quiere ver.",
-            "No creo en hacer cosas solo porque se ven 'bonitas'. Para mí, el diseño y la publicidad tienen que tener un propósito: comunicar, conectar y vender. Me gusta pensar antes de diseñar y analizar antes de proponer.",
-            "Mi trabajo es una mezcla de estrategia y arte. Desde crear una identidad visual desde cero hasta planear una campaña que impacte, me involucro en el proceso para asegurar que el resultado final tenga alma y sentido."
-        ],
+        intro: {
+            summary: "Soy Karen Dayanna Jiménez Bernal, mercadóloga con enfoque en Social Media y marketing digital. Me apasiona comprender cómo las personas interactúan con las marcas y cómo, a partir de datos, insights y tendencias, es posible construir estrategias que realmente impulsen su crecimiento en el entorno digital.",
+            sections: [
+                {
+                    title: "¿Cómo aporto valor?",
+                    content: "Mi experiencia combina el marketing con procesos administrativos clave que fortalecen la operación del área. He participado en la creación y gestión de proveedores, el seguimiento de planes anuales y la coordinación de procesos de pago, asegurando una ejecución eficiente y organizada de proyectos. Además, gestiono la comunicación interna y externa de los productos que comercializamos, apoyando el posicionamiento de marca a través de estrategias de branding, SEO y el desarrollo de materiales POP necesarios para la ejecución de acciones comerciales. Dentro de mis funciones también destaco el apoyo en la planificación, cotización y logística de eventos. Acompaño cada etapa: desde la evaluación de necesidades, la dirección y organización del espacio, la correcta instalación del material POP y el acompañamiento operativo durante el evento."
+                },
+                {
+                    title: "¿Qué me diferencia?",
+                    content: "Integro creatividad, estrategia, análisis y gestión operativa. Más que generar contenido, estructuro planes digitales fundamentados en datos, tendencias y objetivos definidos. Mi enfoque me permite construir narrativas que conectan con las audiencias correctas y fortalecen la identidad y reputación de las marcas, mientras cuido los procesos internos necesarios para que cada proyecto avance sin fricciones. Esta combinación me permite aportar valor desde la planeación y conceptualización hasta la implementación, el control y la medición de resultados."
+                },
+                {
+                    title: "Mi propósito profesional",
+                    content: "Aportar a la transformación de marcas mediante estrategias auténticas, éticas y efectivas. Me motiva ayudar a las personas y organizaciones a consolidar una presencia digital relevante y competitiva, entendiendo que el mercado evoluciona constantemente y exige adaptabilidad, claridad y enfoque. Asimismo, busco fortalecer procesos internos que permitan que las estrategias se ejecuten con orden, eficiencia y resultados medibles."
+                },
+                {
+                    title: "Colaboración",
+                    content: "Estoy abierta a proyectos relacionados con marketing digital, análisis de datos aplicado al marketing, social media, branding, investigación de mercado, diseño de estrategias integrales y apoyo administrativo en procesos internos del área de marketing. ¡Hablemos!"
+                }
+            ]
+        },
         whatIDo: [
             { title: "Diseño Gráfico", desc: "Creo marcas que se sienten reales. Logos, identidades y piezas visuales que no solo decoran, sino que construyen la personalidad de tu negocio." },
             { title: "Publicidad", desc: "Ideas que pegan. Busco el ángulo creativo perfecto para que tu mensaje llegue claro, fuerte y directo a quien le tiene que llegar." },
@@ -47,7 +63,51 @@ export const tools = [
     { id: 'color', icon: 'swatch-book', label: 'Color Lab', role: 'Estudio de Color', desc: 'El poder del color.', manifesto: 'Herramienta profesional para elegir paletas perfectas, accesibles y hermosas.', services: [] },
     { id: 'gallery', icon: 'camera', label: 'Galería', role: 'Fotografía & Mood', desc: 'Capturando momentos.', manifesto: 'Una colección curada de vibras visuales y fotografía.', services: [] },
     { id: 'strategy', icon: 'brain', label: 'Estrategia', role: 'Arquetipos de Marca', desc: 'Descubre el ADN de tu marca.', manifesto: 'Herramienta interactiva para definir la personalidad de tu negocio.', services: [] },
-    { id: 'contact', icon: 'send', label: 'Contacto', role: 'Inicia el Viaje', desc: 'Hagamos realidad tu proyecto.', manifesto: 'Generador de brief interactivo para entender tus necesidades.', services: [] }
+    { id: 'contact', icon: 'send', label: 'Contacto', role: 'Inicia el Viaje', desc: 'Hagamos realidad tu proyecto.', manifesto: 'Generador de brief interactivo para entender tus necesidades.', services: [] },
+    {
+        id: 'cv',
+        icon: 'file-text',
+        label: 'Curriculum',
+        role: 'Trayectoria',
+        desc: 'Mi camino profesional.',
+        manifesto: 'Experiencia, aprendizaje y crecimiento constante.',
+        profileImage: 'assets/images/profile/perfil.png',
+        downloadUrl: 'assets/file/HOJA DE VIDA K.pdf',
+        experience: [
+            {
+                role: "Mercadóloga & Social Media",
+                company: "Independiente",
+                period: "2020 - Actualidad",
+                desc: "Desarrollo de estrategias de marketing digital, gestión de redes sociales y creación de identidad visual para diversas marcas. Enfoque en resultados medibles y crecimiento orgánico.",
+                tags: ["Estrategia", "Contenido", "Branding"]
+            },
+            {
+                role: "Coordinación de Marketing",
+                company: "Sector Corporativo",
+                period: "2018 - 2020",
+                desc: "Gestión de proveedores, planificación de eventos corporativos y campañas de comunicación interna. Liderazgo en logística y material POP.",
+                tags: ["Logística", "Proveedores", "Eventos"]
+            }
+        ],
+        education: [
+            {
+                degree: "Licenciatura en Mercadotecnia",
+                school: "Universidad de Especialidad",
+                year: "2018",
+                desc: "Formación integral en estrategias de mercado y comportamiento del consumidor."
+            },
+            {
+                degree: "Diplomado en Diseño Gráfico",
+                school: "Plataforma Creativa",
+                year: "2019",
+                desc: "Especialización en herramientas de la suite Adobe y composición visual."
+            }
+        ],
+        skills: {
+            tech: ["Adobe Photoshop", "Adobe Illustrator", "Premiere Pro", "Meta Business Suite", "Google Analytics"],
+            soft: ["Liderazgo", "Resolución de Problemas", "Comunicación Asertiva", "Gestión de Tiempo"]
+        }
+    }
 ];
 
 export const sidebarData = {
@@ -134,6 +194,7 @@ export const siteContent = {
         mobileLogo: "K:C",
         navBrand: "Creative_System",
         navAbout: "Acerca de",
+        navCv: "Curriculum",
         status: "Karen Online"
     },
     tabs: {

@@ -3,6 +3,7 @@ import { renderStrategyTool } from './quiz.js';
 import { renderContactTool } from './contact.js';
 import { renderWindows } from './window-manager.js';
 import { renderAboutSection } from './sections/about.js';
+import { renderCVSection } from './sections/cv.js';
 import { renderColorLab } from './sections/color-lab.js';
 import { renderGallery } from './sections/gallery.js';
 
@@ -59,6 +60,8 @@ function renderSiteContent() {
     if (navBrand) navBrand.innerText = siteContent.header.navBrand;
     const navAbout = document.getElementById('nav-about-text');
     if (navAbout) navAbout.innerText = siteContent.header.navAbout;
+    const navCv = document.getElementById('nav-cv-text');
+    if (navCv) navCv.innerText = siteContent.header.navCv;
 
     // Tabs
     const workText = document.getElementById('workspace-dtext');
@@ -895,6 +898,16 @@ function renderContent(animate = false) {
         const toolContent = document.createElement('div');
         container.appendChild(toolContent);
         renderStrategyTool(toolContent, themePanel, themeBorder);
+        lucide.createIcons();
+        if (animate) animateElements();
+        return;
+    }
+
+    if (activeTool === 'cv') {
+        container.innerHTML = html;
+        const toolContent = document.createElement('div');
+        container.appendChild(toolContent);
+        renderCVSection(toolContent, themePanel, themeBorder);
         lucide.createIcons();
         if (animate) animateElements();
         return;
