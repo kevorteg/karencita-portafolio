@@ -29,7 +29,26 @@ export function renderAboutSection(container, themePanel, themeBorder) {
                         </h2>
 
                         <div class="space-y-6 text-lg leading-relaxed opacity-80 max-w-2xl font-medium">
-                            ${aboutTool.intro.map(p => `<p>${p}</p>`).join('')}
+                            <p>${aboutTool.intro.summary}</p>
+                            
+                            <!-- Accordion Sections -->
+                            <div class="space-y-4 mt-6">
+                                ${aboutTool.intro.sections.map(section => `
+                                    <details class="group bg-stone-50 dark:bg-white/5 rounded-2xl overflow-hidden transition-all duration-300 open:bg-violet-50 dark:open:bg-violet-900/20">
+                                        <summary class="flex items-center justify-between p-4 cursor-pointer select-none list-none marker:hidden">
+                                            <span class="font-bold text-violet-700 dark:text-violet-300 group-open:text-violet-800 dark:group-open:text-violet-200 text-sm uppercase tracking-wider">
+                                                ${section.title}
+                                            </span>
+                                            <div class="w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-600 dark:text-violet-400 transition-transform duration-300 group-open:rotate-180">
+                                                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                                            </div>
+                                        </summary>
+                                        <div class="px-6 pb-6 pt-2 text-[15px] leading-relaxed text-stone-700 dark:text-stone-300 border-t border-violet-100 dark:border-white/5 mx-0 mt-2">
+                                            ${section.content}
+                                        </div>
+                                    </details>
+                                `).join('')}
+                            </div>
                         </div>
                      </div>
                 </div>
