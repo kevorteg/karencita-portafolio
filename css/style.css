@@ -33,8 +33,15 @@ body {
 }
 
 /* Custom Scrollbar */
+/* Custom Scrollbar */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(124, 58, 237, 0.2) transparent;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
-    width: 5px;
+    width: 4px;
+    height: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -47,7 +54,7 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(124, 58, 237, 0.4);
+    background: rgba(124, 58, 237, 0.6);
 }
 
 .no-scrollbar {
