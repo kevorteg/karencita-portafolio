@@ -548,7 +548,7 @@ function renderTools() {
             id="tool-btn-${tool.id}"
             onclick="setActiveTool('${tool.id}')"
             data-hover-title="${tool.label}"
-            class="w-12 h-12 flex items-center justify-center rounded-full transition-all relative group ${activeTool === tool.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20' : 'hover:bg-black/5 opacity-40 hover:opacity-100'}"
+            class="w-12 h-12 shrink-0 flex items-center justify-center rounded-full transition-all relative group ${activeTool === tool.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20' : 'hover:bg-black/5 opacity-40 hover:opacity-100'}"
         >
             <i data-lucide="${tool.icon}" class="w-5 h-5"></i>
             <span class="absolute left-16 bg-black text-white text-[9px] px-2 py-1.5 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-all translate-x-[-4px] group-hover:translate-x-0 whitespace-nowrap z-50 uppercase font-bold tracking-widest hidden sm:block">
