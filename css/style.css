@@ -50,6 +50,13 @@ body {
     background: rgba(124, 58, 237, 0.4);
 }
 
+.no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }

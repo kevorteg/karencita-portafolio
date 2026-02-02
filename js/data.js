@@ -37,12 +37,50 @@ export const tools = [
             technical: ["Suite Adobe", "Branding Estratégico", "Identidad Corporativa", "Campañas 360", "Redacción Creativa"],
             professional: ["Visión Estratégica", "Liderazgo de Equipos", "Gestión de Marcas", "Comunicación Asertiva"]
         },
-        process: [
-            "Platicar y entender el problema.",
-            "Investigar a fondo el contexto.",
-            "Lluvia de ideas y estrategia.",
-            "Diseño y creación (la magia).",
-            "Refinar y entregar lo mejor."
+        experience: [
+            {
+                period: "2023 - 2024",
+                company: "CALIER COLOMBIA",
+                role: "PASANTÍA DE MARKETING",
+                tasks: [
+                    "Creación de proveedores, seguimiento de pagos, manejo de planes anuales y solicitudes en SAP para asegurar la ejecución de eventos, congresos y acciones comerciales.",
+                    "Apoyo en comunicación interna y externa de productos, gestión de branding, SEO y coordinación de materiales POP para campañas y actividades comerciales.",
+                    "Cotización, planeación y ejecución de eventos, incluyendo dirección en campo, acomodación, instalación de POP y soporte operativo en actividades locales y regionales.",
+                    "Consulta y entrega de información cuantitativa en Power BI para respaldar decisiones comerciales y de marketing, además de apoyar en la preparación de eventos estratégicos como la Convención LATAM y la Convención Comercial Colombia."
+                ]
+            },
+            {
+                period: "2023 - 2025",
+                company: "AGENCIA PUBLICIDAD DIGITAL PARTNER",
+                role: "SOCIAL MEDIA MANAGER",
+                tasks: [
+                    "Gestioné comunidades en Meta, traduciendo identidades de marca en estrategias visuales y comunicativas que fortalecieron su posicionamiento.",
+                    "Humanicé servicios complejos para marcas como Revisoría Fiscal y Cootraim mediante contenido educativo que generó confianza y consolidó su autoridad.",
+                    "Creé campañas sensoriales para la Academia de Modas, Yummy y CBC, transformando productos y experiencias en piezas visuales que inspiraron y motivaron visitas.",
+                    "Desarrollé contenido especializado para Cderma, la Dra. Liliana Arias y Ana Cepeda, educando a la audiencia y posicionando a las profesionales como referentes confiables."
+                ]
+            },
+            {
+                period: "2020 - 2021",
+                company: "FORTOX S.A.",
+                role: "APRENDIZ DE COMUNICACIONES",
+                tasks: [
+                    "Creé boletines y campañas digitales para mantener informados y conectados a más de 10.000 colaboradores, comunicando protocolos, bienestar y salud mental en un entorno de crisis.",
+                    "Participé en la elaboración de comunicados de prensa y mensajes institucionales para fortalecer la imagen pública de Fortox y comunicar acciones empresariales de alto impacto social.",
+                    "Aprendí a comunicar con sensibilidad, claridad y enfoque estratégico, entendiendo el impacto de cada mensaje en la empresa, en las personas y en el entorno social."
+                ]
+            },
+            {
+                period: "2019 - 2020",
+                company: "ARTE IMPRESO COLMENA",
+                role: "DISEÑADORA GRÁFICA",
+                tasks: [
+                    "Generar piezas visuales creativas para la compañía.",
+                    "Ejecutar y construir estrategias de imprenta.",
+                    "Apoyar solicitudes de áreas comunicativas de la empresa.",
+                    "Gestionar canales comunicativos."
+                ]
+            }
         ],
         projectsText: "Cada marca es un mundo y me encanta explorarlos todos. Aquí verás una selección de trabajos donde he puesto creatividad, estrategia y mucho cariño.",
         education: "Mercadóloga graduada con formación constante en diseño y dirección de arte. Nunca dejo de aprender porque el mundo digital nunca deja de cambiar.",
@@ -216,7 +254,7 @@ export const siteContent = {
         skillsCore: "Habilidades Core",
         skillsCreative: "Creativas",
         skillsTech: "Técnicas & Pro",
-        processTitle: "Proceso Creativo",
+        processTitle: "Experiencia",
         processPhasePrefix: "Fase",
         educationTitle: "Educación",
         statusTitle: "Status",

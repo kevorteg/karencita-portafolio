@@ -115,23 +115,43 @@ export function renderAboutSection(container, themePanel, themeBorder) {
             </div>
         </div>
 
-        <!-- PROCESS SECTION -->
+        <!-- EXPERIENCE SECTION -->
         <div class="mb-24">
              <div class="flex items-end justify-between mb-12 px-2">
                 <h2 class="text-4xl md:text-6xl font-serif italic text-stone-300 dark:text-stone-700 select-none">${data.processTitle}</h2>
                 <div class="hidden sm:block h-px flex-1 bg-stone-200 dark:bg-stone-800 mx-8 mb-4"></div>
-                <span class="text-xs font-black uppercase tracking-widest opacity-40 mb-4">Methodology v2.0</span>
+                <span class="text-xs font-black uppercase tracking-widest opacity-40 mb-4">Trajectory</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                ${aboutTool.process.map((step, i) => `
-                    <div class="relative group">
-                        <div class="h-full ${themePanel} border ${themeBorder} rounded-[2rem] p-6 hover:bg-stone-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all duration-500 flex flex-col justify-between min-h-[200px]">
-                            <span class="text-[10px] font-black uppercase tracking-widest opacity-30 group-hover:opacity-100 transition-opacity mb-4 block">${data.processPhasePrefix} 0${i + 1}</span>
-                            <p class="font-bold text-lg leading-tight group-hover:translate-x-1 transition-transform">${step}</p>
-                            <div class="mt-4 w-8 h-8 rounded-full border border-current flex items-center justify-center opacity-20 group-hover:opacity-100 transition-all">
-                                <i data-lucide="arrow-down" class="w-3 h-3 -rotate-45 group-hover:rotate-0 transition-transform"></i>
+            <div class="space-y-6">
+                ${aboutTool.experience.map((job, i) => `
+                    <div class="group relative pl-8 sm:pl-0">
+                        <!-- Timeline Line (Mobile) -->
+                        <div class="absolute left-0 top-0 bottom-0 w-px bg-stone-200 dark:bg-stone-800 sm:hidden"></div>
+                        <div class="absolute left-[-4px] top-6 w-2 h-2 rounded-full bg-violet-600 sm:hidden"></div>
+
+                        <div class="${themePanel} border ${themeBorder} rounded-[2rem] p-8 hover:border-violet-600/50 transition-colors group-hover:shadow-lg">
+                            <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-6">
+                                <div>
+                                    <span class="inline-block px-3 py-1 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-300 text-[10px] font-bold uppercase tracking-widest mb-3">
+                                        ${job.period}
+                                    </span>
+                                    <h3 class="text-2xl font-bold mb-1 group-hover:text-violet-600 transition-colors">${job.role}</h3>
+                                    <h4 class="text-sm font-black uppercase tracking-widest opacity-60">${job.company}</h4>
+                                </div>
+                                <div class="hidden md:block opacity-20 group-hover:opacity-100 transition-opacity">
+                                    <i data-lucide="briefcase" class="w-6 h-6"></i>
+                                </div>
                             </div>
+                            
+                            <ul class="space-y-3">
+                                ${job.tasks.map(task => `
+                                    <li class="flex items-start gap-3 text-sm leading-relaxed opacity-80">
+                                        <div class="mt-1.5 w-1.5 h-1.5 rounded-full bg-stone-300 dark:bg-stone-600 shrink-0 group-hover:bg-violet-500 transition-colors"></div>
+                                        <span>${task}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
                         </div>
                     </div>
                 `).join('')}
