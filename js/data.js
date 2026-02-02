@@ -107,45 +107,73 @@ export const tools = [
         icon: 'file-text',
         label: 'Curriculum',
         role: 'Trayectoria',
-        desc: 'Mi camino profesional.',
-        manifesto: 'Experiencia, aprendizaje y crecimiento constante.',
+        desc: 'Mi camino profesional.', // Restore missing description
         profileImage: 'assets/images/profile/perfil.png',
-        downloadUrl: 'assets/file/HOJA DE VIDA K.pdf',
+        downloadUrl: 'assets/cv.pdf',
+        profile: {
+            name: "Karen Dayanna Jiménez Bernal",
+            role: "Mercadóloga y Publicista",
+            summary: "Karen es Mercadóloga y Publicista con dominio de los idiomas español e inglés. Cuenta con experiencia en Social Media, Branding y Estrategias Digitales. Su perfil destaca por el apoyo en procesos administrativos de marketing (gestión de proveedores y pagos), comunicación interna/externa, desarrollo de materiales POP y logística de eventos."
+        },
+        contact: {
+            phone: "316 432 1424",
+            email: "innova.novus@gmail.com",
+            linkedin: "linkedin.com/in/kadajim",
+            user: "KADAJIM"
+        },
         experience: [
             {
-                role: "Mercadóloga & Social Media",
-                company: "Independiente",
-                period: "2020 - Actualidad",
-                desc: "Desarrollo de estrategias de marketing digital, gestión de redes sociales y creación de identidad visual para diversas marcas. Enfoque en resultados medibles y crecimiento orgánico.",
-                tags: ["Estrategia", "Contenido", "Branding"]
+                company: "Calier Colombia",
+                period: "2025 - 2026",
+                role: "Pasantía de Marketing",
+                tasks: [
+                    "Manejo de SAP para creación de proveedores, seguimiento de pagos y planes anuales.",
+                    "Gestión de branding, SEO, comunicación de productos y coordinación de material POP.",
+                    "Planeación de eventos estratégicos como la Convención LATAM y soporte en Power BI para decisiones comerciales."
+                ]
             },
             {
-                role: "Coordinación de Marketing",
-                company: "Sector Corporativo",
-                period: "2018 - 2020",
-                desc: "Gestión de proveedores, planificación de eventos corporativos y campañas de comunicación interna. Liderazgo en logística y material POP.",
-                tags: ["Logística", "Proveedores", "Eventos"]
+                company: "Agencia Publicidad Digital Partner",
+                period: "2023 - 2025",
+                role: "Social Media Manager",
+                tasks: [
+                    "Gestión de comunidades en Meta y traducción de identidad de marca en estrategias visuales.",
+                    "Creación de contenido educativo para humanizar servicios complejos (Revisaría Fiscal, Cootraim).",
+                    "Desarrollo de campañas sensoriales y contenido especializado para el sector salud y moda."
+                ]
+            },
+            {
+                company: "Fortox S.A.",
+                period: "2020 - 2021",
+                role: "Aprendiz de Comunicaciones",
+                tasks: [
+                    "Creación de boletines para más de 10,000 colaboradores enfocados en bienestar y salud mental durante crisis.",
+                    "Elaboración de comunicados de prensa y mensajes institucionales."
+                ]
+            },
+            {
+                company: "Arte Impreso Colmena",
+                period: "2019 - 2020",
+                role: "Diseñadora Gráfica",
+                tasks: [
+                    "Generación de piezas visuales y ejecución de estrategias de imprenta.",
+                    "Gestión de canales comunicativos de la empresa."
+                ]
             }
         ],
         education: [
-            {
-                degree: "Licenciatura en Mercadotecnia",
-                school: "Universidad de Especialidad",
-                year: "2018",
-                desc: "Formación integral en estrategias de mercado y comportamiento del consumidor."
-            },
-            {
-                degree: "Diplomado en Diseño Gráfico",
-                school: "Plataforma Creativa",
-                year: "2019",
-                desc: "Especialización en herramientas de la suite Adobe y composición visual."
-            }
+            { school: "Universidad Libre Cali", degree: "Mercadeo", period: "Actual - 2024" },
+            { school: "Fundación Academia de Dibujo Profesional", degree: "Tecnólogo en Producción Publicitaria", period: "2019 - 2023" },
+            { school: "SENA", degree: "Componentes Audiovisuales Adobe", period: "2016 - 2017" },
+            { school: "I.T.I. Antonio José Camacho", degree: "Técnico en Construcción Civil (Arq.)", period: "2012 - 2018" }
         ],
         skills: {
-            tech: ["Adobe Photoshop", "Adobe Illustrator", "Premiere Pro", "Meta Business Suite", "Google Analytics"],
-            soft: ["Liderazgo", "Resolución de Problemas", "Comunicación Asertiva", "Gestión de Tiempo"]
-        }
-    }
+            technical: ["Ofimática", "SAP", "Adobe Suite", "Power BI", "IA Generativa", "Canvas", "CapCut"],
+            soft: ["Coordinación y ejecución", "Responsabilidad", "Innovación", "Comunicación efectiva"],
+            areas: ["Gestión administrativa", "Análisis de estrategias", "Comunicación corporativa"]
+        },
+        manifesto: "Crear es dar vida."
+    },
 ];
 
 export const sidebarData = {
