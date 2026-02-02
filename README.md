@@ -90,7 +90,7 @@ Para agregar un proyecto al portafolio, ve a la lista **`projects`** y añade un
 
 <div align="center">
   <p style="opacity: 0.6; font-size: 0.9em;">
-    Desarrollado con ❤️ y mucho café. <br>
+    Desarrollado con 👍 y mucho café. <br>
     Sistema optimizado para <b>Karen's Creative Lab</b>.
   </p>
 </div>
