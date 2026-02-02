@@ -22,6 +22,14 @@ body {
         radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
         radial-gradient(rgba(255, 255, 255, 0.05) 1px, #1A1844 1px);
     opacity: 1;
+    color: white !important;
+}
+
+/* Reverted global text override to fix white-on-white issue */
+/* Targeted override for main headers in dark mode */
+.dark h2,
+.dark h3 {
+    color: white !important;
 }
 
 .font-serif {
