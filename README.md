@@ -1,8 +1,7 @@
-
 <div align="center">
   <img src="assets/images/profile/perfil.png" alt="Karen Profile" width="120" style="border-radius: 50%; box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);">
 
-  <h1 style="font-size: 3em; margin-top: 20px;">Karen's Creative Portfolio</h1>
+  <h1 style="font-size: 3em; margin-top: 20px;">Sistema optimizado para <b>Karen's Creative Lab</b>.</h1>
   
   <p style="font-size: 1.2em; max-width: 600px; margin: 0 auto; line-height: 1.6;">
     Un espacio digital diseñado para destacar estrategia, creatividad y visión. 
@@ -74,23 +73,16 @@ Para agregar un proyecto al portafolio, ve a la lista **`projects`** y añade un
     description: 'Descripción corta y atractiva.' 
 },
 ```
+*(Ojo: Asegúrate que la foto `tu-foto.jpg` esté guardada en la carpeta `assets/images/projects/`)*.
 
 ---
 
-## 💎 Características Pro
+## 🆘 ¡Ayuda, rompí algo!
 
-| Feature | Descripción | Estado |
-| :--- | :--- | :--- |
-| **Modo Oscuro/Claro** | Se adapta a la preferencia del sistema y tiene botón manual. | ✅ Activo |
-| **Color Lab** | Sistema inteligente que extrae colores de imágenes subidas. | ✅ Activo |
-| **Animaciones GSAP** | Transiciones suaves y efectos de entrada cinematográficos. | ✅ Activo |
-| **Responsive** | Se ve perfecto en iPhone, iPad y monitores 4K. | ✅ Activo |
+Si guardas y la página se pone blanca o no carga:
+1.  ¡Respira! 🧘‍♀️
+2.  Seguro borraste una comilla `'` o una coma `,` sin querer.
+3.  Dale **Ctrl + Z** (Deshacer) hasta que reviva y vuelve a intentarlo con más calmita.
+4.  Si no te funciona, escríbeme para corregir los errores.
 
----
-
-<div align="center">
-  <p style="opacity: 0.6; font-size: 0.9em;">
-    Desarrollado con 👍 y mucho café por <a href="https://github.com/kevorteg"><b>Kevin Ortega</b></a>.<br>
-    Sistema optimizado para <b>Karen's Creative Lab</b>.
-  </p>
-</div>
+¡Tú puedes! Haz que ese portafolio brille. ✨🚀
