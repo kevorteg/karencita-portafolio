@@ -94,20 +94,12 @@ export const tools = [
             availability: ["Freelance disponible.", "Proyectos por objetivo.", "Asesorías 1 a 1."]
         }
     },
-    { id: 'design', icon: 'palette', label: 'Diseño Gráfico', role: 'Identidad Visual', desc: 'Tu marca merece verse increíble.', manifesto: 'Diseño sistemas visuales que cuentan la historia de tu negocio.', services: ['Logotipos', 'Manual de Marca', 'Papelería'] },
-    { id: 'branding', icon: 'pen-tool', label: 'Branding', role: 'Arte Digital', desc: 'Dibujando ideas.', manifesto: 'Ilustraciones personalizadas para darle carácter a tus proyectos.', services: ['Editorial', 'Redes Sociales'] },
-    { id: 'publicity', icon: 'megaphone', label: 'Publicidad', role: 'Campañas', desc: 'Hagamos ruido del bueno.', manifesto: 'Conceptos publicitarios que conectan con las emociones de la gente.', services: ['Concepto Creativo', 'Copywriting'] },
-    { id: 'marketing', icon: 'bar-chart-3', label: 'Marketing', role: 'Estrategia', desc: 'Crecer con sentido.', manifesto: 'Planeación estratégica para que cada peso invertido cuente.', services: ['Auditoría de Marca', 'Plan de Contenidos'] },
-    { id: 'color', icon: 'swatch-book', label: 'Color Lab', role: 'Estudio de Color', desc: 'El poder del color.', manifesto: 'Herramienta profesional para elegir paletas perfectas, accesibles y hermosas.', services: [] },
-    { id: 'gallery', icon: 'camera', label: 'Galería', role: 'Fotografía & Mood', desc: 'Capturando momentos.', manifesto: 'Una colección curada de vibras visuales y fotografía.', services: [] },
-    { id: 'strategy', icon: 'brain', label: 'Estrategia', role: 'Arquetipos de Marca', desc: 'Descubre el ADN de tu marca.', manifesto: 'Herramienta interactiva para definir la personalidad de tu negocio.', services: [] },
-    { id: 'contact', icon: 'send', label: 'Contacto', role: 'Inicia el Viaje', desc: 'Hagamos realidad tu proyecto.', manifesto: 'Generador de brief interactivo para entender tus necesidades.', services: [] },
     {
         id: 'cv',
         icon: 'file-text',
         label: 'Curriculum',
         role: 'Trayectoria',
-        desc: 'Mi camino profesional.', // Restore missing description
+        desc: 'Mi camino profesional.',
         profileImage: 'assets/images/profile/perfil.png',
         downloadUrl: 'assets/cv.pdf',
         profile: {
@@ -159,7 +151,7 @@ export const tools = [
                     "Generación de piezas visuales y ejecución de estrategias de imprenta.",
                     "Gestión de canales comunicativos de la empresa."
                 ]
-            }
+            },
         ],
         education: [
             { school: "Universidad Libre Cali", degree: "Mercadeo", period: "Actual - 2024" },
@@ -174,6 +166,15 @@ export const tools = [
         },
         manifesto: "Crear es dar vida."
     },
+    { id: 'design', icon: 'palette', label: 'Diseño Gráfico', role: 'Identidad Visual', desc: 'Tu marca merece verse increíble.', manifesto: 'Diseño sistemas visuales que cuentan la historia de tu negocio.', services: ['Logotipos', 'Manual de Marca', 'Papelería'] },
+    { id: 'branding', icon: 'pen-tool', label: 'Branding', role: 'Arte Digital', desc: 'Dibujando ideas.', manifesto: 'Ilustraciones personalizadas para darle carácter a tus proyectos.', services: ['Editorial', 'Redes Sociales'] },
+    { id: 'publicity', icon: 'megaphone', label: 'Publicidad', role: 'Campañas', desc: 'Hagamos ruido del bueno.', manifesto: 'Conceptos publicitarios que conectan con las emociones de la gente.', services: ['Concepto Creativo', 'Copywriting'] },
+    { id: 'marketing', icon: 'bar-chart-3', label: 'Marketing', role: 'Estrategia', desc: 'Crecer con sentido.', manifesto: 'Planeación estratégica para que cada peso invertido cuente.', services: ['Auditoría de Marca', 'Plan de Contenidos'] },
+    { id: 'color', icon: 'swatch-book', label: 'Color Lab', role: 'Estudio de Color', desc: 'El poder del color.', manifesto: 'Herramienta profesional para elegir paletas perfectas, accesibles y hermosas.', services: [] },
+    { id: 'gallery', icon: 'camera', label: 'Galería', role: 'Fotografía & Mood', desc: 'Capturando momentos.', manifesto: 'Una colección curada de vibras visuales y fotografía.', services: [] },
+    { id: 'strategy', icon: 'brain', label: 'Estrategia', role: 'Arquetipos de Marca', desc: 'Descubre el ADN de tu marca.', manifesto: 'Herramienta interactiva para definir la personalidad de tu negocio.', services: [] },
+    { id: 'contact', icon: 'send', label: 'Contacto', role: 'Inicia el Viaje', desc: 'Hagamos realidad tu proyecto.', manifesto: 'Generador de brief interactivo para entender tus necesidades.', services: [] },
+
 ];
 
 export const sidebarData = {
