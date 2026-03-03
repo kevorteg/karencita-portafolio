@@ -6,6 +6,8 @@ import { renderCVSection } from './sections/cv.js';
 import { renderColorLab } from './sections/color-lab.js';
 import { renderGallery } from './sections/gallery.js';
 import { renderSocialMediaSection } from './sections/social-media.js';
+import { renderIllustrationsSection } from './sections/illustrations.js';
+import { renderPhotographySection } from './sections/photography.js';
 
 import {
     hexToRgb, fetchColorName
@@ -937,7 +939,17 @@ function renderContent(animate = false) {
         container.innerHTML = html;
         const toolContent = document.createElement('div');
         container.appendChild(toolContent);
-        renderGallery(toolContent);
+        renderPhotographySection(toolContent, themePanel, themeBorder);
+        lucide.createIcons();
+        if (animate) animateElements();
+        return;
+    }
+
+    if (activeTool === 'design') {
+        container.innerHTML = html;
+        const toolContent = document.createElement('div');
+        container.appendChild(toolContent);
+        renderIllustrationsSection(toolContent, themePanel, themeBorder);
         lucide.createIcons();
         if (animate) animateElements();
         return;
