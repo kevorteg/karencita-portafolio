@@ -68,7 +68,8 @@ export function sendWhatsApp() {
         return;
     }
 
-    let text = `Hola Karen, soy *${name}*.`;
+    let text = `Cordial saludos, ¿Cómo estás? 
+Te necesito Karen.... *${name}*.`;
 
     if (window.clientProfile) {
         text += `\n\nHice tu diagnóstico y mi perfil es *${window.clientProfile}*.`;
