@@ -1,0 +1,35 @@
+# Ignore heavy RAW video folders
+**/RAW/
+**/raw/
+
+# Ignore specific large files (> 50MB)
+# (Videos)
+assets/Ilustraciones/Videos/Mi_edición.mp4
+assets/SOCIAL MEDIA/SOCIAL MEDIA/dra. Cepeda/reels/CEPEDA 2.mp4
+assets/SOCIAL MEDIA/SOCIAL MEDIA/dra. Cepeda/reels/CEPEDA 13.mp4
+assets/SOCIAL MEDIA/SOCIAL MEDIA/dra. Cepeda/reels/CEPEDA 9.mp4
+assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/GRACIAS.mp4
+assets/SOCIAL MEDIA/SOCIAL MEDIA/DISEÑAMOS/historias/16 MAR.mp4
+assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/historias/19 MAR.mp4
+assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/historias/27 MAR.mp4
+assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/historias/21 MAR.mp4
+assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/historias/23 MAR.mp4
+assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/historias/9 MAR.mp4
+assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/historias/31 MAR.mp4
+assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/historias/29 MAR.mp4
+assets/SOCIAL MEDIA/SOCIAL MEDIA/dra. Cepeda/reels/CEPEDA 2(1).mp4
+
+# (PDFs or others)
+assets/SOCIAL MEDIA/SOCIAL MEDIA/COOTRAIM/FOLLETO COOTRAIN.pdf
+assets/Fotografia/FOTOGRAFIA/corporativas/impresos/CALENDARIO 2025.pdf
+
+# Exclude any other heavy files from the raw list
+assets/Fotografia/FOTOGRAFIA/corporativas/RAW/
+
+# OS/Local files
+.DS_Store
+Thumbs.db
+node_modules/
+.gemini/
+brain/
+compress_images.py

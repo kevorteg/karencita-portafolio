@@ -1,11 +1,11 @@
 import { tools, projects, sidebarData, tutorialSteps, siteContent } from './data.js';
-import { renderStrategyTool } from './quiz.js';
 import { renderContactTool } from './contact.js';
 import { renderWindows } from './window-manager.js';
 import { renderAboutSection } from './sections/about.js';
 import { renderCVSection } from './sections/cv.js';
 import { renderColorLab } from './sections/color-lab.js';
 import { renderGallery } from './sections/gallery.js';
+import { renderSocialMediaSection } from './sections/social-media.js';
 
 import {
     hexToRgb, fetchColorName
@@ -548,12 +548,10 @@ function renderTools() {
             id="tool-btn-${tool.id}"
             onclick="setActiveTool('${tool.id}')"
             data-hover-title="${tool.label}"
-            class="w-12 h-12 shrink-0 flex items-center justify-center rounded-full transition-all relative group ${activeTool === tool.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20' : 'hover:bg-black/5 opacity-40 hover:opacity-100'}"
+            class="w-full px-1 py-2.5 shrink-0 flex flex-col items-center justify-center gap-1 rounded-xl transition-all relative group ${activeTool === tool.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20' : 'hover:bg-white/5 opacity-40 hover:opacity-100'}"
         >
-            <i data-lucide="${tool.icon}" class="w-5 h-5"></i>
-            <span class="absolute left-16 bg-black text-white text-[9px] px-2 py-1.5 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-all translate-x-[-4px] group-hover:translate-x-0 whitespace-nowrap z-50 uppercase font-bold tracking-widest hidden sm:block">
-                ${tool.label}
-            </span>
+            <i data-lucide="${tool.icon}" class="w-4 h-4 shrink-0"></i>
+            <span class="text-[7px] font-bold uppercase tracking-wider leading-tight text-center w-full px-0.5 line-clamp-2 break-words">${tool.label}</span>
         </button>
     `).join('');
 
@@ -565,10 +563,11 @@ function renderTools() {
             <button
                 id="mobile-tool-btn-${tool.id}"
                 onclick="setActiveTool('${tool.id}')"
-                class="group relative flex items-center justify-center w-12 h-12 rounded-full transition-all"
+                class="group relative flex flex-col items-center justify-center gap-0.5 px-1 transition-all"
             >
                 <div class="absolute inset-0 bg-violet-600 rounded-full opacity-0 scale-50 transition-all duration-300 ${activeTool === tool.id ? 'opacity-100 scale-100' : ''}"></div>
-                <i data-lucide="${tool.icon}" class="relative z-10 w-5 h-5 transition-colors ${activeTool === tool.id ? 'text-white' : 'text-stone-400 dark:text-white'}"></i>
+                <i data-lucide="${tool.icon}" class="relative z-10 w-4 h-4 transition-colors ${activeTool === tool.id ? 'text-white' : 'text-stone-400 dark:text-white'}"></i>
+                <span class="relative z-10 text-[6px] font-bold uppercase tracking-wide transition-colors ${activeTool === tool.id ? 'text-white' : 'text-stone-400 dark:text-white'}">${tool.label}</span>
             </button>
         `).join('');
     }
@@ -893,11 +892,12 @@ function renderContent(animate = false) {
         return;
     }
 
-    if (activeTool === 'strategy') {
+
+    if (activeTool === 'marketing') {
         container.innerHTML = html;
         const toolContent = document.createElement('div');
         container.appendChild(toolContent);
-        renderStrategyTool(toolContent, themePanel, themeBorder);
+        renderSocialMediaSection(toolContent, themePanel, themeBorder);
         lucide.createIcons();
         if (animate) animateElements();
         return;
@@ -942,6 +942,7 @@ function renderContent(animate = false) {
         if (animate) animateElements();
         return;
     }
+
 
     // Default: Projects (for 'design' etc if any)
     const projectsList = projects.filter(p => p.category === activeTool || activeTool === 'all');

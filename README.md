@@ -2,7 +2,7 @@
 <div align="center">
   <img src="assets/images/profile/perfil.png" alt="Karen Profile" width="120" style="border-radius: 50%; box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);">
 
-  <h1 style="font-size: 3em; margin-top: 20px;">Karen's Creative Portfolio</h1>
+  <h1 style="font-size: 3em; margin-top: 20px;">Karen Creative Portfolio</h1>
   
   <p style="font-size: 1.2em; max-width: 600px; margin: 0 auto; line-height: 1.6;">
     Un espacio digital diseñado para destacar estrategia, creatividad y visión. 

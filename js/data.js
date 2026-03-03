@@ -27,10 +27,9 @@ export const tools = [
             ]
         },
         whatIDo: [
-            { title: "Diseño Gráfico", desc: "Creo marcas que se sienten reales. Logos, identidades y piezas visuales que no solo decoran, sino que construyen la personalidad de tu negocio." },
-            { title: "Publicidad", desc: "Ideas que pegan. Busco el ángulo creativo perfecto para que tu mensaje llegue claro, fuerte y directo a quien le tiene que llegar." },
-            { title: "Marketing", desc: "Estrategia sin humo. Analizo el mercado y defino acciones claras para que tu marca crezca con pasos firmes y objetivos reales." },
-            { title: "Branding", desc: "Arte para comunicar. A veces una imagen dice más que mil palabras, y uso la ilustración para darle ese toque único y personal a los proyectos." }
+            { title: "Social Media", desc: "Estrategia sin humo. Analizo el mercado y defino acciones claras para que tu marca crezca con pasos firmes y objetivos reales." },
+            { title: "Fotografía", desc: "Capturo la esencia visual de cada proyecto con ojo estratégico y sensibilidad estética." },
+            { title: "Ilustraciones", desc: "Creo marcas que se sienten reales. Logos, identidades y piezas visuales que construyen la personalidad de tu negocio." }
         ],
         skills: {
             creative: ["Dirección de Arte", "Conceptos Creativos", "Narrativa Visual", "Curaduría Estética"],
@@ -166,13 +165,10 @@ export const tools = [
         },
         manifesto: "Crear es dar vida."
     },
-    { id: 'design', icon: 'palette', label: 'Diseño Gráfico', role: 'Identidad Visual', desc: 'Tu marca merece verse increíble.', manifesto: 'Diseño sistemas visuales que cuentan la historia de tu negocio.', services: ['Logotipos', 'Manual de Marca', 'Papelería'] },
-    { id: 'branding', icon: 'pen-tool', label: 'Branding', role: 'Arte Digital', desc: 'Dibujando ideas.', manifesto: 'Ilustraciones personalizadas para darle carácter a tus proyectos.', services: ['Editorial', 'Redes Sociales'] },
-    { id: 'publicity', icon: 'megaphone', label: 'Publicidad', role: 'Campañas', desc: 'Hagamos ruido del bueno.', manifesto: 'Conceptos publicitarios que conectan con las emociones de la gente.', services: ['Concepto Creativo', 'Copywriting'] },
-    { id: 'marketing', icon: 'bar-chart-3', label: 'Marketing', role: 'Estrategia', desc: 'Crecer con sentido.', manifesto: 'Planeación estratégica para que cada peso invertido cuente.', services: ['Auditoría de Marca', 'Plan de Contenidos'] },
+    { id: 'marketing', icon: 'instagram', label: 'Social Media', role: 'Estrategia Digital', desc: 'Crecer con sentido.', manifesto: 'Planeación estratégica para que cada peso invertido cuente.', services: ['Auditoría de Marca', 'Plan de Contenidos'] },
+    { id: 'gallery', icon: 'camera', label: 'Fotografía', role: 'Fotografía & Mood', desc: 'Capturando momentos.', manifesto: 'Una colección curada de vibras visuales y fotografía.', services: [] },
+    { id: 'design', icon: 'palette', label: 'Ilustraciones', role: 'Identidad Visual', desc: 'Tu marca merece verse increíble.', manifesto: 'Diseño sistemas visuales que cuentan la historia de tu negocio.', services: ['Logotipos', 'Manual de Marca', 'Papelería'] },
     { id: 'color', icon: 'swatch-book', label: 'Color Lab', role: 'Estudio de Color', desc: 'El poder del color.', manifesto: 'Herramienta profesional para elegir paletas perfectas, accesibles y hermosas.', services: [] },
-    { id: 'gallery', icon: 'camera', label: 'Galería', role: 'Fotografía & Mood', desc: 'Capturando momentos.', manifesto: 'Una colección curada de vibras visuales y fotografía.', services: [] },
-    { id: 'strategy', icon: 'brain', label: 'Estrategia', role: 'Arquetipos de Marca', desc: 'Descubre el ADN de tu marca.', manifesto: 'Herramienta interactiva para definir la personalidad de tu negocio.', services: [] },
     { id: 'contact', icon: 'send', label: 'Contacto', role: 'Inicia el Viaje', desc: 'Hagamos realidad tu proyecto.', manifesto: 'Generador de brief interactivo para entender tus necesidades.', services: [] },
 
 ];
@@ -214,37 +210,37 @@ export const tutorialSteps = [
     {
         target: 'header',
         title: 'Centro de Comando',
-        text: 'Aquí controlas el sistema global. Puedes cambiar entre modo Día/Noche para descansar la vista y verificar tu estado de conexión.'
+        text: 'Aquí controlas el sistema global. Cambia entre modo Día/Noche para descansar la vista y verifica tu estado de conexión.'
     },
     {
         target: 'sidebar',
-        title: 'Barra de Herramientas',
-        text: 'Este es tu menú principal. Navega entre mis diferentes facetas profesionales. Cada icono desbloquea una nueva interfaz.'
+        title: 'Barra de Navegación',
+        text: 'Tu menú principal. Cada ícono desbloquea una sección diferente: desde mi perfil y CV hasta Social Media, Fotografía e Ilustraciones.'
+    },
+    {
+        target: 'tool-btn-marketing',
+        title: 'Social Media',
+        text: 'Explora mi trabajo de gestión de redes. Verás las historias y posts de cada marca gestionada, con una interfaz estilo Instagram.'
+    },
+    {
+        target: 'tool-btn-gallery',
+        title: 'Fotografía',
+        text: 'Una colección curada de fotografía y moodboards visuales que complementan la estrategia de contenido.'
     },
     {
         target: 'tool-btn-color',
         title: 'Color Lab',
-        text: '¡La joya de la corona! Una herramienta técnica avanzada para diseñadores. Genera paletas, extrae colores de imágenes y verifica accesibilidad.'
-    },
-    {
-        target: 'tool-btn-branding',
-        title: 'Branding & Diseño',
-        text: 'Explora mis servicios visuales. Aquí es donde la magia ocurre y las marcas cobran identidad propia.'
-    },
-    {
-        target: 'tool-btn-strategy',
-        title: 'Estrategia de Marca',
-        text: 'No solo es diseño bonitos. Aquí definimos el ADN, los arquetipos y la ruta de crecimiento de tu negocio.'
+        text: '¡La joya de la corona! Herramienta interactiva para diseñadores. Genera paletas, extrae colores de imágenes y verifica accesibilidad.'
     },
     {
         target: 'tabs-bar',
         title: 'Multitarea',
-        text: 'Gestiona tus "ventanas" abiertas. Puedes tener varios proyectos o herramientas activas al mismo tiempo, como en un sistema operativo.'
+        text: 'Gestiona tus "ventanas" abiertas. Puedes tener varios proyectos activos al mismo tiempo, como en un sistema operativo.'
     },
     {
         target: 'inspector',
         title: 'Inspector de Propiedades',
-        text: 'El panel de detalles. Aquí verás información contextual, mis niveles de habilidad (Skills) y testimonios reales de clientes.'
+        text: 'El panel de detalles. Aquí verás información contextual, mis habilidades y testimonios reales de clientes.'
     }
 ];
 
