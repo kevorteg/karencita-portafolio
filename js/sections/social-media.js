@@ -214,17 +214,17 @@ export function renderSocialMediaSection(container, themePanel, themeBorder) {
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 <div class="${themePanel} border ${themeBorder} rounded-2xl p-6 group hover:-translate-y-1 transition-all">
-                    <div class="text-violet-500 text-2xl mb-3">🏦</div>
+                    <div class="text-violet-500 text-2xl mb-3"></div>
                     <h4 class="font-serif italic text-base mb-2 font-bold">Servicios y Finanzas</h4>
                     <p class="text-[11px] opacity-50 leading-relaxed">Especialista en la humanización de servicios complejos. Transformé tecnicismos en contenido educativo y accesible, posicionando a las marcas como autoridades de confianza en su sector. <em class="opacity-70">(Cootraim, Confecoop)</em></p>
                 </div>
                 <div class="${themePanel} border ${themeBorder} rounded-2xl p-6 group hover:-translate-y-1 transition-all">
-                    <div class="text-pink-500 text-2xl mb-3">👗</div>
+                    <div class="text-pink-500 text-2xl mb-3"></div>
                     <h4 class="font-serif italic text-base mb-2 font-bold">Moda y Gastronomía</h4>
                     <p class="text-[11px] opacity-50 leading-relaxed">Gestión de narrativa visual y sensorial. Desarrollé campañas enfocadas en el storytelling del proceso creativo y experiencias de consumo de alto impacto visual para incentivar la conversión. <em class="opacity-70">(Diseñamos, CBC)</em></p>
                 </div>
                 <div class="${themePanel} border ${themeBorder} rounded-2xl p-6 group hover:-translate-y-1 transition-all">
-                    <div class="text-emerald-500 text-2xl mb-3">💚</div>
+                    <div class="text-emerald-500 text-2xl mb-3"></div>
                     <h4 class="font-serif italic text-base mb-2 font-bold">Salud y Belleza</h4>
                     <p class="text-[11px] opacity-50 leading-relaxed">Construcción de autoridad y lealtad. Implementé estrategias basadas en la educación y la empatía, transformando marcas personales en comunidades de cuidado y bienestar. <em class="opacity-70">(Dra. Arias, Dra. Cepeda)</em></p>
                 </div>
