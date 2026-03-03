@@ -201,8 +201,8 @@ export const sidebarData = {
 };
 
 export const projects = [
-    { id: 1, title: 'Aura Branding', category: 'design', img: 'assets/images/projects/aura.jpg', description: 'Sistema visual para marca de lujo.' },
-    { id: 2, title: 'Noches de Neón', category: 'branding', img: 'assets/images/projects/neon.jpg', description: 'Serie de ilustraciones digitales.' },
+    { id: 1, title: 'Aura Branding', category: 'design', img: 'assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/1-CBC.png', description: 'Sistema visual para marca de lujo.' },
+    { id: 2, title: 'Noches de Neón', category: 'design', img: 'assets/SOCIAL MEDIA/SOCIAL MEDIA/DISEÑAMOS/3-DISEÑAMOS.png', description: 'Serie de ilustraciones digitales.' },
     { id: 99, title: 'Protocolo Contacto', category: 'special', img: 'assets/images/projects/contact.jpg', description: 'Estoy abierta a nuevas colaboraciones creativas.' }
 ];
 
