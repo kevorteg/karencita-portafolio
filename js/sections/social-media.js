@@ -19,9 +19,13 @@ const brands = [
         ],
         posts: [
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/post/3 FEB.png',
+            { type: 'youtube', id: 'frhwYgwE8eo' },
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/post/6 FEB.png',
+            { type: 'youtube', id: '-P2aYx7dZ2o' },
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/post/7 FEB.png',
+            { type: 'youtube', id: 'nrNDX-RDj_U' },
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/post/10 FEB.png',
+            { type: 'youtube', id: 'IrIg2P96TDE' },
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/post/13 FEB.png',
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/CBC/post/17 FEB.png',
         ]
@@ -83,6 +87,7 @@ const brands = [
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/CONFECOOP/VOLANTE.jpg',
         ],
         posts: [
+            { type: 'youtube', id: 'jjwhMMT3iW0' },
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/CONFECOOP/BANNER CONFECOOP.jpg',
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/CONFECOOP/POST CONFECOOP 2.jpg',
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/CONFECOOP/VOLANTE.jpg',
@@ -101,8 +106,13 @@ const brands = [
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/dra. Cepeda/Captura de pantalla 2026-02-27 134052.png',
         ],
         posts: [
+            { type: 'youtube', id: 'a83wBaZYYuw' },
+            { type: 'youtube', id: 'vJe27nFcETU' },
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/dra. Cepeda/Captura de pantalla 2026-02-27 134010.png',
+            { type: 'youtube', id: 't9khmslm7Y0' },
+            { type: 'youtube', id: 'ayWMulaqeOY' },
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/dra. Cepeda/Captura de pantalla 2026-02-27 134052.png',
+            { type: 'youtube', id: 'LF9UR0anCtM' }
         ]
     },
     {
@@ -187,7 +197,7 @@ function ensureModals() {
     `;
     postModal.innerHTML = `
         <button onclick="closeSMPost()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);border:none;border-radius:50%;width:36px;height:36px;color:white;cursor:pointer;font-size:18px;z-index:10;">✕</button>
-        <img id="sm-post-img" src="" alt="Post" style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);">
+        <div id="sm-post-content" class="w-full h-full flex flex-col items-center justify-center"></div>
     `;
     postModal.addEventListener('click', (e) => {
         if (e.target === postModal) closeSMPost();
@@ -238,25 +248,25 @@ export function renderSocialMediaSection(container, themePanel, themeBorder) {
                 <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-violet-600">Clientes · Destacados</span>
             </div>
             <div class="flex gap-5 overflow-x-auto pb-3" style="scrollbar-width:none;">
-                ${brands.map(b => `
-                    <div
-                        class="flex flex-col items-center gap-2 cursor-pointer group shrink-0"
-                        onclick="openSMStory('${b.id}')"
-                    >
-                        <div class="p-[2.5px] rounded-full bg-gradient-to-br ${b.gradient} hover:scale-105 transition-transform duration-300 shadow-lg">
+                \${brands.map(b => `
+        < div
+    class="flex flex-col items-center gap-2 cursor-pointer group shrink-0"
+    onclick = "openSMStory('\${b.id}')"
+        >
+                        <div class="p-[2.5px] rounded-full bg-gradient-to-br \${b.gradient} hover:scale-105 transition-transform duration-300 shadow-lg">
                             <div class="w-[68px] h-[68px] rounded-full bg-[#0f0c29] p-[2px] overflow-hidden">
                                 <img
-                                    src="${epath(b.avatar)}"
-                                    alt="${b.name}"
+                                    src="\${epath(b.avatar)}"
+                                    alt="\${b.name}"
                                     class="w-full h-full rounded-full object-cover"
-                                    onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;border-radius:50%;background:${b.color}33;display:flex;align-items:center;justify-content:center;font-size:18px;\'>📸</div>'"
+                                    onerror="this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;border-radius:50%;background:\${b.color}33;display:flex;align-items:center;justify-content:center;font-size:18px;\\'>📸</div>'"
                                 >
                             </div>
                         </div>
-                        <span class="text-[9px] font-bold uppercase tracking-wide opacity-60 group-hover:opacity-100 transition-opacity text-center leading-tight" style="max-width:72px;">${b.name}</span>
-                        <span class="text-[8px] opacity-30 text-center">${b.stories.length} hist.</span>
-                    </div>
-                `).join('')}
+                        <span class="text-[9px] font-bold uppercase tracking-wide opacity-60 group-hover:opacity-100 transition-opacity text-center leading-tight" style="max-width:72px;">\${b.name}</span>
+                        <span class="text-[8px] opacity-30 text-center">\${b.stories.length} hist.</span>
+                    </div >
+        `).join('')}
             </div>
         </div>
 
@@ -266,36 +276,49 @@ export function renderSocialMediaSection(container, themePanel, themeBorder) {
                 class="shrink-0 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all bg-violet-600 text-white border-violet-600">
                 Todos
             </button>
-            ${brands.map(b => `
-                <button onclick="filterSMBrand('${b.id}')" id="sm-filter-${b.id}"
-                    class="shrink-0 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all opacity-50 hover:opacity-100" style="border-color:rgba(99,86,255,0.2);">
-                    ${b.name}
-                </button>
-            `).join('')}
+            \${brands.map(b => `
+        < button onclick = "filterSMBrand('\${b.id}')" id = "sm-filter-\${b.id}"
+    class="shrink-0 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all opacity-50 hover:opacity-100" style = "border-color:rgba(99,86,255,0.2);" >
+    \${ b.name }
+                </button >
+        `).join('')}
         </div>
 
         <!-- POSTS GRID -->
         <div id="sm-posts-grid" class="grid grid-cols-3 gap-1 mb-20">
-            ${brands.flatMap(b =>
-        b.posts.map((post, i) => `
-                    <div
-                        class="sm-post-item aspect-square overflow-hidden cursor-pointer relative group"
-                        data-brand="${b.id}"
-                        onclick="openSMPost('${post.replace(/'/g, "\\'")}')"
-                        style="background:${b.color}15;"
-                    >
-                        <img
-                            src="${epath(post)}"
-                            alt="${b.name} post ${i + 1}"
-                            class="w-full h-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-75"
-                            loading="lazy"
-                            onerror="this.style.display='none';"
-                        >
-                        <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-all">
-                            <span class="text-white text-[8px] font-bold uppercase tracking-widest">${b.name}</span>
+            \${brands.flatMap(b =>
+        b.posts.map((post, i) => {
+            const isVideo = typeof post === 'object' && post.type === 'youtube';
+            const src = isVideo ? \`https://img.youtube.com/vi/\${post.id}/hqdefault.jpg\` : epath(post);
+            const clickArg = isVideo ? \`{ type: 'youtube', id: '\${post.id}' }\` : \`'\${post.replace(/'/g, "\\\\'")}'\`;
+
+            return `
+        < div
+    class="sm-post-item aspect-square overflow-hidden cursor-pointer relative group"
+    data - brand="\${b.id}"
+    onclick = "openSMPost(\${clickArg})"
+    style = "background:\${b.color}15;"
+        >
+        <img
+            src="\${src}"
+            alt="\${b.name} post \${i + 1}"
+            class="w-full h-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-75"
+            loading="lazy"
+            onerror="this.style.display='none';"
+        >
+            \${isVideo ? `
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                            <div class="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white border border-white/20">
+                                <i data-lucide="play" class="w-4 h-4 ml-0.5" fill="currentColor"></i>
+                            </div>
                         </div>
-                    </div>
-                `)
+                        ` : ''}
+            <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-all z-10">
+                <span class="text-white text-[8px] font-bold uppercase tracking-widest">\${b.name}</span>
+            </div>
+        </div>
+    `;
+        })
     ).join('')}
         </div>
     `;
@@ -354,20 +377,20 @@ function setupSMHandlers() {
         img.src = '';
         img.src = epath(brand.stories[current]);
         document.getElementById('sm-story-brand-name').textContent = brand.name;
-        document.getElementById('sm-story-counter').textContent = `${current + 1} / ${total}`;
+        document.getElementById('sm-story-counter').textContent = \`\${current + 1} / \${total}\`;
         document.getElementById('sm-story-avatar-img').src = epath(brand.avatar);
 
         // Progress bars
         const progressEl = document.getElementById('sm-story-progress');
-        progressEl.innerHTML = brand.stories.map((_, i) => `
+        progressEl.innerHTML = brand.stories.map((_, i) => \`
             <div style="flex:1;height:2px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,0.2);">
-                <div id="sm-prog-${i}" style="height:100%;border-radius:99px;background:white;width:${i < current ? '100%' : '0%'};"></div>
+                <div id="sm-prog-\${i}" style="height:100%;border-radius:99px;background:white;width:\${i < current ? '100%' : '0%'};"></div>
             </div>
-        `).join('');
+        \`).join('');
 
         // Animate current bar
         setTimeout(() => {
-            const bar = document.getElementById(`sm-prog-${current}`);
+            const bar = document.getElementById(\`sm-prog-\${current}\`);
             if (bar) {
                 bar.style.transition = 'width 5s linear';
                 bar.style.width = '100%';
@@ -380,23 +403,49 @@ function setupSMHandlers() {
         storyTimer = setTimeout(() => window.nextSMStory(), 5000);
     }
 
-    window.openSMPost = function (src) {
+    window.openSMPost = function (srcOrObj) {
         const modal = document.getElementById('sm-post-modal');
-        const img = document.getElementById('sm-post-img');
-        img.src = '';
-        img.src = epath(src);
+        const contentContainer = document.getElementById('sm-post-content');
+
+        // Clear previous content
+        contentContainer.innerHTML = '';
+
+        if (typeof srcOrObj === 'object' && srcOrObj.type === 'youtube') {
+            contentContainer.innerHTML = \`
+                <div class="relative w-full max-w-4xl mx-auto aspect-[9/16] sm:aspect-video rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.8)] border border-white/10 bg-black">
+                    <iframe 
+                        src="https://www.youtube.com/embed/\${srcOrObj.id}?autoplay=1&controls=0&rel=0&modestbranding=1&playsinline=1" 
+                        title="YouTube video player" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen
+                        class="absolute inset-0 w-full h-full"
+                    ></iframe>
+                </div>
+            \`;
+        } else {
+            contentContainer.innerHTML = \`
+                <img src="\${epath(srcOrObj)}" alt="Post" class="max-w-[90vw] max-h-[90vh] object-contain rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.6)]">
+            \`;
+        }
+
         modal.style.display = 'flex';
     };
 
     window.closeSMPost = function () {
         const modal = document.getElementById('sm-post-modal');
-        if (modal) modal.style.display = 'none';
+        const contentContainer = document.getElementById('sm-post-content');
+        if (modal) {
+            modal.style.display = 'none';
+            // Clear content to stop video playback
+            contentContainer.innerHTML = '';
+        }
     };
 
     window.filterSMBrand = function (brandId) {
         const allBtn = document.getElementById('sm-filter-all');
         brands.forEach(b => {
-            const btn = document.getElementById(`sm-filter-${b.id}`);
+            const btn = document.getElementById(\`sm-filter-\${b.id}\`);
             if (btn) {
                 btn.style.background = '';
                 btn.style.color = '';
@@ -412,7 +461,7 @@ function setupSMHandlers() {
             allBtn.classList.remove('opacity-100', 'bg-violet-600', 'text-white');
         }
 
-        const activeBtn = brandId === 'all' ? allBtn : document.getElementById(`sm-filter-${brandId}`);
+        const activeBtn = brandId === 'all' ? allBtn : document.getElementById(\`sm-filter-\${brandId}\`);
         if (activeBtn) {
             activeBtn.style.background = '#7C3AED';
             activeBtn.style.color = 'white';
