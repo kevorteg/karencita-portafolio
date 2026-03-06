@@ -103,11 +103,14 @@ function renderContent(animate = false) {
     switch (activeTool) {
         case 'about': renderAboutSection(container); break;
         case 'cv': renderCVSection(container, themePanel, themeBorder); break;
+        case 'color':
         case 'color-lab': renderColorLab(container, isDarkMode); break;
         case 'social':
         case 'social-media':
         case 'marketing': renderSocialMediaSection(container, themePanel, themeBorder); break;
+        case 'design':
         case 'illustrations': renderIllustrationsSection(container, themePanel, themeBorder); break;
+        case 'gallery':
         case 'photography': renderPhotographySection(container, themePanel, themeBorder); break;
         case 'contact': renderContactTool(container, themePanel, themeBorder); break;
         default: container.innerHTML = `<div class="flex items-center justify-center h-full opacity-20"><p>Section ${activeTool} not found</p></div>`;
