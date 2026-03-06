@@ -69,12 +69,13 @@ window.renderTools = function () {
     const sortedTools = [...tools].sort((a, b) => catOrder.indexOf(a.category) - catOrder.indexOf(b.category));
 
     container.innerHTML = sortedTools.map(tool => `
-        <button onclick="setActiveTool('${tool.id}')" id="tool-btn-${tool.id}" title="${tool.label}"
-            class="w-12 h-12 flex items-center justify-center rounded-xl transition-all duration-300 group
+        <button onclick="setActiveTool('${tool.id}')" id="tool-btn-${tool.id}"
+            class="w-12 h-12 flex items-center justify-center rounded-xl transition-all duration-300 group relative
             ${activeTool === tool.id
             ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20'
             : 'text-stone-500 dark:text-stone-400 hover:bg-violet-600/10 hover:text-violet-600'}">
             <i data-lucide="${tool.icon}" class="w-5 h-5"></i>
+            <span class="pointer-events-none absolute left-[calc(100%+8px)] top-1/2 -translate-y-1/2 whitespace-nowrap px-2 py-1 rounded-md bg-stone-900 dark:bg-stone-800 text-white text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all duration-200 z-[9999] shadow-lg">${tool.label}</span>
         </button>
     `).join('');
 
@@ -104,7 +105,7 @@ window.renderContent = function (animate = false) {
         case 'about': renderAboutSection(container); break;
         case 'cv': renderCVSection(container, themePanel, themeBorder); break;
         case 'color':
-        case 'color-lab': renderColorLab(container, isDarkMode); break;
+        case 'color-lab': renderColorLab(container, currentBaseColor, isDarkMode, window._pickerState || { h: 280, s: 70, v: 70 }); break;
         case 'social':
         case 'social-media':
         case 'marketing': renderSocialMediaSection(container, themePanel, themeBorder); break;
@@ -249,6 +250,26 @@ window.setActiveTool = function (id) {
         { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "expo.out" }
     );
 };
+
+// Initialize picker state for Color Lab
+window._pickerState = window._pickerState || { h: 280, s: 70, v: 70 };
+
+window.updateColor = function (hex) {
+    currentBaseColor = hex;
+    // Update picker state to match new color
+    const { hexToHSL } = window._colorStudio || {};
+    window._pickerState = { h: 280, s: 70, v: 70 }; // will be refined when color-studio is loaded
+    if (activeTool === 'color' || activeTool === 'color-lab') {
+        renderContent(false);
+    }
+    // Save to history
+    try {
+        let history = JSON.parse(localStorage.getItem('colorHistory')) || [];
+        history = [hex, ...history.filter(c => c !== hex)].slice(0, 5);
+        localStorage.setItem('colorHistory', JSON.stringify(history));
+    } catch (e) { }
+};
+
 
 function applyTheme() {
     if (isDarkMode) {
