@@ -37,7 +37,8 @@ let currentBaseColor = '#5F259F';
 let currentTutorialStep = 0;
 
 // --- RENDER SITE CONTENT ---
-function renderSiteContent() {
+// --- RENDER SITE CONTENT ---
+window.renderSiteContent = function () {
     if (!siteContent) return;
     document.title = siteContent.meta.title;
     const bootText = document.getElementById('boot-text');
@@ -56,10 +57,10 @@ function renderSiteContent() {
     if (navCv) navCv.innerText = siteContent.header.navCv;
     const workText = document.getElementById('workspace-dtext');
     if (workText) workText.innerText = siteContent.tabs.workspace;
-}
+};
 
 // --- CORE RENDERERS ---
-function renderTools() {
+window.renderTools = function () {
     const container = document.getElementById('tool-buttons');
     if (!container) return;
 
@@ -68,13 +69,12 @@ function renderTools() {
     const sortedTools = [...tools].sort((a, b) => catOrder.indexOf(a.category) - catOrder.indexOf(b.category));
 
     container.innerHTML = sortedTools.map(tool => `
-        <button onclick="setActiveTool('${tool.id}')" id="tool-btn-${tool.id}"
+        <button onclick="setActiveTool('${tool.id}')" id="tool-btn-${tool.id}" title="${tool.label}"
             class="w-12 h-12 flex items-center justify-center rounded-xl transition-all duration-300 group
             ${activeTool === tool.id
             ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20'
-            : 'text-stone-400 hover:bg-white/5 hover:text-white'}">
+            : 'text-stone-500 dark:text-stone-400 hover:bg-violet-600/10 hover:text-violet-600'}">
             <i data-lucide="${tool.icon}" class="w-5 h-5"></i>
-            <!-- Mobile/Desktop Tooltip logic could go here, but focusing on visibility -->
         </button>
     `).join('');
 
@@ -91,9 +91,9 @@ function renderTools() {
     }
 
     if (window.lucide) lucide.createIcons();
-}
+};
 
-function renderContent(animate = false) {
+window.renderContent = function (animate = false) {
     const container = document.getElementById('main-content-render');
     if (!container) return;
 
@@ -115,9 +115,9 @@ function renderContent(animate = false) {
         case 'contact': renderContactTool(container, themePanel, themeBorder); break;
         default: container.innerHTML = `<div class="flex items-center justify-center h-full opacity-20"><p>Section ${activeTool} not found</p></div>`;
     }
-}
+};
 
-function renderInspector() {
+window.renderInspector = function () {
     const container = document.getElementById('inspector');
     if (!container) return;
 
@@ -192,7 +192,7 @@ function renderInspector() {
         </div>
     `;
     if (window.lucide) lucide.createIcons();
-}
+};
 
 // --- INIT ---
 window.onload = () => {
@@ -286,12 +286,14 @@ function applyTheme() {
     } else {
         if (body) {
             body.classList.replace('bg-[#1A1844]', 'bg-[#F5F5F0]');
-            body.classList.replace('text-white', 'text-stone-800');
+            body.classList.replace('text-white', 'text-stone-900');
         }
         elements.forEach(el => {
             if (el) {
                 el.classList.replace('bg-[#16143C]', 'bg-[#EAEAE5]');
                 el.classList.replace('border-indigo-900/30', 'border-stone-300');
+                el.classList.remove('text-white');
+                el.classList.add('text-stone-900');
             }
         });
         if (modalPanel) {
@@ -316,34 +318,63 @@ window.toggleWelcome = function (show) {
     if (modal) modal.style.display = show ? 'flex' : 'none';
 };
 
-function startTutorial() {
+window.startTutorial = function () {
     currentTutorialStep = 0;
-    const tutBody = document.getElementById('tutorial-body');
-    if (tutBody) tutBody.style.display = 'flex';
-    updateTutorialStep();
-}
+    const tutOverlay = document.getElementById('tutorial-overlay');
+    if (tutOverlay) {
+        tutOverlay.classList.remove('hidden');
+        tutOverlay.style.display = 'block';
+    }
+    window.updateTutorialStep();
+};
 
-function updateTutorialStep() {
+window.updateTutorialStep = function () {
     const step = tutorialSteps[currentTutorialStep];
     if (!step) return;
+
     const title = document.getElementById('tut-title');
-    const content = document.getElementById('tut-content');
+    const content = document.getElementById('tut-text');
+    const stepCount = document.getElementById('tut-step-count');
+    const nextBtn = document.getElementById('tut-next-btn');
+    const skipBtn = document.getElementById('tut-skip-btn');
+
     if (title) title.innerText = step.title;
-    if (content) content.innerText = step.content;
+    if (content) content.innerText = step.text;
+    if (stepCount) stepCount.innerText = `Paso ${currentTutorialStep + 1}/${tutorialSteps.length}`;
+    if (nextBtn) nextBtn.innerText = currentTutorialStep === tutorialSteps.length - 1 ? 'Finalizar' : 'Siguiente';
+    if (skipBtn) skipBtn.innerText = 'Saltar';
+
+    // Spotlight logic placeholder or simple highlight
+    const target = document.getElementById(step.target);
+    if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.classList.add('ring-4', 'ring-violet-600', 'ring-offset-4', 'ring-offset-transparent');
+        setTimeout(() => target.classList.remove('ring-4', 'ring-violet-600', 'ring-offset-4'), 3000);
+    }
+
+    // Animate card
+    const card = document.getElementById('tutorial-card');
+    if (card) {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }
 }
 
-window.nextTutorialStep = function () {
+window.nextStep = function () {
     currentTutorialStep++;
     if (currentTutorialStep >= tutorialSteps.length) {
-        window.skipTutorial();
+        window.endTutorial();
     } else {
         updateTutorialStep();
     }
 };
 
-window.skipTutorial = function () {
-    const tutBody = document.getElementById('tutorial-body');
-    if (tutBody) tutBody.style.display = 'none';
+window.endTutorial = function () {
+    const tutOverlay = document.getElementById('tutorial-overlay');
+    if (tutOverlay) {
+        tutOverlay.classList.add('hidden');
+        tutOverlay.style.display = 'none';
+    }
 };
 
 window.sendWhatsApp = function () {
