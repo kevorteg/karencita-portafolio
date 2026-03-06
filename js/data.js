@@ -294,60 +294,73 @@ export const siteContent = {
         hexName: "Nombre",
         techData: "Datos Técnicos"
     },
-    export const quizData = {
-        intro: {
-            label: "Diagnóstico Estratégico",
-            title: "¿Qué necesita tu marca <br/> <span class='text-violet-600'>realmente?</span>",
-            description: "Responde 3 preguntas honestas y recibe una hoja de ruta clara para tu siguiente nivel.",
-            btnStart: "Iniciar Diagnóstico"
-        },
-        questions: [
-            {
-                id: 'q1',
-                step: '01',
-                title: 'Prioridad Actual',
-                options: [
-                    { id: 'design', icon: 'palette', title: 'Imagen & Percepción', desc: '"Siento que mi marca se ve amateur. Necesito elevar mi estética para cobrar mejor."', value: 'brand' },
-                    { id: 'growth', icon: 'trending-up', title: 'Ventas & Tráfico', desc: '"Necesito clientes YA. Mi problema no es lo bonito, es que nadie me ve."', value: 'growth' }
-                ]
-            },
-            {
-                id: 'q2',
-                step: '02',
-                title: 'Canal Principal',
-                options: [
-                    { id: 'organic', icon: 'users', title: 'Referidos / Organic', desc: '"Vivo del boca a boca. Si no me recomiendan, no vendo."', value: 'brand' },
-                    { id: 'ads', icon: 'megaphone', title: 'Ads / Social Media', desc: '"Intento mover redes y pauta, pero siento que tiro el dinero."', value: 'growth' }
-                ]
-            },
-            {
-                id: 'q3',
-                step: '03',
-                title: 'Mayor Obstáculo',
-                options: [
-                    { id: 'insecurity', icon: 'eye-off', title: 'Inseguridad Visual', desc: '"Me da pena mandar mi portafolio o web actual."', value: 'brand' },
-                    { id: 'clarity', icon: 'message-square-dashed', title: 'Claridad del Mensaje', desc: '"No sé cómo explicar lo que hago de forma atractiva."', value: 'growth' }
-                ]
-            }
-        ],
-        results: {
-            brand: {
-                title: "Arquetipo: La Marca de Culto",
-                desc: "Tu prioridad es elevar la percepción. Tienes un buen producto, pero tu imagen no refleja lo que vales. Necesitas Branding Premium.",
-                health: "45%"
-            },
-            growth: {
-                title: "Arquetipo: El Growth Hacker",
-                desc: "Tu prioridad es el alcance. Tienes la oferta, pero te falta el megáfono. Necesitas Estrategia de Contenidos y Ads.",
-                health: "60%"
-            },
-            hybrid: {
-                title: "Arquetipo: El Visionario",
-                desc: "Estás en un punto medio. Necesitas equilibrar imagen con acción masiva.",
-                health: "50%"
-            }
-        }
+    contactData: {
+        title: "Hablemos de tu Proyecto",
+        subtitle: "Brief Interactivo",
+        nameLabel: "¿Cómo te llamas?",
+        namePlaceholder: "Tu nombre o empresa",
+        servicesLabel: "¿Qué necesitas?",
+        services: ['Branding', 'Web', 'Social', 'Otro'],
+        msgLabel: "Cuéntame más",
+        msgPlaceholder: "Detalles, sueños, fechas límite...",
+        btnSend: "Enviar Brief por WhatsApp"
+    }
+};
+
+export const quizData = {
+    intro: {
+        label: "Diagnóstico Estratégico",
+        title: "¿Qué necesita tu marca <br/> <span class='text-violet-600'>realmente?</span>",
+        description: "Responde 3 preguntas honestas y recibe una hoja de ruta clara para tu siguiente nivel.",
+        btnStart: "Iniciar Diagnóstico"
     },
+    questions: [
+        {
+            id: 'q1',
+            step: '01',
+            title: 'Prioridad Actual',
+            options: [
+                { id: 'design', icon: 'palette', title: 'Imagen & Percepción', desc: '"Siento que mi marca se ve amateur. Necesito elevar mi estética para cobrar mejor."', value: 'brand' },
+                { id: 'growth', icon: 'trending-up', title: 'Ventas & Tráfico', desc: '"Necesito clientes YA. Mi problema no es lo bonito, es que nadie me ve."', value: 'growth' }
+            ]
+        },
+        {
+            id: 'q2',
+            step: '02',
+            title: 'Canal Principal',
+            options: [
+                { id: 'organic', icon: 'users', title: 'Referidos / Organic', desc: '"Vivo del boca a boca. Si no me recomiendan, no vendo."', value: 'brand' },
+                { id: 'ads', icon: 'megaphone', title: 'Ads / Social Media', desc: '"Intento mover redes y pauta, pero siento que tiro el dinero."', value: 'growth' }
+            ]
+        },
+        {
+            id: 'q3',
+            step: '03',
+            title: 'Mayor Obstáculo',
+            options: [
+                { id: 'insecurity', icon: 'eye-off', title: 'Inseguridad Visual', desc: '"Me da pena mandar mi portafolio o web actual."', value: 'brand' },
+                { id: 'clarity', icon: 'message-square-dashed', title: 'Claridad del Mensaje', desc: '"No sé cómo explicar lo que hago de forma atractiva."', value: 'growth' }
+            ]
+        }
+    ],
+    results: {
+        brand: {
+            title: "Arquetipo: La Marca de Culto",
+            desc: "Tu prioridad es elevar la percepción. Tienes un buen producto, pero tu imagen no refleja lo que vales. Necesitas Branding Premium.",
+            health: "45%"
+        },
+        growth: {
+            title: "Arquetipo: El Growth Hacker",
+            desc: "Tu prioridad es el alcance. Tienes la oferta, pero te falta el megáfono. Necesitas Estrategia de Contenidos y Ads.",
+            health: "60%"
+        },
+        hybrid: {
+            title: "Arquetipo: El Visionario",
+            desc: "Estás en un punto medio. Necesitas equilibrar imagen con acción masiva.",
+            health: "50%"
+        }
+    }
+},
     contactData: {
         title: "Hablemos de tu Proyecto",
         subtitle: "Brief Interactivo",
