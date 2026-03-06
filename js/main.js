@@ -70,12 +70,12 @@ window.renderTools = function () {
 
     container.innerHTML = sortedTools.map(tool => `
         <button onclick="setActiveTool('${tool.id}')" id="tool-btn-${tool.id}"
-            class="w-12 h-12 flex items-center justify-center rounded-xl transition-all duration-300 group relative
+            class="w-full flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl transition-all duration-300
             ${activeTool === tool.id
             ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20'
-            : 'text-stone-500 dark:text-stone-400 hover:bg-violet-600/10 hover:text-violet-600'}">
-            <i data-lucide="${tool.icon}" class="w-5 h-5"></i>
-            <span class="pointer-events-none absolute left-[calc(100%+8px)] top-1/2 -translate-y-1/2 whitespace-nowrap px-2 py-1 rounded-md bg-stone-900 dark:bg-stone-800 text-white text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all duration-200 z-[9999] shadow-lg">${tool.label}</span>
+            : 'text-stone-400 dark:text-stone-400 hover:bg-violet-600/10 hover:text-violet-600'}">
+            <i data-lucide="${tool.icon}" class="w-5 h-5 shrink-0"></i>
+            <span class="text-[7px] font-bold uppercase tracking-wide leading-tight text-center w-full px-1">${tool.label}</span>
         </button>
     `).join('');
 
