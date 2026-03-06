@@ -294,7 +294,7 @@ export const siteContent = {
         hexName: "Nombre",
         techData: "Datos Técnicos"
     },
-    quizData: {
+    export const quizData = {
         intro: {
             label: "Diagnóstico Estratégico",
             title: "¿Qué necesita tu marca <br/> <span class='text-violet-600'>realmente?</span>",
