@@ -71,7 +71,7 @@ function renderTools() {
                 ? 'bg-violet-600/10 text-violet-500 shadow-[inset_0_0_20px_rgba(124,58,237,0.05)]'
                 : 'text-stone-400 hover:bg-stone-500/5 hover:text-stone-200'}">
                 <i data-lucide="${tool.icon}" class="w-4 h-4 ${activeTool === tool.id ? 'opacity-100' : 'opacity-40 group-hover:opacity-70'}"></i>
-                <span class="text-[11px] font-bold uppercase tracking-wider">${tool.name}</span>
+                <span class="text-[11px] font-bold uppercase tracking-wider">${tool.label}</span>
                 ${activeTool === tool.id ? '<div class="ml-auto w-1.5 h-1.5 rounded-full bg-violet-500 shadow-[0_0_10px_rgba(124,58,237,0.5)]"></div>' : ''}
             </button>
         `).join('');
@@ -90,7 +90,9 @@ function renderContent(animate = false) {
         case 'about': renderAboutSection(container); break;
         case 'cv': renderCVSection(container, themePanel, themeBorder); break;
         case 'color-lab': renderColorLab(container, isDarkMode); break;
-        case 'social': renderSocialMediaSection(container, themePanel, themeBorder); break;
+        case 'social':
+        case 'social-media':
+        case 'marketing': renderSocialMediaSection(container, themePanel, themeBorder); break;
         case 'illustrations': renderIllustrationsSection(container, themePanel, themeBorder); break;
         case 'photography': renderPhotographySection(container, themePanel, themeBorder); break;
         case 'contact': renderContactTool(container, themePanel, themeBorder); break;
@@ -101,21 +103,73 @@ function renderContent(animate = false) {
 function renderInspector() {
     const container = document.getElementById('inspector-scroll');
     if (!container) return;
+
+    const profileData = sidebarData.profile;
+    const skillsData = sidebarData.skills;
+
     container.innerHTML = `
         <div class="p-5 space-y-8">
+            <!-- Properties Panel -->
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-40">Propiedades</span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-40">Propiedades_Global</span>
                     <i data-lucide="settings-2" class="w-3 h-3 opacity-30"></i>
                 </div>
                 <div class="p-4 rounded-2xl bg-black/20 border border-white/5 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[9px] opacity-40 uppercase">Status</span>
-                        <div class="flex items-center gap-2">
-                             <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                             <span class="text-[9px] font-bold uppercase text-green-500">Online</span>
+                    ${profileData.items.map(item => `
+                        <div class="flex items-center justify-between">
+                            <span class="text-[9px] opacity-40 uppercase">${item.label}</span>
+                            ${item.isStatus ? `
+                                <div class="flex items-center gap-2">
+                                     <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                                     <span class="text-[9px] font-bold uppercase text-green-500">${item.value}</span>
+                                </div>
+                            ` : `
+                                <span class="text-[9px] font-bold uppercase">${item.value}</span>
+                            `}
                         </div>
-                    </div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <!-- Skills Progress -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-40">${skillsData.creativeTitle}</span>
+                    <i data-lucide="cpu" class="w-3 h-3 opacity-30"></i>
+                </div>
+                <div class="space-y-4">
+                    ${skillsData.creative.map(skill => `
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-[9px] uppercase font-bold tracking-wider">
+                                <span>${skill.name}</span>
+                                <span class="opacity-40">${skill.level}%</span>
+                            </div>
+                            <div class="h-1 bg-white/5 rounded-full overflow-hidden">
+                                <div class="h-full bg-violet-600 rounded-full" style="width: ${skill.level}%"></div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="space-y-4 pt-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-40">${skillsData.professionalTitle}</span>
+                    <i data-lucide="shield-check" class="w-3 h-3 opacity-30"></i>
+                </div>
+                <div class="space-y-4">
+                    ${skillsData.professional.map(skill => `
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-[9px] uppercase font-bold tracking-wider">
+                                <span>${skill.name}</span>
+                                <span class="opacity-40">${skill.level}%</span>
+                            </div>
+                            <div class="h-1 bg-white/5 rounded-full overflow-hidden">
+                                <div class="h-full bg-violet-600 rounded-full" style="width: ${skill.level}%"></div>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         </div>
