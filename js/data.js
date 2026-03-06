@@ -360,16 +360,4 @@ export const quizData = {
             health: "50%"
         }
     }
-},
-    contactData: {
-        title: "Hablemos de tu Proyecto",
-        subtitle: "Brief Interactivo",
-        nameLabel: "¿Cómo te llamas?",
-        namePlaceholder: "Tu nombre o empresa",
-        servicesLabel: "¿Qué necesitas?",
-        services: ['Branding', 'Web', 'Social', 'Otro'],
-        msgLabel: "Cuéntame más",
-        msgPlaceholder: "Detalles, sueños, fechas límite...",
-        btnSend: "Enviar Brief por WhatsApp"
-    }
 };
