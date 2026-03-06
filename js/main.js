@@ -60,22 +60,36 @@ function renderSiteContent() {
 
 // --- CORE RENDERERS ---
 function renderTools() {
-    const categories = ['system', 'creative', 'info'];
-    categories.forEach(cat => {
-        const list = document.getElementById(`${cat}-tools-list`);
-        if (!list) return;
-        list.innerHTML = tools.filter(t => t.category === cat).map(tool => `
-            <button onclick="setActiveTool('${tool.id}')" 
-                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group
-                ${activeTool === tool.id
-                ? 'bg-violet-600/10 text-violet-500 shadow-[inset_0_0_20px_rgba(124,58,237,0.05)]'
-                : 'text-stone-400 hover:bg-stone-500/5 hover:text-stone-200'}">
-                <i data-lucide="${tool.icon}" class="w-4 h-4 ${activeTool === tool.id ? 'opacity-100' : 'opacity-40 group-hover:opacity-70'}"></i>
-                <span class="text-[11px] font-bold uppercase tracking-wider">${tool.label}</span>
-                ${activeTool === tool.id ? '<div class="ml-auto w-1.5 h-1.5 rounded-full bg-violet-500 shadow-[0_0_10px_rgba(124,58,237,0.5)]"></div>' : ''}
+    const container = document.getElementById('tool-buttons');
+    if (!container) return;
+
+    // Sort tools by category order or just render them all
+    const catOrder = ['system', 'creative', 'info'];
+    const sortedTools = [...tools].sort((a, b) => catOrder.indexOf(a.category) - catOrder.indexOf(b.category));
+
+    container.innerHTML = sortedTools.map(tool => `
+        <button onclick="setActiveTool('${tool.id}')" id="tool-btn-${tool.id}"
+            class="w-12 h-12 flex items-center justify-center rounded-xl transition-all duration-300 group
+            ${activeTool === tool.id
+            ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20'
+            : 'text-stone-400 hover:bg-white/5 hover:text-white'}">
+            <i data-lucide="${tool.icon}" class="w-5 h-5"></i>
+            <!-- Mobile/Desktop Tooltip logic could go here, but focusing on visibility -->
+        </button>
+    `).join('');
+
+    // Also render mobile nav if needed
+    const mobileNav = document.getElementById('mobile-nav');
+    if (mobileNav) {
+        mobileNav.innerHTML = sortedTools.filter(t => t.category !== 'info').map(tool => `
+            <button onclick="setActiveTool('${tool.id}')"
+                class="flex flex-col items-center gap-1 ${activeTool === tool.id ? 'text-violet-500' : 'text-stone-500'}">
+                <i data-lucide="${tool.icon}" class="w-5 h-5"></i>
+                <span class="text-[8px] font-bold uppercase">${tool.label}</span>
             </button>
         `).join('');
-    });
+    }
+
     if (window.lucide) lucide.createIcons();
 }
 
@@ -101,7 +115,7 @@ function renderContent(animate = false) {
 }
 
 function renderInspector() {
-    const container = document.getElementById('inspector-scroll');
+    const container = document.getElementById('inspector');
     if (!container) return;
 
     const profileData = sidebarData.profile;
@@ -289,7 +303,7 @@ function applyTheme() {
     renderWindows();
 }
 
-window.toggleTheme = function () {
+window.toggleDarkMode = function () {
     isDarkMode = !isDarkMode;
     applyTheme();
 };
