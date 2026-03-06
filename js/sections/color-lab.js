@@ -242,6 +242,7 @@ export async function renderColorLab(container, currentBaseColor, isDarkMode, pi
                     </div>
                 </div>
             </div>
+
         </div>
     `;
 
