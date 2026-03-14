@@ -7,7 +7,7 @@ export function renderCVSection(container, themePanel, themeBorder) {
     const { profile, contact, experience, education, skills, downloadUrl, profileImage } = cvTool;
 
     let html = `
-        <div class="max-w-7xl mx-auto pb-24 font-sans text-stone-800 dark:text-stone-100 animate-fade-in-up">
+        <div id="cv-container" class="max-w-7xl mx-auto pb-24 font-sans text-stone-800 dark:text-stone-100 animate-fade-in-up">
             
             <!-- HEADER: Title & Download -->
             <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b-2 border-stone-200 dark:border-white/10 pb-6">
@@ -46,33 +46,33 @@ export function renderCVSection(container, themePanel, themeBorder) {
 
                     <!-- CONTACT INFO -->
                     <div class="${themePanel} border ${themeBorder} rounded-3xl p-8">
-                        <h4 class="text-sm font-black text-stone-400 dark:text-stone-400 uppercase tracking-widest mb-6">Contacto</h4>
-                        <ul class="space-y-4 text-sm font-medium text-stone-600 dark:text-stone-200">
+                        <h4 class="text-sm font-black text-stone-400 dark:text-white uppercase tracking-widest mb-6">Contacto</h4>
+                        <ul class="space-y-4 text-sm font-medium text-stone-600 dark:text-white">
                              <li class="flex items-center gap-4">
-                                <div class="w-10 h-10 shrink-0 rounded-full bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center text-violet-600 dark:text-violet-300">
+                                <div class="w-10 h-10 shrink-0 rounded-full bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center text-violet-600 dark:text-violet-400">
                                     <i data-lucide="phone" class="w-5 h-5"></i>
                                 </div>
-                                <span>${contact.phone}</span>
+                                <span class="dark:text-white">${contact.phone}</span>
                             </li>
                             <li class="flex items-center gap-4">
-                                <div class="w-10 h-10 shrink-0 rounded-full bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center text-violet-600 dark:text-violet-300">
+                                <div class="w-10 h-10 shrink-0 rounded-full bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center text-violet-600 dark:text-violet-400">
                                     <i data-lucide="mail" class="w-5 h-5"></i>
                                 </div>
-                                <span class="break-all">${contact.email}</span>
+                                <span class="break-all dark:text-white">${contact.email}</span>
                             </li>
                             <li class="flex items-center gap-4">
-                                <div class="w-10 h-10 shrink-0 rounded-full bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center text-violet-600 dark:text-violet-300">
+                                <div class="w-10 h-10 shrink-0 rounded-full bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center text-violet-600 dark:text-violet-400">
                                     <i data-lucide="linkedin" class="w-5 h-5"></i>
                                 </div>
-                                <a href="https://${contact.linkedin}" target="_blank" class="hover:text-violet-600 dark:hover:text-white transition-colors">${contact.user}</a>
+                                <a href="https://${contact.linkedin}" target="_blank" class="hover:text-violet-600 dark:text-white hover:dark:text-white transition-colors">${contact.user}</a>
                             </li>
                         </ul>
                     </div>
 
                     <!-- PROFILE SUMMARY -->
                     <div class="${themePanel} border ${themeBorder} rounded-3xl p-8">
-                        <h4 class="text-sm font-black text-stone-400 dark:text-stone-400 uppercase tracking-widest mb-4">Perfil Profesional</h4>
-                        <p class="text-stone-600 dark:text-stone-200 leading-relaxed text-sm">
+                        <h4 class="text-sm font-black text-stone-400 dark:text-white uppercase tracking-widest mb-4">Perfil Profesional</h4>
+                        <p class="text-stone-600 dark:text-white leading-relaxed text-sm">
                             ${profile.summary}
                         </p>
                     </div>
@@ -98,17 +98,17 @@ export function renderCVSection(container, themePanel, themeBorder) {
                                     <div class="${themePanel} border ${themeBorder} rounded-2xl p-6 md:p-8 hover:border-violet-400 dark:hover:border-violet-500/50 transition-colors">
                                         <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-2 mb-4">
                                             <div>
-                                                <h4 class="text-xl font-bold text-violet-900 dark:!text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">${job.role}</h4>
-                                                <p class="text-lg font-medium text-stone-500 dark:text-stone-300">${job.company}</p>
+                                                <h4 class="text-xl font-bold text-violet-900 dark:!text-white group-hover:text-violet-600 transition-colors">${job.role}</h4>
+                                                <p class="text-lg font-medium text-stone-500 dark:text-white">${job.company}</p>
                                             </div>
-                                            <span class="inline-block px-3 py-1 bg-violet-50 dark:bg-white/5 rounded-lg text-xs font-bold text-violet-700 dark:text-cyan-300 whitespace-nowrap">
+                                            <span class="inline-block px-3 py-1 bg-violet-50 dark:bg-white/20 rounded-lg text-xs font-bold text-violet-700 dark:text-white whitespace-nowrap">
                                                 ${job.period}
                                             </span>
                                         </div>
                                         
                                         <ul class="space-y-2">
                                             ${job.tasks.map(task => `
-                                                <li class="flex items-start gap-2 text-stone-700 dark:text-stone-200 text-sm leading-relaxed">
+                                                <li class="flex items-start gap-2 text-stone-700 dark:text-white text-sm leading-relaxed">
                                                     <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-violet-500 flex-shrink-0"></span>
                                                     ${task}
                                                 </li>
@@ -126,15 +126,15 @@ export function renderCVSection(container, themePanel, themeBorder) {
                         <!-- EDUCATION -->
                         <div>
                              <h3 class="flex items-center gap-3 text-2xl font-black italic text-stone-900 dark:!text-white mb-8">
-                                <i data-lucide="graduation-cap" class="w-6 h-6 text-violet-600 dark:text-cyan-400"></i>
+                                <i data-lucide="graduation-cap" class="w-6 h-6 text-violet-600 dark:text-violet-400"></i>
                                 FORMACIÓN
                             </h3>
                             <div class="space-y-4">
                                 ${education.map(edu => `
-                                    <div class="p-4 rounded-xl bg-stone-50 dark:bg-white/5 border border-stone-200 dark:border-white/10 hover:border-violet-400/50 dark:hover:border-cyan-400/50 transition-colors">
-                                        <p class="text-xs font-bold text-violet-600 dark:text-cyan-400 mb-1">${edu.period}</p>
-                                        <h5 class="font-bold text-violet-900 dark:text-violet-300 mb-1 leading-tight">${edu.degree}</h5>
-                                        <p class="text-sm text-stone-500 dark:text-stone-400">${edu.school}</p>
+                                    <div class="p-4 rounded-xl bg-stone-50 dark:bg-white/10 border border-stone-200 dark:border-white/20 hover:border-violet-400/50 transition-colors">
+                                        <p class="text-xs font-bold text-violet-600 dark:text-white mb-1">${edu.period}</p>
+                                        <h5 class="font-bold text-violet-900 dark:text-white mb-1 leading-tight">${edu.degree}</h5>
+                                        <p class="text-sm text-stone-500 dark:text-white">${edu.school}</p>
                                     </div>
                                 `).join('')}
                             </div>
@@ -143,15 +143,15 @@ export function renderCVSection(container, themePanel, themeBorder) {
                         <!-- SKILLS -->
                         <div>
                              <h3 class="flex items-center gap-3 text-2xl font-black italic text-stone-900 dark:!text-white mb-8">
-                                <i data-lucide="cpu" class="w-6 h-6 text-violet-600 dark:text-yellow-400"></i>
+                                <i data-lucide="cpu" class="w-6 h-6 text-violet-600 dark:text-violet-400"></i>
                                 HABILIDADES
                             </h3>
                             
                             <div class="mb-6">
-                                <h5 class="text-xs font-black uppercase text-stone-400 dark:text-stone-500 mb-3 tracking-widest">Técnicas</h5>
+                                <h5 class="text-xs font-black uppercase text-stone-400 dark:text-white mb-3 tracking-widest">Técnicas</h5>
                                 <div class="flex flex-wrap gap-2">
                                     ${skills.technical.map(skill => `
-                                        <span class="px-3 py-1 rounded-md bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-xs font-bold text-stone-600 dark:text-stone-300 hover:text-white hover:bg-violet-600 hover:border-violet-600 dark:hover:border-violet-500 transition-colors cursor-default">
+                                        <span class="px-3 py-1 rounded-md bg-stone-100 dark:bg-white/20 border border-stone-200 dark:border-white/30 text-xs font-bold text-stone-600 dark:text-white hover:text-white transition-colors cursor-default">
                                             ${skill}
                                         </span>
                                     `).join('')}
@@ -159,10 +159,10 @@ export function renderCVSection(container, themePanel, themeBorder) {
                             </div>
 
                             <div class="mb-6">
-                                <h5 class="text-xs font-black uppercase text-stone-400 dark:text-stone-500 mb-3 tracking-widest">Destrezas</h5>
+                                <h5 class="text-xs font-black uppercase text-stone-400 dark:text-white mb-3 tracking-widest">Destrezas</h5>
                                 <div class="flex flex-wrap gap-2">
                                     ${skills.soft.map(skill => `
-                                        <span class="px-3 py-1 rounded-md bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-xs font-bold text-stone-600 dark:text-stone-300 hover:text-white hover:bg-violet-500 hover:border-violet-500 dark:hover:border-cyan-400 transition-colors cursor-default">
+                                        <span class="px-3 py-1 rounded-md bg-stone-100 dark:bg-white/20 border border-stone-200 dark:border-white/30 text-xs font-bold text-stone-600 dark:text-white hover:text-white transition-colors cursor-default">
                                             ${skill}
                                         </span>
                                     `).join('')}
@@ -170,10 +170,10 @@ export function renderCVSection(container, themePanel, themeBorder) {
                             </div>
                             
                             <div>
-                                <h5 class="text-xs font-black uppercase text-stone-400 dark:text-stone-500 mb-3 tracking-widest">Experticia</h5>
+                                <h5 class="text-xs font-black uppercase text-stone-400 dark:text-white mb-3 tracking-widest">Experticia</h5>
                                 <div class="space-y-2">
                                      ${skills.areas.map(area => `
-                                        <div class="flex items-center gap-2 text-sm text-stone-600 dark:text-stone-300">
+                                        <div class="flex items-center gap-2 text-sm text-stone-600 dark:text-white">
                                             <i data-lucide="check-circle" class="w-3 h-3 text-green-600 dark:text-green-400"></i>
                                             ${area}
                                         </div>

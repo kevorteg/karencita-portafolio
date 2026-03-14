@@ -27,8 +27,14 @@ const illustrations = [
     },
 ];
 
+const illustrationVideos = [
+    { id: 'Jau4wpSdyRY', label: 'Proceso Creativo', tag: 'Edición & Motion' },
+];
+
 function ensureIllustrationModal() {
     if (document.getElementById('ill-modal')) return;
+
+    // IMAGE MODAL
     const modal = document.createElement('div');
     modal.id = 'ill-modal';
     modal.style.cssText = `
@@ -44,6 +50,22 @@ function ensureIllustrationModal() {
     modal.addEventListener('click', e => { if (e.target === modal) closeIllModal(); });
     document.body.appendChild(modal);
 
+    // VIDEO MODAL
+    const vModal = document.createElement('div');
+    vModal.id = 'ill-video-modal';
+    vModal.style.cssText = `
+        display:none; position:fixed; inset:0; z-index:9999;
+        align-items:center; justify-content:center;
+        background:rgba(0,0,0,0.95); backdrop-filter:blur(12px);
+        cursor:zoom-out;
+    `;
+    vModal.innerHTML = `
+        <button onclick="closeIllVideoModal()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:50%;width:36px;height:36px;color:white;cursor:pointer;font-size:16px;z-index:10;display:flex;align-items:center;justify-content:center;">✕</button>
+        <div id="ill-video-content" style="width:min(380px,90vw);aspect-ratio:9/16;border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.8);"></div>
+    `;
+    vModal.addEventListener('click', e => { if (e.target === vModal) closeIllVideoModal(); });
+    document.body.appendChild(vModal);
+
     window.openIllModal = function (src) {
         const modal = document.getElementById('ill-modal');
         document.getElementById('ill-modal-img').src = epath(src);
@@ -51,6 +73,17 @@ function ensureIllustrationModal() {
     };
     window.closeIllModal = function () {
         document.getElementById('ill-modal').style.display = 'none';
+    };
+    window.openIllVideoModal = function (ytId) {
+        const modal = document.getElementById('ill-video-modal');
+        const content = document.getElementById('ill-video-content');
+        content.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1&controls=1&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;height:100%;"></iframe>`;
+        modal.style.display = 'flex';
+    };
+    window.closeIllVideoModal = function () {
+        const modal = document.getElementById('ill-video-modal');
+        const content = document.getElementById('ill-video-content');
+        if (modal) { modal.style.display = 'none'; content.innerHTML = ''; }
     };
 }
 
@@ -118,6 +151,48 @@ export function renderIllustrationsSection(container, themePanel, themeBorder) {
                         </div>
                     </div>
 
+                    <!-- Corner index -->
+                    <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span class="font-serif italic text-white/50 text-sm">0${i + 1}</span>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+
+        <!-- VIDEOS SECTION -->
+        <div class="mb-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="h-[1px] w-8 bg-violet-600"></div>
+                <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-violet-600">Videos & Motion</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-24">
+            ${illustrationVideos.map((vid, i) => `
+                <div
+                    class="relative group cursor-pointer overflow-hidden rounded-2xl"
+                    style="aspect-ratio:9/16; background:#0f0c29;"
+                    onclick="openIllVideoModal('${vid.id}')"
+                >
+                    <img
+                        src="https://img.youtube.com/vi/${vid.id}/hqdefault.jpg"
+                        alt="${vid.label}"
+                        loading="lazy"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 group-hover:brightness-75"
+                    >
+                    <!-- Play button -->
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div class="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white transition-transform duration-300 group-hover:scale-110">
+                            <i data-lucide="play" class="w-5 h-5 ml-0.5" fill="currentColor"></i>
+                        </div>
+                    </div>
+                    <!-- Overlay info -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-400 flex items-end p-4">
+                        <div class="translate-y-3 group-hover:translate-y-0 transition-transform duration-300">
+                            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-violet-400 mb-1">${vid.tag}</p>
+                            <p class="text-white font-serif italic text-sm leading-tight">${vid.label}</p>
+                        </div>
+                    </div>
                     <!-- Corner index -->
                     <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
                         <span class="font-serif italic text-white/50 text-sm">0${i + 1}</span>

@@ -1,17 +1,17 @@
-import { tools, projects, sidebarData, tutorialSteps, siteContent } from './data.js';
-import { renderContactTool } from './contact.js';
-import { renderWindows } from './window-manager.js';
-import { renderAboutSection } from './sections/about.js';
-import { renderCVSection } from './sections/cv.js';
-import { renderColorLab } from './sections/color-lab.js';
-import { renderGallery } from './sections/gallery.js';
-import { renderSocialMediaSection } from './sections/social-media.js';
-import { renderIllustrationsSection } from './sections/illustrations.js';
-import { renderPhotographySection } from './sections/photography.js';
+import { tools, projects, sidebarData, tutorialSteps, siteContent } from './data.js?v=2';
+import { renderContactTool } from './contact.js?v=2';
+import { renderWindows } from './window-manager.js?v=2';
+import { renderAboutSection } from './sections/about.js?v=2';
+import { renderCVSection } from './sections/cv.js?v=2';
+import { renderColorLab } from './sections/color-lab.js?v=2';
+import { renderGallery } from './sections/gallery.js?v=2';
+import { renderSocialMediaSection } from './sections/social-media.js?v=2';
+import { renderIllustrationsSection } from './sections/illustrations.js?v=2';
+import { renderPhotographySection } from './sections/photography.js?v=2';
 
 import {
     hexToRgb, fetchColorName
-} from './color-studio.js';
+} from './color-studio.js?v=2';
 
 // --- UTILS ---
 window.copyToClipboard = function (text) {
@@ -57,6 +57,18 @@ window.renderSiteContent = function () {
     if (navCv) navCv.innerText = siteContent.header.navCv;
     const workText = document.getElementById('workspace-dtext');
     if (workText) workText.innerText = siteContent.tabs.workspace;
+    
+    // Welcome modal content
+    const welcomeTitle = document.getElementById('welcome-title');
+    if (welcomeTitle) welcomeTitle.innerHTML = siteContent.welcome.title;
+    const welcomeText = document.getElementById('welcome-text');
+    if (welcomeText) welcomeText.innerHTML = siteContent.welcome.text;
+    const welcomeBtn = document.getElementById('welcome-btn');
+    if (welcomeBtn) welcomeBtn.innerText = siteContent.welcome.btn;
+    const welcomeLabel = document.getElementById('welcome-label');
+    if (welcomeLabel) welcomeLabel.innerText = siteContent.welcome.label;
+    const welcomeCredits = document.getElementById('welcome-credits');
+    if (welcomeCredits) welcomeCredits.innerText = "Made with ❤️ and Code";
 };
 
 // --- CORE RENDERERS ---
@@ -73,7 +85,7 @@ window.renderTools = function () {
             class="w-full flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl transition-all duration-300
             ${activeTool === tool.id
             ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20'
-            : 'text-stone-400 dark:text-stone-400 hover:bg-violet-600/10 hover:text-violet-600'}">
+            : 'text-stone-400 dark:text-white/70 hover:bg-violet-600/10 hover:text-violet-600 dark:hover:text-violet-300'}">
             <i data-lucide="${tool.icon}" class="w-5 h-5 shrink-0"></i>
             <span class="text-[7px] font-bold uppercase tracking-wide leading-tight text-center w-full px-1">${tool.label}</span>
         </button>
@@ -102,7 +114,7 @@ window.renderContent = function (animate = false) {
     const themeBorder = isDarkMode ? 'border-indigo-900/30' : 'border-stone-200';
 
     switch (activeTool) {
-        case 'about': renderAboutSection(container); break;
+        case 'about': renderAboutSection(container, themePanel, themeBorder); break;
         case 'cv': renderCVSection(container, themePanel, themeBorder); break;
         case 'color':
         case 'color-lab': renderColorLab(container, currentBaseColor, isDarkMode, window._pickerState || { h: 280, s: 70, v: 70 }); break;
@@ -130,20 +142,20 @@ window.renderInspector = function () {
             <!-- Properties Panel -->
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-40">Propiedades_Global</span>
-                    <i data-lucide="settings-2" class="w-3 h-3 opacity-30"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">Propiedades_Global</span>
+                    <i data-lucide="settings-2" class="w-3 h-3 opacity-40"></i>
                 </div>
-                <div class="p-4 rounded-2xl bg-black/20 border border-white/5 space-y-3">
+                <div class="p-4 rounded-2xl bg-stone-100 dark:bg-[#13114A] border border-stone-200 dark:border-indigo-900/50 space-y-3">
                     ${profileData.items.map(item => `
                         <div class="flex items-center justify-between">
-                            <span class="text-[9px] opacity-40 uppercase">${item.label}</span>
+                            <span class="text-[9px] text-stone-400 dark:text-stone-400 uppercase font-semibold tracking-widest">${item.label}</span>
                             ${item.isStatus ? `
                                 <div class="flex items-center gap-2">
                                      <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
                                      <span class="text-[9px] font-bold uppercase text-green-500">${item.value}</span>
                                 </div>
                             ` : `
-                                <span class="text-[9px] font-bold uppercase">${item.value}</span>
+                                <span class="text-[9px] font-bold uppercase text-stone-700 dark:text-white">${item.value}</span>
                             `}
                         </div>
                     `).join('')}
@@ -153,8 +165,8 @@ window.renderInspector = function () {
             <!-- Skills Progress -->
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-40">${skillsData.creativeTitle}</span>
-                    <i data-lucide="cpu" class="w-3 h-3 opacity-30"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">${skillsData.creativeTitle}</span>
+                    <i data-lucide="cpu" class="w-3 h-3 opacity-40"></i>
                 </div>
                 <div class="space-y-4">
                     ${skillsData.creative.map(skill => `
@@ -163,7 +175,7 @@ window.renderInspector = function () {
                                 <span>${skill.name}</span>
                                 <span class="opacity-40">${skill.level}%</span>
                             </div>
-                            <div class="h-1 bg-white/5 rounded-full overflow-hidden">
+                            <div class="h-1 bg-stone-200 dark:bg-white/5 rounded-full overflow-hidden">
                                 <div class="h-full bg-violet-600 rounded-full" style="width: ${skill.level}%"></div>
                             </div>
                         </div>
@@ -173,8 +185,8 @@ window.renderInspector = function () {
             
             <div class="space-y-4 pt-4">
                 <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-40">${skillsData.professionalTitle}</span>
-                    <i data-lucide="shield-check" class="w-3 h-3 opacity-30"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">${skillsData.professionalTitle}</span>
+                    <i data-lucide="shield-check" class="w-3 h-3 opacity-40"></i>
                 </div>
                 <div class="space-y-4">
                     ${skillsData.professional.map(skill => `
@@ -183,7 +195,7 @@ window.renderInspector = function () {
                                 <span>${skill.name}</span>
                                 <span class="opacity-40">${skill.level}%</span>
                             </div>
-                            <div class="h-1 bg-white/5 rounded-full overflow-hidden">
+                            <div class="h-1 bg-stone-200 dark:bg-white/5 rounded-full overflow-hidden">
                                 <div class="h-full bg-violet-600 rounded-full" style="width: ${skill.level}%"></div>
                             </div>
                         </div>
@@ -252,13 +264,38 @@ window.setActiveTool = function (id) {
 };
 
 // Initialize picker state for Color Lab
-window._pickerState = window._pickerState || { h: 280, s: 70, v: 70 };
+window._pickerState = window._pickerState || hexToHSV('#5F259F');
+
+function hexToHSV(hex) {
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const d = max - min;
+    let h = 0;
+    if (d !== 0) {
+        if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        else if (max === g) h = ((b - r) / d + 2) / 6;
+        else h = ((r - g) / d + 4) / 6;
+    }
+    return {
+        h: Math.round(h * 360),
+        s: Math.round(max === 0 ? 0 : (d / max) * 100),
+        v: Math.round(max * 100)
+    };
+}
+
+// Silent update — updates currentBaseColor WITHOUT re-rendering (used during picker drag)
+window.setColorSilent = function (hex) {
+    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+    currentBaseColor = hex;
+    window._pickerState = hexToHSV(hex);
+};
 
 window.updateColor = function (hex) {
+    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
     currentBaseColor = hex;
-    // Update picker state to match new color
-    const { hexToHSL } = window._colorStudio || {};
-    window._pickerState = { h: 280, s: 70, v: 70 }; // will be refined when color-studio is loaded
+    window._pickerState = hexToHSV(hex);
     if (activeTool === 'color' || activeTool === 'color-lab') {
         renderContent(false);
     }
@@ -365,19 +402,54 @@ window.updateTutorialStep = function () {
     if (nextBtn) nextBtn.innerText = currentTutorialStep === tutorialSteps.length - 1 ? 'Finalizar' : 'Siguiente';
     if (skipBtn) skipBtn.innerText = 'Saltar';
 
-    // Spotlight logic placeholder or simple highlight
-    const target = document.getElementById(step.target);
-    if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        target.classList.add('ring-4', 'ring-violet-600', 'ring-offset-4', 'ring-offset-transparent');
-        setTimeout(() => target.classList.remove('ring-4', 'ring-violet-600', 'ring-offset-4'), 3000);
+    // Navigate to the relevant section if step has a toolId
+    if (step.toolId && step.toolId !== activeTool) {
+        activeTool = step.toolId;
+        localStorage.setItem('lastActiveTab', activeTool);
+        renderTools();
+        renderContent(false);
     }
 
-    // Animate card
+    // Highlight target element after possible re-render
+    setTimeout(() => {
+        const target = document.getElementById(step.target);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.classList.add('ring-4', 'ring-violet-600', 'ring-offset-4', 'ring-offset-transparent');
+            setTimeout(() => target.classList.remove('ring-4', 'ring-violet-600', 'ring-offset-4', 'ring-offset-transparent'), 2500);
+        }
+        // Position tutorial card next to the target
+        const card = document.getElementById('tutorial-card');
+        if (card && target) {
+            const rect = target.getBoundingClientRect();
+            const cardW = 288; // w-72
+            const margin = 12;
+            let left = rect.right + margin;
+            let top = rect.top + rect.height / 2 - 100;
+            if (left + cardW > window.innerWidth) left = rect.left - cardW - margin;
+            if (left < 8) left = 8;
+            if (top < 8) top = 8;
+            if (top + 220 > window.innerHeight) top = window.innerHeight - 230;
+            card.style.left = left + 'px';
+            card.style.top = top + 'px';
+            card.style.right = 'auto';
+        } else if (card) {
+            card.style.left = '50%';
+            card.style.top = '50%';
+            card.style.transform = 'translate(-50%, -50%)';
+        }
+    }, 150);
+
+    // Animate card in
     const card = document.getElementById('tutorial-card');
     if (card) {
-        card.style.opacity = '1';
-        card.style.transform = 'translateY(0)';
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(8px)';
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.3s, transform 0.3s';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 50);
     }
 }
 
