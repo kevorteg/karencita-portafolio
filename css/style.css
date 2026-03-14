@@ -25,11 +25,43 @@ body {
     color: white !important;
 }
 
-/* Reverted global text override to fix white-on-white issue */
-/* Targeted override for main headers in dark mode */
+/* Override for main section headings in dark mode — h4/h5 excluded to preserve label styles */
+.dark h1,
 .dark h2,
 .dark h3 {
-    color: white !important;
+    color: white;
+}
+
+/* General Fallback for Tailwind's dark text omitted by CDN missing dynamically injected scripts */
+.dark .dark\:text-white,
+html.dark .dark\:text-white {
+    color: #ffffff !important;
+}
+
+.dark .dark\:\!text-white,
+html.dark .dark\:\!text-white {
+    color: #ffffff !important;
+}
+
+/* Fallback for backgrounds omitted by CDN */
+.dark .dark\:bg-white\/20,
+html.dark .dark\:bg-white\/20 {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark .dark\:bg-white\/10,
+html.dark .dark\:bg-white\/10 {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .dark\:border-white\/20,
+html.dark .dark\:border-white\/20 {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark .dark\:border-white\/30,
+html.dark .dark\:border-white\/30 {
+    border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 .font-serif {
@@ -238,6 +270,13 @@ body {
     z-index: 99998;
 }
 
+/* Tutorial Card - fixed positioning for overlay */
 #tutorial-card {
+    position: fixed;
     z-index: 99999;
+    width: 288px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: all;
 }

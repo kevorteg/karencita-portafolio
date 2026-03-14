@@ -209,36 +209,43 @@ export const projects = [
 export const tutorialSteps = [
     {
         target: 'header',
+        toolId: 'about',
         title: 'Centro de Comando',
         text: 'Aquí controlas el sistema global. Cambia entre modo Día/Noche para descansar la vista y verifica tu estado de conexión.'
     },
     {
         target: 'sidebar',
+        toolId: 'about',
         title: 'Barra de Navegación',
         text: 'Tu menú principal. Cada ícono desbloquea una sección diferente: desde mi perfil y CV hasta Social Media, Fotografía e Ilustraciones.'
     },
     {
         target: 'tool-btn-marketing',
+        toolId: 'marketing',
         title: 'Social Media',
         text: 'Explora mi trabajo de gestión de redes. Verás las historias y posts de cada marca gestionada, con una interfaz estilo Instagram.'
     },
     {
         target: 'tool-btn-gallery',
+        toolId: 'gallery',
         title: 'Fotografía',
         text: 'Una colección curada de fotografía y moodboards visuales que complementan la estrategia de contenido.'
     },
     {
         target: 'tool-btn-color',
+        toolId: 'color',
         title: 'Color Lab',
         text: '¡La joya de la corona! Herramienta interactiva para diseñadores. Genera paletas, extrae colores de imágenes y verifica accesibilidad.'
     },
     {
         target: 'tabs-bar',
+        toolId: 'about',
         title: 'Multitarea',
         text: 'Gestiona tus "ventanas" abiertas. Puedes tener varios proyectos activos al mismo tiempo, como en un sistema operativo.'
     },
     {
         target: 'inspector',
+        toolId: 'about',
         title: 'Inspector de Propiedades',
         text: 'El panel de detalles. Aquí verás información contextual, mis habilidades y testimonios reales de clientes.'
     }

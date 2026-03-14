@@ -58,21 +58,68 @@ export function renderContactTool(container, themePanel, themeBorder) {
     container.innerHTML = html;
 }
 
-export function sendWhatsApp() {
-    const name = document.getElementById('contact-name').value;
-    const msg = document.getElementById('contact-msg').value;
-    const services = Array.from(document.querySelectorAll('input[name="service"]:checked')).map(el => el.value);
+// --- Security: sanitize text to prevent XSS / injection ---
+function sanitize(str) {
+    if (typeof str !== 'string') return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+        .replace(/\//g, '&#x2F;')
+        .trim()
+        .slice(0, 1000); // max length
+}
 
+function showContactError(msg) {
+    let err = document.getElementById('contact-error');
+    if (!err) {
+        err = document.createElement('div');
+        err.id = 'contact-error';
+        err.className = 'mt-4 px-4 py-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 rounded-xl text-sm font-bold';
+        const form = document.querySelector('#canvas-content form');
+        if (form) form.appendChild(err);
+    }
+    err.textContent = msg;
+    err.style.display = 'block';
+    setTimeout(() => { if (err) err.style.display = 'none'; }, 4000);
+}
+
+export function sendWhatsApp() {
+    const nameRaw = document.getElementById('contact-name')?.value || '';
+    const msgRaw = document.getElementById('contact-msg')?.value || '';
+    const services = Array.from(document.querySelectorAll('input[name="service"]:checked'))
+        .map(el => sanitize(el.value))
+        .filter(v => ['Branding', 'Web', 'Social', 'Otro'].includes(v)); // allowlist
+
+    // Sanitize
+    const name = sanitize(nameRaw);
+    const msg = sanitize(msgRaw);
+
+    // Validations
     if (!name) {
-        alert("Por favor dime tu nombre :)"); // Could be better but simple for now
+        showContactError('Por favor ingresa tu nombre para continuar 😊');
+        return;
+    }
+    if (name.length < 2 || name.length > 80) {
+        showContactError('El nombre debe tener entre 2 y 80 caracteres.');
+        return;
+    }
+    if (/[<>{}"';\\]/.test(nameRaw)) {
+        showContactError('El nombre contiene caracteres no permitidos.');
+        return;
+    }
+    if (msg.length > 800) {
+        showContactError('El mensaje es demasiado largo (máximo 800 caracteres).');
         return;
     }
 
-    let text = `Cordial saludos, ¿Cómo estás? 
-Te necesito Karen.... *${name}*.`;
+    let text = `Cordial saludos Karen, soy *${name}*.`;
 
     if (window.clientProfile) {
-        text += `\n\nHice tu diagnóstico y mi perfil es *${window.clientProfile}*.`;
+        const profile = sanitize(String(window.clientProfile));
+        text += `\n\nHice tu diagnóstico y mi perfil es *${profile}*.`;
     }
 
     if (services.length > 0) {
@@ -80,11 +127,11 @@ Te necesito Karen.... *${name}*.`;
     }
 
     if (msg) {
-        text += `\n\nCuéntame más: ${msg}`;
+        text += `\n\nDetalles: ${msg}`;
     }
 
     const encoded = encodeURIComponent(text);
-    window.open(`https://wa.me/5211234567890?text=${encoded}`, '_blank');
+    window.open(`https://wa.me/573164321424?text=${encoded}`, '_blank');
 }
 
 // Attach to global scope

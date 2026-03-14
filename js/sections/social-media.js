@@ -46,6 +46,11 @@ const brands = [
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/DISEÑAMOS/historias/5 MAR (1).png',
         ],
         posts: [
+            { type: 'youtube', id: 'nQJ09NBT9II' },
+            { type: 'youtube', id: 'weR1FtekZ8g' },
+            { type: 'youtube', id: 'N3B6DG9WGVg' },
+            { type: 'youtube', id: 'kRQ77aGxbiU' },
+            { type: 'youtube', id: 'eJO6wZzbPPQ' },
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/DISEÑAMOS/historias/6 MAR (1).png',
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/DISEÑAMOS/historias/7 MAR (1).png',
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/DISEÑAMOS/historias/8 MAR (1).png',
@@ -68,6 +73,8 @@ const brands = [
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/COOTRAIM/Captura de pantalla 2026-02-27 132230.png',
         ],
         posts: [
+            { type: 'youtube', id: '_Dy1sQKfzVU' },
+            { type: 'youtube', id: '1OgzZLUmmhE' },
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/COOTRAIM/Captura de pantalla 2026-02-27 132136.png',
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/COOTRAIM/Captura de pantalla 2026-02-27 132155.png',
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/COOTRAIM/Captura de pantalla 2026-02-27 132213.png',
@@ -88,6 +95,8 @@ const brands = [
         ],
         posts: [
             { type: 'youtube', id: 'jjwhMMT3iW0' },
+            { type: 'youtube', id: '_1hUjqZMUCQ' },
+            { type: 'youtube', id: 'zKXa705VUFA' },
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/CONFECOOP/BANNER CONFECOOP.jpg',
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/CONFECOOP/POST CONFECOOP 2.jpg',
             'assets/SOCIAL MEDIA/SOCIAL MEDIA/CONFECOOP/VOLANTE.jpg',
